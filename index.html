@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vishal Electricals | Outstanding Payment Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --bg:#07090f;--panel:#0e1420;--card:#131d2e;--card2:#182236;
+  --border:#1c2d44;--glow:#1a4070;
+  --a1:#00d4ff;--a2:#0066ff;--a3:#00ffb3;--a4:#ff6b35;--a5:#ffc107;--a6:#b44fff;
+  --red:#ff4040;--green:#00e676;--yellow:#ffd700;--muted:#5a7a9a;--sub:#8aa8c4;--txt:#ddeeff;
+  --sw:260px;--hh:60px;
+  font-size:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--panel)}
+::-webkit-scrollbar-thumb{background:var(--glow);border-radius:3px}
+
+/* SIDEBAR */
+#sb{position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:300;transition:transform .3s cubic-bezier(.4,0,.2,1);overflow:hidden}
+#sb::after{content:'';position:absolute;top:0;left:0;right:0;height:200px;background:linear-gradient(180deg,rgba(0,102,255,.06),transparent);pointer-events:none}
+.sb-logo{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sb-icon{width:40px;height:40px;background:linear-gradient(135deg,#003a99,#00d4ff);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;box-shadow:0 0 18px rgba(0,212,255,.25);flex-shrink:0}
+.sb-name{font-weight:700;font-size:13px;color:var(--a1);letter-spacing:.5px;line-height:1.3}
+.sb-sub{font-size:10px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.sb-search{padding:12px 14px;border-bottom:1px solid var(--border);position:relative}
+.sb-search input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px 7px 32px;color:var(--txt);font-size:12px;font-family:'Space Grotesk',sans-serif;outline:none;transition:border-color .2s}
+.sb-search input:focus{border-color:var(--a2)}
+.sb-search input::placeholder{color:var(--muted)}
+.sb-search .si{position:absolute;left:24px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:11px}
+.sb-nav{flex:1;overflow-y:auto;padding-bottom:8px}
+.sb-sec{padding:10px 18px 5px;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 18px;cursor:pointer;font-size:12px;font-weight:500;color:var(--sub);transition:all .18s;border-left:2px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ni:hover{background:rgba(0,212,255,.05);color:var(--txt);border-left-color:var(--a2)}
+.ni.active{background:rgba(0,212,255,.1);color:var(--a1);border-left-color:var(--a1)}
+.ni .ic{width:15px;text-align:center;font-size:11px;flex-shrink:0;color:inherit}
+.ni .bd{margin-left:auto;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:700;flex-shrink:0}
+.bd-red{background:rgba(255,64,64,.2);color:var(--red);border:1px solid rgba(255,64,64,.3)}
+.bd-green{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.bd-blue{background:rgba(0,212,255,.15);color:var(--a1);border:1px solid rgba(0,212,255,.25)}
+.sb-foot{padding:12px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#003a99,#00d4ff);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+
+/* MAIN */
+#main{margin-left:var(--sw);min-height:100vh;display:flex;flex-direction:column;transition:margin-left .3s}
+
+/* HEADER */
+#hdr{height:var(--hh);background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 22px;position:sticky;top:0;z-index:100}
+#menu-btn{display:none;background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer;padding:4px}
+.hdr-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--a1)}
+.hdr-bc{font-size:11px;color:var(--muted);margin-left:2px}
+.hdr-sp{flex:1}
+.hdr-acts{display:flex;align-items:center;gap:10px}
+.hdr-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.25);border-radius:20px;font-size:11px;font-weight:700;color:var(--green)}
+.hdr-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hdr-date{font-size:11px;color:var(--muted)}
+.btn-ic{width:34px;height:34px;background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sub);font-size:13px;transition:all .2s}
+.btn-ic:hover{border-color:var(--a2);color:var(--a1)}
+.csv-btn{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--a2),var(--a1));border:none;border-radius:8px;padding:7px 14px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:opacity .2s}
+.csv-btn:hover{opacity:.88}
+
+/* CONTENT */
+#content{flex:1;padding:20px;overflow-y:auto}
+.view{display:none}.view.active{display:block}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0b1628 0%,#0d2240 50%,#091830 100%);border:1px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-40px;width:350px;height:350px;background:radial-gradient(circle,rgba(0,102,255,.14),transparent 65%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-60px;left:30%;width:250px;height:250px;background:radial-gradient(circle,rgba(0,212,255,.07),transparent 65%);pointer-events:none}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.hero-h{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;line-height:1.1}
+.hero-h span{color:var(--a1)}
+.hero-sub{font-size:12px;color:var(--sub);margin-top:3px}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.hbadge{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.hb-blue{background:rgba(0,212,255,.12);color:var(--a1);border:1px solid rgba(0,212,255,.3)}
+.hb-orange{background:rgba(255,107,53,.12);color:var(--a4);border:1px solid rgba(255,107,53,.3)}
+.hb-green{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.hero-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+.hkpi{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.hkpi-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.hkpi-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--txt)}
+.hkpi-sub{font-size:10px;color:var(--sub);margin-top:3px}
+.hkpi.accent{border-color:var(--a2)}
+.hkpi.accent .hkpi-val{color:var(--a1)}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;cursor:default;transition:transform .2s,box-shadow .2s,border-color .2s;transform-style:preserve-3d}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc,var(--a1))}
+.kpi:hover{transform:translateY(-3px) rotateX(3deg);box-shadow:0 14px 40px rgba(0,0,0,.3);border-color:var(--kc,var(--a1))}
+.kpi-ic{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--kc,var(--a1));margin-bottom:10px}
+.kpi-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.kpi-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700}
+.kpi-sub{font-size:10px;color:var(--sub);margin-top:4px}
+.kpi-bg{position:absolute;right:-8px;bottom:-8px;font-size:65px;opacity:.04;color:var(--kc,var(--a1))}
+
+/* PANELS */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.row2.wide{grid-template-columns:2fr 1fr}
+.row2.full{grid-template-columns:1fr}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.ph{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.ph-title{font-weight:700;font-size:14px;letter-spacing:.3px}
+.pb{font-size:9px;padding:2px 8px;border-radius:10px;font-weight:700}
+.pb-blue{background:rgba(0,212,255,.12);color:var(--a1);border:1px solid rgba(0,212,255,.25)}
+.pb-green{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.pb-orange{background:rgba(255,107,53,.12);color:var(--a4);border:1px solid rgba(255,107,53,.25)}
+.pb-purple{background:rgba(180,79,255,.12);color:var(--a6);border:1px solid rgba(180,79,255,.25)}
+.pa{margin-left:auto;display:flex;gap:7px}
+.pa-btn{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:10px;color:var(--sub);cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif;font-weight:500}
+.pa-btn:hover{border-color:var(--a2);color:var(--a1)}
+.pb-body{padding:14px 18px}
+
+/* TABLE */
+.tw{overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:11px}
+table.dt th{background:var(--card2);padding:9px 11px;text-align:left;color:var(--muted);font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2}
+table.dt td{padding:9px 11px;border-bottom:1px solid rgba(28,45,68,.5);color:var(--sub);white-space:nowrap;font-size:11px}
+table.dt td.mono{font-family:'JetBrains Mono',monospace;font-size:10px}
+table.dt td.txt{font-size:11px;font-family:'Space Grotesk',sans-serif}
+table.dt tr:hover td{background:rgba(0,212,255,.03);color:var(--txt)}
+.pos{color:var(--green)!important}.neg{color:var(--red)!important}.neu{color:var(--yellow)!important}
+.acts{display:flex;gap:5px}
+.ab{padding:3px 8px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;border:1px solid;transition:all .18s;font-family:'Space Grotesk',sans-serif;letter-spacing:.3px}
+.vb{border-color:var(--a2);color:var(--a1);background:rgba(0,102,255,.08)}
+.vb:hover{background:rgba(0,102,255,.22)}
+.eb{border-color:var(--a5);color:var(--a5);background:rgba(255,193,7,.08)}
+.eb:hover{background:rgba(255,193,7,.22)}
+.stt{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.stt-r{background:rgba(255,64,64,.15);color:var(--red)}
+.stt-g{background:rgba(0,230,118,.15);color:var(--green)}
+.stt-y{background:rgba(255,208,0,.15);color:var(--yellow)}
+.stt-p{background:rgba(180,79,255,.15);color:var(--a6)}
+
+/* BAR CHART */
+.bar-wrap{padding:4px 0}
+.bar-item{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-lbl{width:110px;font-size:10px;color:var(--sub);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:7px;background:var(--card2);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.bar-val{width:90px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sub);text-align:right}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:16px;padding:4px 0}
+.legend{flex:1}
+.leg-item{display:flex;align-items:center;gap:7px;margin-bottom:8px;font-size:11px}
+.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.leg-lbl{color:var(--sub);flex:1}
+.leg-val{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt)}
+.leg-pct{font-size:9px;color:var(--muted);margin-left:4px}
+
+/* AGEING BANDS */
+.age-band{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(28,45,68,.4)}
+.age-band:last-child{border-bottom:none}
+.age-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.age-info{flex:1}
+.age-lbl{font-size:12px;font-weight:600}
+.age-cnt{font-size:10px;color:var(--muted);margin-top:2px}
+.age-amt{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700}
+.age-bar{height:4px;border-radius:2px;margin-top:5px;transition:width 1s ease}
+
+/* MODAL */
+.mbd{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+.mbd.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:860px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.7);animation:mIn .22s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mh{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.mt{font-weight:700;font-size:15px;letter-spacing:.3px}
+.mcl{margin-left:auto;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.mcl:hover{background:var(--card2);color:var(--txt)}
+.mb{flex:1;overflow-y:auto;padding:20px}
+.mf{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.btn{padding:9px 18px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;letter-spacing:.3px}
+.btn-p{background:linear-gradient(135deg,var(--a2),var(--a1));color:#fff}
+.btn-s{background:var(--card2);border:1px solid var(--border);color:var(--sub)}
+.btn-s:hover{border-color:var(--a2);color:var(--txt)}
+.btn-d{background:rgba(255,64,64,.12);border:1px solid var(--red);color:var(--red)}
+
+/* FORM */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fgrp{display:flex;flex-direction:column;gap:5px}
+.fgrp.full{grid-column:1/-1}
+.flbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.fin{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;color:var(--txt);font-size:12px;font-family:'Space Grotesk',sans-serif;outline:none;transition:border-color .2s;width:100%}
+.fin:focus{border-color:var(--a2)}
+.fin::placeholder{color:var(--muted)}
+
+/* DETAIL GRID */
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.dg-cell{padding:10px 12px;border-bottom:1px solid var(--border)}
+.dg-cell:nth-child(odd){background:rgba(255,255,255,.01)}
+.dg-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.dg-val{font-size:12px;color:var(--txt);font-family:'JetBrains Mono',monospace}
+
+/* TOAST */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:12px;display:flex;align-items:center;gap:9px;z-index:2000;transform:translateY(80px);opacity:0;transition:all .28s;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:300px}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.success{border-color:var(--green)}
+#toast.error{border-color:var(--red)}
+
+/* FINANCE WEEKLY */
+.fw-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.fw-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:700}
+.fw-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(28,45,68,.4);font-size:12px}
+.fw-row:last-child{border-bottom:none}
+.fw-lbl{color:var(--sub)}
+.fw-val{font-family:'JetBrains Mono',monospace;color:var(--txt);font-weight:600}
+
+/* SITE SHEET VIEW */
+.jharsuguda-table{font-size:11px}
+
+/* OVERLAY */
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(2px)}
+
+/* RESPONSIVE */
+@media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.hero-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.row2,.row2.wide{grid-template-columns:1fr}}
+@media(max-width:768px){
+  #sb{transform:translateX(-100%)}
+  #sb.open{transform:translateX(0);box-shadow:12px 0 40px rgba(0,0,0,.6)}
+  #main{margin-left:0}
+  #menu-btn{display:block}
+  #overlay.open{display:block}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  #content{padding:14px}
+  .hero-kpis{grid-template-columns:1fr 1fr}
+  .hero-h{font-size:24px}
+  .fg{grid-template-columns:1fr}
+  .dg{grid-template-columns:1fr}
+  .hdr-date{display:none}
+}
+@media(max-width:480px){.kpi-grid{grid-template-columns:1fr}.hero-kpis{grid-template-columns:1fr}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .45s ease both}
+.fu:nth-child(1){animation-delay:.04s}.fu:nth-child(2){animation-delay:.08s}
+.fu:nth-child(3){animation-delay:.12s}.fu:nth-child(4){animation-delay:.16s}
+.fu:nth-child(5){animation-delay:.2s}.fu:nth-child(6){animation-delay:.24s}
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<div id="sb">
+  <div class="sb-logo">
+    <div class="sb-icon">VE</div>
+    <div>
+      <div class="sb-name">Vishal Electricals</div>
+      <div class="sb-sub">Payment Tracker</div>
+    </div>
+  </div>
+  <div class="sb-search">
+    <i class="fa fa-search si"></i>
+    <input type="text" id="srch" placeholder="Search sites...">
+  </div>
+  <div class="sb-nav" id="sbNav">
+    <div class="sb-sec">Overview</div>
+    <div class="ni active" data-view="dashboard"><i class="fa fa-gauge-high ic"></i>Dashboard<span class="bd bd-blue">LIVE</span></div>
+    <div class="ni" data-view="summary"><i class="fa fa-list ic"></i>All Sites Summary</div>
+    <div class="ni" data-view="ageing"><i class="fa fa-clock ic"></i>Ageing Analysis</div>
+    <div class="ni" data-view="daywise"><i class="fa fa-calendar-days ic"></i>Daywise Outstanding</div>
+    <div class="ni" data-view="finance"><i class="fa fa-chart-line ic"></i>Finance Weekly</div>
+    <div class="ni" data-view="revenue"><i class="fa fa-file-invoice ic"></i>VE Revenue 26-27</div>
+    <div class="sb-sec" style="margin-top:6px">Site Sheets</div>
+    <div id="siteNavItems"></div>
+  </div>
+  <div class="sb-foot">
+    <div class="av">AD</div>
+    <div>
+      <div style="font-size:12px;font-weight:700">Admin</div>
+      <div style="font-size:10px;color:var(--muted)">Edit Access Active</div>
+    </div>
+    <i class="fa fa-ellipsis-v" style="margin-left:auto;color:var(--muted);cursor:pointer"></i>
+  </div>
+</div>
+<div id="overlay"></div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="hdr">
+    <button id="menu-btn"><i class="fa fa-bars"></i></button>
+    <div>
+      <div class="hdr-title">VISHAL ELECTRICALS</div>
+      <div class="hdr-bc" id="bc">/ Dashboard</div>
+    </div>
+    <div class="hdr-sp"></div>
+    <div class="hdr-acts">
+      <div class="hdr-pill"><div class="dot"></div>Live Data</div>
+      <div class="hdr-date">As on 20 May 2026</div>
+      <button class="btn-ic" onclick="openEdit(null,'new')" title="Add Entry"><i class="fa fa-plus"></i></button>
+      <button class="btn-ic" title="Export"><i class="fa fa-download"></i></button>
+      <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTIdqeYJVJRbkK0rk1OPzE2nWRdyfseDrLs0UXoSZf9i3Jq_CJBdNR1eMRJGLl49eRa2FXJWbbHsoiH/pub?output=csv" target="_blank">
+        <button class="csv-btn"><i class="fa fa-table"></i>CSV Source</button>
+      </a>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- DASHBOARD VIEW -->
+    <div class="view active" id="view-dashboard">
+      <div class="hero fu">
+        <div class="hero-top">
+          <div>
+            <div class="hero-h">Outstanding Payment <span>Break-Up</span></div>
+            <div class="hero-sub">Vishal Electricals — Multi-Site Financial Tracker | As on May 2026</div>
+            <div class="hero-badges">
+              <div class="hbadge hb-blue">43 Active Sites</div>
+              <div class="hbadge hb-orange">₹5.17 Cr Total Outstanding</div>
+              <div class="hbadge hb-green">Live Google Sheet</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-kpis">
+          <div class="hkpi accent">
+            <div class="hkpi-lbl">Total Outstanding</div>
+            <div class="hkpi-val">₹5,16,99,620</div>
+            <div class="hkpi-sub">Across all 43 sites</div>
+          </div>
+          <div class="hkpi">
+            <div class="hkpi-lbl">Pending Bill Amount</div>
+            <div class="hkpi-val" style="color:var(--a4)">₹1,65,37,258</div>
+            <div class="hkpi-sub">Unbilled / pending</div>
+          </div>
+          <div class="hkpi">
+            <div class="hkpi-lbl">SD Deduction</div>
+            <div class="hkpi-val" style="color:var(--yellow)">₹1,04,06,153</div>
+            <div class="hkpi-sub">Security deposit held</div>
+          </div>
+          <div class="hkpi">
+            <div class="hkpi-lbl">LD Deduction</div>
+            <div class="hkpi-val" style="color:var(--red)">₹1,58,57,083</div>
+            <div class="hkpi-sub">Liquidated damages</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi fu" style="--kc:#00d4ff"><div class="kpi-ic"><i class="fa fa-building"></i></div><div class="kpi-lbl">Active Sites</div><div class="kpi-val">43</div><div class="kpi-sub">Across India</div><div class="kpi-bg"><i class="fa fa-building"></i></div></div>
+        <div class="kpi fu" style="--kc:#ff6b35"><div class="kpi-ic"><i class="fa fa-file-invoice-dollar"></i></div><div class="kpi-lbl">Withheld Amount</div><div class="kpi-val">₹76.41L</div><div class="kpi-sub">Comm. work pending</div><div class="kpi-bg"><i class="fa fa-file-invoice-dollar"></i></div></div>
+        <div class="kpi fu" style="--kc:#ffc107"><div class="kpi-ic"><i class="fa fa-hourglass-half"></i></div><div class="kpi-lbl">180+ Days Ageing</div><div class="kpi-val">35 Sites</div><div class="kpi-sub">Requires urgent follow-up</div><div class="kpi-bg"><i class="fa fa-hourglass-half"></i></div></div>
+        <div class="kpi fu" style="--kc:#00e676"><div class="kpi-ic"><i class="fa fa-bolt"></i></div><div class="kpi-lbl">Instant Release</div><div class="kpi-val">₹80,566</div><div class="kpi-sub">Ready for disbursement</div><div class="kpi-bg"><i class="fa fa-bolt"></i></div></div>
+      </div>
+
+      <div class="row2 wide">
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Top Outstanding Sites</div><span class="pb pb-orange">By Total Amount</span><div class="pa"><button class="pa-btn" onclick="showView('summary')">View All →</button></div></div>
+          <div class="tw"><table class="dt" id="topSitesTable"></table></div>
+        </div>
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Outstanding Breakup</div><span class="pb pb-blue">Components</span></div>
+          <div class="pb-body" id="breakupChart"></div>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">PM-wise Outstanding</div><span class="pb pb-purple">By Manager</span></div>
+          <div class="pb-body" id="pmChart"></div>
+        </div>
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Ageing Buckets</div><span class="pb pb-green">Days Outstanding</span></div>
+          <div class="pb-body" id="ageingBuckets"></div>
+        </div>
+      </div>
+
+      <!-- Jharsuguda Sheet Preview -->
+      <div class="panel fu" style="margin-top:0">
+        <div class="ph">
+          <div class="ph-title">IOCL JHARSUGUDA — Bill & Payment Details</div>
+          <span class="pb pb-blue">Site Sheet</span>
+          <div class="pa">
+            <button class="pa-btn" onclick="openEdit(null,'Jharsuguda')"><i class="fa fa-plus"></i> Add</button>
+            <button class="pa-btn" onclick="showSiteView('Jharsuguda')">Full View →</button>
+          </div>
+        </div>
+        <div class="tw" id="jharsugudaPreview"></div>
+      </div>
+    </div>
+
+    <!-- SUMMARY VIEW -->
+    <div class="view" id="view-summary">
+      <div class="panel fu">
+        <div class="ph">
+          <div class="ph-title">All Sites — Outstanding Payment Summary</div>
+          <span class="pb pb-blue">43 Sites</span>
+          <div class="pa">
+            <button class="pa-btn" onclick="openEdit(null,'new')"><i class="fa fa-plus"></i> Add</button>
+            <button class="pa-btn" id="sortBtn" onclick="toggleSort()"><i class="fa fa-sort-amount-down"></i> Sort</button>
+          </div>
+        </div>
+        <div class="tw" id="summaryTable"></div>
+      </div>
+    </div>
+
+    <!-- AGEING VIEW -->
+    <div class="view" id="view-ageing">
+      <div class="row2">
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Ageing Analysis</div><span class="pb pb-orange">Days Outstanding</span></div>
+          <div class="pb-body" id="ageingDetail"></div>
+        </div>
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Ageing Summary</div><span class="pb pb-blue">Bucket Totals</span></div>
+          <div class="pb-body" id="ageingSummary"></div>
+        </div>
+      </div>
+      <div class="panel fu">
+        <div class="ph"><div class="ph-title">Site-wise Ageing Detail</div></div>
+        <div class="tw" id="ageingTable"></div>
+      </div>
+    </div>
+
+    <!-- DAYWISE VIEW -->
+    <div class="view" id="view-daywise">
+      <div class="panel fu">
+        <div class="ph"><div class="ph-title">Debtors Outstanding — Day-wise</div><span class="pb pb-blue">As on 20/05/2026</span></div>
+        <div class="tw" id="daywiseTable"></div>
+      </div>
+    </div>
+
+    <!-- FINANCE WEEKLY VIEW -->
+    <div class="view" id="view-finance">
+      <div class="row2">
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Finance Weekly Review</div><span class="pb pb-green">May 2026</span></div>
+          <div class="pb-body" id="financeCards"></div>
+        </div>
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Cash Block Bifurcation</div><span class="pb pb-orange">As on Apr 2026</span></div>
+          <div class="pb-body" id="cashBlock"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE VIEW -->
+    <div class="view" id="view-revenue">
+      <div class="panel fu">
+        <div class="ph"><div class="ph-title">VE Revenue 2026-27</div><span class="pb pb-green">Current FY</span><div class="pa"><button class="pa-btn" onclick="openEdit(null,'revenue')"><i class="fa fa-plus"></i> Add Invoice</button></div></div>
+        <div class="tw" id="revenueTable"></div>
+      </div>
+    </div>
+
+    <!-- SITE DETAIL VIEW -->
+    <div class="view" id="view-site">
+      <div class="panel fu">
+        <div class="ph">
+          <div class="ph-title" id="siteViewTitle">Site</div>
+          <span class="pb pb-blue" id="siteViewPM"></span>
+          <div class="pa">
+            <button class="pa-btn" onclick="openEdit(null, currentSite)"><i class="fa fa-plus"></i> Add</button>
+            <button class="pa-btn" onclick="openSheetLink()"><i class="fab fa-google"></i> Sheets</button>
+          </div>
+        </div>
+        <div class="tw" id="siteDetailTable"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="mbd" id="detailModal">
+  <div class="modal" style="max-width:700px">
+    <div class="mh"><i class="fa fa-eye" style="color:var(--a1)"></i><div class="mt">Record Detail</div><button class="mcl" onclick="closeM('detailModal')"><i class="fa fa-xmark"></i></button></div>
+    <div class="mb" id="detailBody"></div>
+    <div class="mf"><button class="btn btn-s" onclick="closeM('detailModal')">Close</button><button class="btn btn-p" onclick="switchToEdit()"><i class="fa fa-pen"></i> Edit</button></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="mbd" id="editModal">
+  <div class="modal">
+    <div class="mh"><i class="fa fa-pen" style="color:var(--a5)"></i><div class="mt" id="editTitle">Edit Record</div><button class="mcl" onclick="closeM('editModal')"><i class="fa fa-xmark"></i></button></div>
+    <div class="mb" id="editBody"></div>
+    <div class="mf"><button class="btn btn-s" onclick="closeM('editModal')">Cancel</button><button class="btn btn-p" onclick="saveRec()"><i class="fa fa-floppy-disk"></i> Save</button></div>
+  </div>
+</div>
+
+<div id="toast"><i class="fa fa-circle-check" id="ticon"></i><span id="tmsg">Saved</span></div>
+
+<script>
+// ============================================================
+// REAL DATA
+// ============================================================
+const SUMMARY = [
+  {sno:1,site:"IOCL MATHURA BDFP",pm:"Vicky",pending:0,sd:0,ld:1143938.95,gst:0,instant:0,other:0,withheld:0,total:1143938.95},
+  {sno:2,site:"IOCL PANIPAT DO",pm:"Chandrashekhar",pending:0,sd:0,ld:358778.71,gst:0,instant:0,other:0,withheld:0,total:358778.71},
+  {sno:3,site:"IOCL SALEM",pm:"Ravi",pending:817313.81,sd:4159.40,ld:0,gst:0,instant:0,other:0,withheld:0,total:821473.21},
+  {sno:4,site:"IOCL COIMBATORE",pm:"Ravi",pending:0,sd:0,ld:0,gst:0,instant:0,other:0,withheld:593380.89,total:593380.89},
+  {sno:5,site:"IOCL TRICHY",pm:"Ravi",pending:776915.86,sd:0,ld:0,gst:0,instant:0,other:0,withheld:0,total:776915.86},
+  {sno:6,site:"IOCL MADURAI",pm:"Ravi",pending:226311.61,sd:0.003,ld:0,gst:0,instant:0,other:0,withheld:81055.95,total:226311.62},
+  {sno:7,site:"IOCL CHENNAI",pm:"Ravi",pending:0,sd:905314.25,ld:989416.45,gst:0,instant:0,other:0,withheld:614480,total:2509210.70},
+  {sno:8,site:"IOCL HISSAR",pm:"Ravi",pending:2054704.29,sd:0,ld:1145966.13,gst:0,instant:0,other:0,withheld:0,total:3200670.42},
+  {sno:9,site:"IOCL PANIPAT REFINERY",pm:"Chandrashekhar",pending:3907136.72,sd:37208.44,ld:1394719.05,gst:0,instant:0,other:369114.64,withheld:0,total:5708178.85},
+  {sno:10,site:"IOCL BARAUNI",pm:"Vicky",pending:273215.16,sd:0,ld:999625.16,gst:0,instant:0,other:0,withheld:0,total:1272840.32},
+  {sno:11,site:"IOCL KANPUR",pm:"Chandrashekhar",pending:0,sd:0,ld:921902.65,gst:0,instant:0,other:0,withheld:0,total:921902.65},
+  {sno:12,site:"IOCL HOWRAH",pm:"Vicky",pending:0,sd:139834.52,ld:0,gst:0,instant:0,other:0,withheld:0,total:139834.52},
+  {sno:13,site:"IOCL LONI",pm:"Chandrashekhar",pending:0,sd:0,ld:441100.30,gst:0,instant:0,other:0,withheld:0,total:441100.30},
+  {sno:14,site:"IOCL JATNI",pm:"Ravi",pending:0,sd:0,ld:739952.21,gst:0,instant:0,other:0,withheld:0,total:739952.21},
+  {sno:15,site:"IOCL PARADEEP AUTO",pm:"Ravi",pending:0,sd:0,ld:292393,gst:0,instant:0,other:0,withheld:0,total:292393},
+  {sno:16,site:"IOCL AHMEDNAGAR",pm:"Chandrashekhar",pending:4622247.53,sd:1087388.61,ld:0,gst:0,instant:0,other:0,withheld:0,total:5709636.14},
+  {sno:17,site:"IOCL ALLAHABAD",pm:"Chandrashekhar",pending:0,sd:478849.64,ld:685785.03,gst:0,instant:0,other:0,withheld:0,total:1164634.67},
+  {sno:18,site:"IOCL KHUNTI",pm:"Vicky",pending:0,sd:91765,ld:824686,gst:0,instant:80565.99,other:0,withheld:0,total:997016.99},
+  {sno:19,site:"IOCL JHARSUGUDA",pm:"Ravi",pending:1564080.45,sd:0,ld:928887.91,gst:0,instant:0,other:0,withheld:0,total:2492968.36},
+  {sno:20,site:"IOCL NASHIK",pm:"Ravi",pending:0,sd:500213.15,ld:186372.13,gst:0,instant:0,other:0,withheld:0,total:686585.28},
+  {sno:21,site:"HPCL LONI",pm:"Ravi",pending:0,sd:215597.68,ld:297091,gst:0,instant:0,other:0,withheld:0,total:512688.68},
+  {sno:22,site:"NFC KOTA TOWNSHIP",pm:"Chandrashekhar",pending:0,sd:164005.78,ld:0,gst:0,instant:0,other:0,withheld:0,total:164005.78},
+  {sno:23,site:"NFC KOTA",pm:"Chandrashekhar",pending:0,sd:1073156.58,ld:0,gst:0,instant:0,other:0,withheld:0,total:1073156.58},
+  {sno:24,site:"NFC HYDERABAD",pm:"Vicky",pending:0,sd:949417.48,ld:0,gst:0,instant:0,other:0,withheld:0,total:949417.48},
+  {sno:25,site:"IOCL MUMBAI DO",pm:"Ravi",pending:995139.73,sd:433343.59,ld:0,gst:0,instant:0,other:0,withheld:0,total:1428483.32},
+  {sno:26,site:"GENPACT GURGAON",pm:"Ravi",pending:0,sd:0,ld:0,gst:0,instant:0,other:0,withheld:0,total:0},
+  {sno:27,site:"IOCL SARPARA",pm:"Chandrashekhar",pending:6907.62,sd:24578.51,ld:329297.53,gst:0,instant:0,other:0,withheld:0,total:360783.66},
+  {sno:28,site:"IOCL MORADABAD DO",pm:"Chandrashekhar",pending:0,sd:249925.38,ld:77648.16,gst:0,instant:0,other:0,withheld:50000,total:377573.54},
+  {sno:29,site:"Transrail Lighting",pm:"Vicky",pending:384450,sd:0,ld:0,gst:0,instant:0,other:0,withheld:1299025,total:1683475},
+  {sno:30,site:"IOCL BANGALORE",pm:"Ravi",pending:0,sd:0,ld:0,gst:0,instant:0,other:0,withheld:0,total:0},
+  {sno:31,site:"IOCL VIZAG",pm:"Chandrashekhar",pending:267548.59,sd:0,ld:149126,gst:0,instant:0,other:0,withheld:0,total:416674.59},
+  {sno:32,site:"IOCL RAIPUR",pm:"Ravi",pending:0,sd:451274.03,ld:0,gst:0,instant:0,other:0,withheld:0,total:451274.03},
+  {sno:33,site:"IOCL BHATINDA",pm:"Chandrashekhar",pending:0,sd:0,ld:271950.26,gst:0,instant:0,other:0,withheld:0,total:271950.26},
+  {sno:34,site:"IOCL SECUNDERABAD",pm:"Chandrashekhar",pending:0,sd:0,ld:146115.33,gst:0,instant:0,other:0,withheld:0,total:146115.33},
+  {sno:35,site:"IOCL WARANGAL",pm:"Chandrashekhar",pending:0,sd:0,ld:139825.57,gst:0,instant:0,other:0,withheld:0,total:139825.57},
+  {sno:36,site:"IOCL TIRUPATI",pm:"Chandrashekhar",pending:371062.8,sd:0,ld:298192.64,gst:0,instant:0,other:0,withheld:0,total:669255.44},
+  {sno:37,site:"IOCL NIZAMABAD",pm:"Chandrashekhar",pending:0,sd:0,ld:189657.72,gst:0,instant:0,other:0,withheld:0,total:189657.72},
+  {sno:38,site:"IOCL VIJAYWADA",pm:"Chandrashekhar",pending:0,sd:50524.11,ld:272033.43,gst:0,instant:0,other:0,withheld:0,total:322557.54},
+  {sno:39,site:"AAI AMRITSAR",pm:"Vicky",pending:0,sd:288622.5,ld:0,gst:0,instant:0,other:0,withheld:0,total:288622.5},
+  {sno:40,site:"IOCL PARADEEP HM",pm:"Ravi",pending:0,sd:1374309.85,ld:458545.14,gst:0,instant:0,other:890000,withheld:0,total:2722854.99},
+  {sno:41,site:"PARADIP PORT AUTH",pm:"Keshav",pending:0,sd:1521853,ld:2174077,gst:0,instant:0,other:0,withheld:4468402,total:8164332},
+  {sno:42,site:"NTPC DADRI",pm:"Vicky",pending:270223.78,sd:364811,ld:0,gst:0,instant:0,other:0,withheld:145924,total:780958.78},
+  {sno:43,site:"GAIL VIJAIPUR",pm:"Ravi",pending:0,sd:0,ld:0,gst:0,instant:0,other:0,withheld:388234.35,total:388234.35},
+];
+
+const JHARSUGUDA_BILLS = [
+  {sno:1,party:"Indian Oil Corporation Ltd- Jharsuguda",inv:"VE/24-25/49",date:"05.10.2024",taxable:2433506.17,gst:438031.11,total:2871537.28,pdate:"23.10.2024",received:1825129.69,gstTds:48670.12,itTds:24335,interest:0,sd:973402.47,dd:0,ld:0,short:0,link:"https://drive.google.com/file/d/1p2Z6klaS6VIGT3yADtkPbDpEYpMhoUUb/view"},
+  {sno:2,party:"Indian Oil Corporation Ltd- Jharsuguda",inv:"VE/24-25/50",date:"05.10.2024",taxable:113116.43,gst:20380.96,total:133477.39,pdate:"23.10.2024",received:84837.5,gstTds:2262.33,itTds:1131,interest:0,sd:45246.56,dd:0,ld:0,short:0,link:""},
+  {sno:3,party:"Indian Oil Corporation Ltd- Jharsuguda",inv:"VE/24-25/54",date:"25.10.2024",taxable:1089435.52,gst:196098.39,total:1285533.91,pdate:"08.11.2024",received:1143907.65,gstTds:21788.71,itTds:10894.35,interest:0,sd:108943.55,dd:0,ld:0,short:-0.35,link:"https://drive.google.com/file/d/1uKqEUqat45xRDoAB1LdF9_kXnz3hvcF4/view"},
+  {sno:4,party:"Indian Oil Corporation Ltd- Jharsuguda",inv:"VE/24-25/100",date:"29.03.2025",taxable:2562206,gst:461197.08,total:3023403.08,pdate:"CREDIT NOTE",received:3023403.08,gstTds:0,itTds:0,interest:0,sd:0,dd:0,ld:0,short:0,link:"CREDIT NOTE"},
+  {sno:5,party:"Indian Oil Corporation Ltd- Jharsuguda",inv:"VE/25-26/3",date:"10.04.2025",taxable:2498825,gst:449788.5,total:2948613.5,pdate:"29.04.2025",received:2263532.69,gstTds:49976.5,itTds:24988,interest:0,sd:0,dd:0,ld:610116.31,short:0,link:"https://drive.google.com/file/d/1DPMTAIr7ppXOuymO1DR1DhJMKl1pm7x_/view"},
+  {sno:6,party:"Indian Oil Corporation Ltd- Jharsuguda",inv:"VE/25-26/37",date:"30.06.2025",taxable:665497.92,gst:119789.63,total:785287.55,pdate:"13.08.2025",received:545400.78,gstTds:13309.96,itTds:6654.98,interest:0,sd:0,dd:0,ld:219921.8,short:0.03,link:"https://drive.google.com/file/d/1heh_0EbdC00ym6Jq9fkOePj1vyhtKlYl/view"},
+  {sno:7,party:"Indian Oil Corporation Ltd- Jharsuguda",inv:"VE/25-26/73",date:"30.08.2025",taxable:848383.88,gst:152709.1,total:1001092.98,pdate:"12.09.2025",received:889715.04,gstTds:16967,itTds:8484,interest:1092.14,sd:0,dd:84834.8,ld:0,short:0,link:"https://drive.google.com/file/d/18UhiCdZL6U-bEaetXhxjrzyNtCAjEu6o/view"},
+  {sno:8,party:"Indian Oil Corporation Ltd- Jharsuguda",inv:"VE/25-26/86",date:"29.09.2025",taxable:140109.71,gst:25219.75,total:165329.46,pdate:"13.10.2025",received:147111.27,gstTds:2802.19,itTds:1401,interest:0,sd:0,dd:0,ld:14015,short:0,link:"https://drive.google.com/file/d/138V2pCCjrjYmYhBaYFl6Uy4DBLk8yBBn/view"},
+  {sno:9,party:"Indian Oil Corporation Ltd- Jharsuguda",inv:"VE/25-26/169",date:"31.03.2026",taxable:1325491.91,gst:238588.54,total:1564080.45,pdate:"—",received:0,gstTds:0,itTds:0,interest:0,sd:0,dd:0,ld:0,short:0,link:""},
+];
+const JH_SD_ADJ=[
+  {date:"23.07.2025",sd:-108943.55,link:"https://drive.google.com/file/d/1TrH8fmWsn88m6OFzlaegbSOWpEBuo1Ou/view"},
+  {date:"20.12.2024",sd:-763986.77,link:"https://drive.google.com/file/d/10AUlug-1kwVxYwrwpKjxwpnhxf059p-b/view"},
+  {date:"03.01.2025",sd:-254662.26,link:"https://drive.google.com/file/d/1Vrxdy97u8e5rb1I9eD1HyI1ZZyl77SMI/view"},
+];
+
+const AGEING=[
+  {sno:1,site:"IOCL MATHURA BDFP",col:"LD Deduction",amt:1143938.95,oldest:"45500",days:661,avg:568,bucket:"180+ Days"},
+  {sno:2,site:"IOCL PANIPAT DO",col:"LD Deduction",amt:358778.71,oldest:"45747",days:414,avg:294,bucket:"180+ Days"},
+  {sno:3,site:"IOCL SALEM",col:"Pending Bill",amt:817313.81,oldest:"45747",days:414,avg:276,bucket:"180+ Days"},
+  {sno:4,site:"IOCL SALEM",col:"SD Deduction",amt:4159.40,oldest:"45747",days:414,avg:276,bucket:"180+ Days"},
+  {sno:5,site:"IOCL TRICHY",col:"Pending Bill",amt:776915.86,oldest:"45747",days:414,avg:290,bucket:"180+ Days"},
+  {sno:6,site:"IOCL CHENNAI",col:"SD Deduction",amt:905314.25,oldest:"45747",days:414,avg:376,bucket:"180+ Days"},
+  {sno:7,site:"IOCL CHENNAI",col:"LD Deduction",amt:989416.45,oldest:"45747",days:414,avg:376,bucket:"180+ Days"},
+  {sno:8,site:"IOCL HISSAR",col:"Pending Bill",amt:2054704.29,oldest:"45747",days:414,avg:222,bucket:"180+ Days"},
+  {sno:9,site:"IOCL HISSAR",col:"LD Deduction",amt:1145966.13,oldest:"45747",days:414,avg:222,bucket:"180+ Days"},
+  {sno:10,site:"IOCL PANIPAT REFINERY",col:"Pending Bill",amt:3907139.72,oldest:"45803",days:358,avg:226,bucket:"180+ Days"},
+  {sno:11,site:"IOCL PANIPAT REFINERY",col:"SD Deduction",amt:37208.44,oldest:"45803",days:358,avg:226,bucket:"180+ Days"},
+  {sno:12,site:"IOCL PANIPAT REFINERY",col:"LD Deduction",amt:1394719.05,oldest:"45803",days:358,avg:226,bucket:"180+ Days"},
+  {sno:13,site:"IOCL BARAUNI",col:"Pending Bill",amt:273215.16,oldest:"45559",days:602,avg:335,bucket:"180+ Days"},
+  {sno:14,site:"IOCL BARAUNI",col:"LD Deduction",amt:999625.16,oldest:"45559",days:602,avg:335,bucket:"180+ Days"},
+  {sno:15,site:"IOCL AHMEDNAGAR",col:"Pending Bill",amt:4622247.53,oldest:"45226",days:935,avg:551,bucket:"180+ Days"},
+  {sno:16,site:"IOCL AHMEDNAGAR",col:"SD Deduction",amt:1087388.61,oldest:"45226",days:935,avg:551,bucket:"180+ Days"},
+  {sno:17,site:"IOCL JHARSUGUDA",col:"Pending Bill",amt:1564080.45,oldest:"45570",days:591,avg:382,bucket:"180+ Days"},
+  {sno:18,site:"IOCL JHARSUGUDA",col:"LD Deduction",amt:928887.91,oldest:"45570",days:591,avg:382,bucket:"180+ Days"},
+  {sno:19,site:"IOCL SECUNDERABAD",col:"LD Deduction",amt:146115.33,oldest:"45981",days:180,avg:115,bucket:"91-180 Days"},
+  {sno:20,site:"IOCL WARANGAL",col:"LD Deduction",amt:139825.57,oldest:"45982",days:179,avg:102,bucket:"91-180 Days"},
+  {sno:21,site:"IOCL TIRUPATI",col:"Pending Bill",amt:371062.8,oldest:"45982",days:179,avg:111,bucket:"91-180 Days"},
+  {sno:22,site:"IOCL TIRUPATI",col:"LD Deduction",amt:298192.64,oldest:"45982",days:179,avg:111,bucket:"91-180 Days"},
+  {sno:23,site:"IOCL NIZAMABAD",col:"LD Deduction",amt:189657.72,oldest:"45994",days:167,avg:89,bucket:"91-180 Days"},
+  {sno:24,site:"IOCL VIJAYWADA",col:"SD Deduction",amt:50524.11,oldest:"46014",days:147,avg:88,bucket:"91-180 Days"},
+  {sno:25,site:"IOCL VIJAYWADA",col:"LD Deduction",amt:272033.43,oldest:"46014",days:147,avg:88,bucket:"91-180 Days"},
+  {sno:26,site:"AAI AMRITSAR",col:"SD Deduction",amt:288622.5,oldest:"46038",days:123,avg:86,bucket:"91-180 Days"},
+  {sno:27,site:"IOCL PARADEEP HM",col:"SD Deduction",amt:1374309.85,oldest:"46063",days:98,avg:65,bucket:"91-180 Days"},
+  {sno:28,site:"PARADIP PORT AUTH",col:"SD Deduction",amt:1521853,oldest:"46063",days:98,avg:74,bucket:"91-180 Days"},
+  {sno:29,site:"NTPC DADRI",col:"Pending Bill",amt:270223.78,oldest:"46063",days:98,avg:72,bucket:"91-180 Days"},
+  {sno:30,site:"NTPC DADRI",col:"SD Deduction",amt:364811,oldest:"46063",days:98,avg:72,bucket:"91-180 Days"},
+  {sno:31,site:"GAIL VIJAIPUR",col:"Withheld",amt:388234.35,oldest:"46097",days:64,avg:64,bucket:"61-90 Days"},
+];
+
+const DAYWISE=[
+  {sno:1,debtor:"IOCL MADURAI",d30:0,d30_45:0,d45_60:0,lt60:228116,total:228116},
+  {sno:2,debtor:"IOCL AHMEDNAGAR",d30:0,d30_45:0,d45_60:3841050.31,lt60:781197.22,total:4622247.53},
+  {sno:3,debtor:"Transrail Lighting Ltd",d30:0,d30_45:0,d45_60:0,lt60:1683475,total:1683475},
+  {sno:4,debtor:"IOCL PANIPAT REFINERY",d30:0,d30_45:0,d45_60:3907329.83,lt60:0,total:3907329.83},
+  {sno:5,debtor:"IOCL VIZAG",d30:0,d30_45:0,d45_60:267548.59,lt60:0,total:267548.59},
+  {sno:6,debtor:"IOCL HISSAR",d30:0,d30_45:0,d45_60:2054704.29,lt60:0,total:2054704.29},
+  {sno:7,debtor:"IOCL TIRUPATI",d30:0,d30_45:0,d45_60:371062.8,lt60:0,total:371062.8},
+  {sno:8,debtor:"IOCL SALEM",d30:0,d30_45:0,d45_60:817313.81,lt60:0,total:817313.81},
+  {sno:9,debtor:"IOCL JHARSUGUDA",d30:0,d30_45:0,d45_60:1564080.45,lt60:0,total:1564080.45},
+  {sno:10,debtor:"IOCL MUMBAI DO",d30:0,d30_45:0,d45_60:995139.73,lt60:0,total:995139.73},
+  {sno:11,debtor:"NTPC DADRI",d30:270223.78,d30_45:0,d45_60:0,lt60:0,total:270223.78},
+  {sno:12,debtor:"IOCL BARAUNI",d30:273215.16,d30_45:0,d45_60:0,lt60:0,total:273215.16},
+  {sno:13,debtor:"IOCL TRICHY",d30:776915.86,d30_45:0,d45_60:0,lt60:0,total:776915.86},
+];
+
+const REVENUE=[
+  {date:"03 Apr 2026",inv:"VE/26-27/1",party:"IOCL SECUNDERABAD",taxable:196322.5,igst:35338.05,cgst:0,sgst:0,total:231660.55,code:"R",month:"April"},
+  {date:"25 Apr 2026",inv:"VE/26-27/2",party:"IOCL BARAUNI",taxable:231538.27,igst:41676.89,cgst:0,sgst:0,total:273215.16,code:"R",month:"April"},
+  {date:"03 May 2026",inv:"VE/26-27/3",party:"IOCL TRICHY",taxable:658403.27,igst:118512.59,cgst:0,sgst:0,total:776915.86,code:"R",month:"May"},
+];
+
+const FINANCE={
+  debtor:{mar:"793.18 Lakh / 69 days",apr:"702.55 Lakh",may:"663.04 Lakh"},
+  inventory:{mar:"123.36 Lakh / 22 days",apr:"111.47 Lakh",may:"108.16 Lakh"},
+  revenue:{mar:"24.03 Cr",apr:"27.17 Lakh",may:"16.93 Lakh"},
+  cashBlock:{debtor:{apr:44424529.96,may:40119315},sd:{apr:10361923.04,may:10386501.55},ld:{apr:15468513,may:15797810.53},inventory:{apr:11146747,may:10816017}},
+  profitPct:"4.3%",
+};
+
+// ============================================================
+// HELPERS
+// ============================================================
+const INR=v=>v?'₹'+parseFloat(v).toLocaleString('en-IN',{maximumFractionDigits:2}):'₹0';
+const L=v=>v?(v/100000).toFixed(2)+'L':'0';
+const Cr=v=>v?(v/10000000).toFixed(2)+' Cr':'0';
+const pct=(v,t)=>t?((v/t)*100).toFixed(1)+'%':'0%';
+
+let sortAsc=false;
+let currentSite='Jharsuguda';
+let currentEditCtx=null;
+
+function toast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.className=type+' show';
+  document.getElementById('tmsg').textContent=msg;
+  document.getElementById('ticon').className=type==='success'?'fa fa-circle-check':'fa fa-circle-xmark';
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>t.className='',3000);
+}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+function openM(id){document.getElementById(id).classList.add('open')}
+function esc(s){return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ============================================================
+// SIDEBAR & NAV
+// ============================================================
+document.getElementById('menu-btn').addEventListener('click',()=>{
+  document.getElementById('sb').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+});
+document.getElementById('overlay').addEventListener('click',()=>{
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+});
+
+function buildSidebarSites(){
+  const nav=document.getElementById('siteNavItems');
+  SUMMARY.filter(s=>s.total>0).sort((a,b)=>b.total-a.total).forEach(s=>{
+    const el=document.createElement('div');
+    el.className='ni';el.dataset.site=s.site;
+    el.innerHTML=`<i class="fa fa-location-dot ic"></i><span style="overflow:hidden;text-overflow:ellipsis">${s.site}</span>`;
+    el.title=s.site;
+    el.addEventListener('click',()=>{ showSiteView(s.site); closeMobile(); });
+    nav.appendChild(el);
+  });
+}
+function closeMobile(){
+  if(window.innerWidth<=768){
+    document.getElementById('sb').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+  }
+}
+
+document.querySelectorAll('[data-view]').forEach(el=>{
+  el.addEventListener('click',()=>{ showView(el.dataset.view); closeMobile(); });
+});
+
+function showView(v){
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.ni[data-view]').forEach(x=>x.classList.remove('active'));
+  const el=document.getElementById('view-'+v);
+  if(el){el.classList.add('active');}
+  const ni=document.querySelector(`.ni[data-view="${v}"]`);
+  if(ni){ni.classList.add('active');}
+  const labels={dashboard:'/ Dashboard',summary:'/ All Sites',ageing:'/ Ageing',daywise:'/ Daywise OS',finance:'/ Finance Weekly',revenue:'/ Revenue 26-27',site:`/ ${currentSite}`};
+  document.getElementById('bc').textContent=labels[v]||`/ ${v}`;
+  if(v==='summary')renderSummaryTable();
+  if(v==='ageing'){renderAgeingDetail();renderAgeingSummary();renderAgeingTable();}
+  if(v==='daywise')renderDaywiseTable();
+  if(v==='finance')renderFinance();
+  if(v==='revenue')renderRevenueTable();
+}
+
+function showSiteView(siteName){
+  currentSite=siteName;
+  showView('site');
+  document.getElementById('siteViewTitle').textContent=siteName;
+  const s=SUMMARY.find(x=>x.site===siteName)||{};
+  document.getElementById('siteViewPM').textContent=s.pm?'PM: '+s.pm:'';
+  renderSiteDetail(siteName);
+  document.querySelectorAll('.ni[data-site]').forEach(x=>x.classList.remove('active'));
+  const match=document.querySelector(`.ni[data-site="${siteName}"]`);
+  if(match)match.classList.add('active');
+}
+
+function openSheetLink(){
+  window.open('https://docs.google.com/spreadsheets/d/1iHrPxhvsFnedO2Js7u3wmFbPAxLeC4F1WP71MBv5gcw/edit','_blank');
+}
+
+// Search
+document.getElementById('srch').addEventListener('input',function(){
+  const q=this.value.toLowerCase();
+  document.querySelectorAll('#siteNavItems .ni').forEach(el=>{
+    el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+  });
+});
+
+// ============================================================
+// DASHBOARD RENDERS
+// ============================================================
+function renderTopSites(){
+  const top=SUMMARY.filter(s=>s.total>0).sort((a,b)=>b.total-a.total).slice(0,10);
+  const maxT=top[0]?.total||1;
+  let html=`<thead><tr><th>#</th><th>Site</th><th>PM</th><th>Pending</th><th>SD</th><th>LD</th><th>Total OS</th><th>Actions</th></tr></thead><tbody>`;
+  top.forEach((s,i)=>{
+    const pct2=(s.total/maxT*100).toFixed(0);
+    html+=`<tr>
+      <td class="mono" style="color:var(--muted)">${i+1}</td>
+      <td class="txt" style="font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis">${esc(s.site)}</td>
+      <td class="txt"><span style="padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;background:rgba(0,212,255,.1);color:var(--a1)">${esc(s.pm)}</span></td>
+      <td class="mono ${s.pending>0?'neu':''}">${s.pending>0?INR(s.pending):'—'}</td>
+      <td class="mono ${s.sd>0?'':''}" style="color:${s.sd>0?'var(--yellow)':'var(--muted)'}">${s.sd>0?INR(s.sd):'—'}</td>
+      <td class="mono" style="color:${s.ld>0?'var(--red)':'var(--muted)'}">${s.ld>0?INR(s.ld):'—'}</td>
+      <td class="mono" style="color:var(--a1);font-weight:700">${INR(s.total)}</td>
+      <td><div class="acts">
+        <button class="ab vb" onclick="openDetail(${s.sno-1})">View</button>
+        <button class="ab eb" onclick="openEdit(${s.sno-1},'summary')">Edit</button>
+      </div></td>
+    </tr>`;
+  });
+  html+='</tbody>';
+  document.getElementById('topSitesTable').innerHTML=html;
+}
+
+function renderBreakupChart(){
+  const totPending=SUMMARY.reduce((a,s)=>a+s.pending,0);
+  const totSD=SUMMARY.reduce((a,s)=>a+s.sd,0);
+  const totLD=SUMMARY.reduce((a,s)=>a+s.ld,0);
+  const totWithheld=SUMMARY.reduce((a,s)=>a+s.withheld,0);
+  const totOther=SUMMARY.reduce((a,s)=>a+s.other,0);
+  const grand=totPending+totSD+totLD+totWithheld+totOther;
+  const items=[
+    {label:'Pending Bill',val:totPending,color:'#ff6b35'},
+    {label:'LD Deduction',val:totLD,color:'#ff4040'},
+    {label:'SD Deduction',val:totSD,color:'#ffc107'},
+    {label:'Withheld',val:totWithheld,color:'#b44fff'},
+    {label:'Other',val:totOther,color:'#00d4ff'},
+  ];
+  document.getElementById('breakupChart').innerHTML=`<div class="bar-wrap">${items.map(it=>`
+    <div class="bar-item">
+      <div class="bar-lbl">${it.label}</div>
+      <div class="bar-track"><div class="bar-fill" data-pct="${(it.val/grand*100).toFixed(1)}" style="width:0%;background:${it.color}"></div></div>
+      <div class="bar-val">${INR(it.val)}</div>
+    </div>`).join('')}</div>
+    <div style="margin-top:12px;padding:10px;background:var(--card2);border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:10px;color:var(--muted)">GRAND TOTAL</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--a1)">${INR(grand)}</span>
+    </div>`;
+  setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(el=>el.style.width=el.dataset.pct+'%'),100);
+}
+
+function renderPMChart(){
+  const pms={};
+  SUMMARY.forEach(s=>{ pms[s.pm]=(pms[s.pm]||0)+s.total; });
+  const sorted=Object.entries(pms).sort((a,b)=>b[1]-a[1]);
+  const max=sorted[0]?.[1]||1;
+  const colors=['#00d4ff','#0066ff','#00e676','#ffc107','#ff6b35','#b44fff'];
+  document.getElementById('pmChart').innerHTML=`<div class="bar-wrap">${sorted.map((([pm,amt],i)=>`
+    <div class="bar-item">
+      <div class="bar-lbl">${esc(pm)}</div>
+      <div class="bar-track"><div class="bar-fill" data-pct="${(amt/max*100).toFixed(1)}" style="width:0%;background:${colors[i%colors.length]}"></div></div>
+      <div class="bar-val">${INR(amt)}</div>
+    </div>`)).join('')}</div>`;
+  setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(el=>el.style.width=el.dataset.pct+'%'),120);
+}
+
+function renderAgeingBuckets(){
+  const buckets={'180+ Days':{color:'#ff4040',cnt:0,amt:0},'91-180 Days':{color:'#ffc107',cnt:0,amt:0},'61-90 Days':{color:'#00d4ff',cnt:0,amt:0}};
+  AGEING.forEach(a=>{
+    if(buckets[a.bucket]){buckets[a.bucket].cnt++;buckets[a.bucket].amt+=a.amt;}
+  });
+  const grand=Object.values(buckets).reduce((a,b)=>a+b.amt,0);
+  document.getElementById('ageingBuckets').innerHTML=Object.entries(buckets).map(([bk,bv])=>`
+    <div class="age-band">
+      <div class="age-dot" style="background:${bv.color}"></div>
+      <div class="age-info">
+        <div class="age-lbl">${bk}</div>
+        <div class="age-cnt">${bv.cnt} entries</div>
+        <div class="age-bar" data-pct="${(bv.amt/grand*100).toFixed(1)}" style="width:0%;background:${bv.color}"></div>
+      </div>
+      <div class="age-amt" style="color:${bv.color}">${INR(bv.amt)}</div>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('.age-bar').forEach(el=>el.style.width=el.dataset.pct+'%'),150);
+}
+
+function renderJharsugudaPreview(){
+  const rows=JHARSUGUDA_BILLS;
+  let html=`<table class="dt"><thead><tr>
+    <th>#</th><th>Invoice No.</th><th>Inv Date</th><th>Taxable Value</th><th>GST</th><th>Total Invoice</th>
+    <th>Pay Date</th><th>Received</th><th>GST TDS</th><th>IT TDS</th><th>SD</th><th>LD</th><th>Short Pay</th><th>Actions</th>
+  </tr></thead><tbody>`;
+  rows.forEach((r,i)=>{
+    const isCredit=r.pdate==='CREDIT NOTE';
+    html+=`<tr>
+      <td class="mono" style="color:var(--muted)">${r.sno}</td>
+      <td class="txt" style="font-weight:700;color:var(--a1)">${esc(r.inv)}</td>
+      <td class="mono">${esc(r.date)}</td>
+      <td class="mono pos">${INR(r.taxable)}</td>
+      <td class="mono">${INR(r.gst)}</td>
+      <td class="mono" style="font-weight:700">${INR(r.total)}</td>
+      <td class="mono ${isCredit?'':''}"><span class="${isCredit?'stt stt-p':''}">${isCredit?'CREDIT NOTE':esc(r.pdate)||'—'}</span></td>
+      <td class="mono" style="color:var(--green)">${r.received?INR(r.received):'—'}</td>
+      <td class="mono">${r.gstTds?INR(r.gstTds):'—'}</td>
+      <td class="mono">${r.itTds?INR(r.itTds):'—'}</td>
+      <td class="mono" style="color:${r.sd<0?'var(--green)':r.sd>0?'var(--yellow)':'var(--muted)'}">${r.sd?INR(r.sd):'—'}</td>
+      <td class="mono" style="color:${r.ld>0?'var(--red)':'var(--muted)'}">${r.ld?INR(r.ld):'—'}</td>
+      <td class="mono ${r.short<0?'neg':r.short>0?'pos':''}">${r.short?r.short:'—'}</td>
+      <td><div class="acts">
+        <button class="ab vb" onclick="openJhDetail(${i})">View</button>
+        <button class="ab eb" onclick="openEditJh(${i})">Edit</button>
+        ${r.link&&r.link!=='CREDIT NOTE'?`<a href="${r.link}" target="_blank"><button class="ab" style="border-color:var(--a3);color:var(--a3);background:rgba(0,255,179,.08)">Link</button></a>`:''}
+      </div></td>
+    </tr>`;
+  });
+  // SD adjustments
+  JH_SD_ADJ.forEach(adj=>{
+    html+=`<tr style="background:rgba(0,230,118,.03)">
+      <td></td><td></td><td></td><td></td><td></td><td></td>
+      <td class="mono">${adj.date}</td><td></td><td></td><td></td>
+      <td class="mono" style="color:var(--green);font-weight:700">${INR(adj.sd)}</td>
+      <td></td><td></td>
+      <td><a href="${adj.link}" target="_blank"><button class="ab" style="border-color:var(--a3);color:var(--a3);background:rgba(0,255,179,.08)">Link</button></a></td>
+    </tr>`;
+  });
+  // Totals
+  const totTax=rows.reduce((a,r)=>a+r.taxable,0);
+  const totRec=rows.reduce((a,r)=>a+r.received,0);
+  const totGstT=rows.reduce((a,r)=>a+r.gstTds,0);
+  const totItT=rows.reduce((a,r)=>a+r.itTds,0);
+  const totSD=rows.reduce((a,r)=>a+r.sd,0)+JH_SD_ADJ.reduce((a,r)=>a+r.sd,0);
+  const totLD=rows.reduce((a,r)=>a+r.ld,0);
+  html+=`<tr style="background:var(--card2);font-weight:700">
+    <td></td><td></td><td></td><td class="txt" style="color:var(--muted);font-weight:700">TOTAL</td>
+    <td class="mono pos">${INR(totTax)}</td><td></td><td></td>
+    <td class="mono" style="color:var(--green)">${INR(totRec)}</td>
+    <td class="mono">${INR(totGstT)}</td><td class="mono">${INR(totItT)}</td>
+    <td class="mono" style="color:${totSD<0?'var(--green)':'var(--yellow)'}">${INR(totSD)}</td>
+    <td class="mono" style="color:var(--red)">${INR(totLD)}</td>
+    <td></td><td></td>
+  </tr>`;
+  html+=`<tr style="background:rgba(255,64,64,.05)">
+    <td colspan="10"></td>
+    <td colspan="4" style="text-align:right;padding:12px;font-size:11px;font-weight:700;color:var(--red)">
+      NET SD DEDUCTION FOR FOLLOW-UP: <span style="font-family:'JetBrains Mono',monospace;font-size:14px">₹0.00</span>
+    </td>
+  </tr>`;
+  html+='</tbody></table>';
+  document.getElementById('jharsugudaPreview').innerHTML=html;
+}
+
+// ============================================================
+// SUMMARY TABLE
+// ============================================================
+let summaryData=[...SUMMARY];
+function renderSummaryTable(){
+  const wrap=document.getElementById('summaryTable');
+  const data=sortAsc?[...summaryData].sort((a,b)=>a.total-b.total):[...summaryData].sort((a,b)=>b.total-a.total);
+  let html=`<table class="dt"><thead><tr>
+    <th>#</th><th>Site Name</th><th>PM</th>
+    <th>Pending Bill</th><th>SD Deduction</th><th>LD Deduction</th>
+    <th>Instant Release</th><th>Other</th><th>Withheld</th>
+    <th style="color:var(--a1)">Total OS</th><th>Actions</th>
+  </tr></thead><tbody>`;
+  data.forEach((s,i)=>{
+    const isDone=s.total===0;
+    html+=`<tr ${isDone?'style="opacity:.4"':''}>
+      <td class="mono" style="color:var(--muted)">${i+1}</td>
+      <td class="txt" style="font-weight:600;min-width:180px">${esc(s.site)}</td>
+      <td class="txt"><span style="padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;background:rgba(0,212,255,.08);color:var(--a1)">${esc(s.pm)}</span></td>
+      <td class="mono" style="color:${s.pending>0?'var(--a4)':'var(--muted)'}">${s.pending>0?INR(s.pending):'—'}</td>
+      <td class="mono" style="color:${s.sd>0?'var(--yellow)':'var(--muted)'}">${s.sd>0?INR(s.sd):'—'}</td>
+      <td class="mono" style="color:${s.ld>0?'var(--red)':'var(--muted)'}">${s.ld>0?INR(s.ld):'—'}</td>
+      <td class="mono pos">${s.instant>0?INR(s.instant):'—'}</td>
+      <td class="mono">${s.other>0?INR(s.other):'—'}</td>
+      <td class="mono" style="color:${s.withheld>0?'var(--a6)':'var(--muted)'}">${s.withheld>0?INR(s.withheld):'—'}</td>
+      <td class="mono" style="color:${isDone?'var(--green)':'var(--a1)'};font-weight:700">${isDone?'✓ CLEAR':INR(s.total)}</td>
+      <td><div class="acts">
+        <button class="ab vb" onclick="openDetail(${s.sno-1})">Detail</button>
+        <button class="ab eb" onclick="openEdit(${s.sno-1},'summary')">Edit</button>
+      </div></td>
+    </tr>`;
+  });
+  const gt=summaryData.reduce((a,s)=>a+s.total,0);
+  html+=`<tr style="background:var(--card2);font-weight:800">
+    <td></td><td class="txt" style="font-size:11px;color:var(--muted)">TOTAL</td><td></td>
+    <td class="mono" style="color:var(--a4)">${INR(summaryData.reduce((a,s)=>a+s.pending,0))}</td>
+    <td class="mono" style="color:var(--yellow)">${INR(summaryData.reduce((a,s)=>a+s.sd,0))}</td>
+    <td class="mono" style="color:var(--red)">${INR(summaryData.reduce((a,s)=>a+s.ld,0))}</td>
+    <td class="mono pos">${INR(summaryData.reduce((a,s)=>a+s.instant,0))}</td>
+    <td class="mono">${INR(summaryData.reduce((a,s)=>a+s.other,0))}</td>
+    <td class="mono" style="color:var(--a6)">${INR(summaryData.reduce((a,s)=>a+s.withheld,0))}</td>
+    <td class="mono" style="color:var(--a1);font-size:13px">${INR(gt)}</td>
+    <td></td>
+  </tr></tbody></table>`;
+  wrap.innerHTML=html;
+}
+function toggleSort(){sortAsc=!sortAsc;renderSummaryTable();}
+
+// ============================================================
+// AGEING
+// ============================================================
+function renderAgeingDetail(){
+  const buckets={'180+ Days':{color:'#ff4040',cnt:0,amt:0},'91-180 Days':{color:'#ffc107',cnt:0,amt:0},'61-90 Days':{color:'#00d4ff',cnt:0,amt:0}};
+  AGEING.forEach(a=>{if(buckets[a.bucket]){buckets[a.bucket].cnt++;buckets[a.bucket].amt+=a.amt;}});
+  const grand=Object.values(buckets).reduce((a,b)=>a+b.amt,0);
+  document.getElementById('ageingDetail').innerHTML=Object.entries(buckets).map(([bk,bv])=>`
+    <div class="fw-card">
+      <div class="fw-title" style="color:${bv.color}">${bk}</div>
+      <div class="fw-row"><span class="fw-lbl">Entries</span><span class="fw-val">${bv.cnt}</span></div>
+      <div class="fw-row"><span class="fw-lbl">Total Amount</span><span class="fw-val" style="color:${bv.color}">${INR(bv.amt)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">% of Total</span><span class="fw-val">${pct(bv.amt,grand)}</span></div>
+      <div class="age-bar" data-pct="${(bv.amt/grand*100).toFixed(1)}" style="width:0%;background:${bv.color};margin-top:8px"></div>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('.age-bar').forEach(el=>el.style.width=el.dataset.pct+'%'),100);
+}
+function renderAgeingSummary(){
+  const totAmt=AGEING.reduce((a,x)=>a+x.amt,0);
+  const avgDays=(AGEING.reduce((a,x)=>a+x.avg,0)/AGEING.length).toFixed(0);
+  const maxDays=Math.max(...AGEING.map(x=>x.days));
+  document.getElementById('ageingSummary').innerHTML=`
+    <div class="fw-card">
+      <div class="fw-title">Overall Stats</div>
+      <div class="fw-row"><span class="fw-lbl">Total Outstanding</span><span class="fw-val" style="color:var(--a1)">${INR(totAmt)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">Avg Ageing Days</span><span class="fw-val">${avgDays} days</span></div>
+      <div class="fw-row"><span class="fw-lbl">Max Ageing Days</span><span class="fw-val" style="color:var(--red)">${maxDays} days</span></div>
+      <div class="fw-row"><span class="fw-lbl">Total Entries</span><span class="fw-val">${AGEING.length}</span></div>
+    </div>`;
+}
+function renderAgeingTable(){
+  let html=`<table class="dt"><thead><tr>
+    <th>#</th><th>Site</th><th>Column</th><th>Amount</th><th>Oldest Date</th><th>Days</th><th>Avg Days</th><th>Bucket</th>
+  </tr></thead><tbody>`;
+  AGEING.forEach((a,i)=>{
+    const bc=a.bucket==='180+ Days'?'stt-r':a.bucket==='91-180 Days'?'stt-y':'stt-g';
+    html+=`<tr>
+      <td class="mono" style="color:var(--muted)">${i+1}</td>
+      <td class="txt" style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis">${esc(a.site)}</td>
+      <td class="txt">${esc(a.col)}</td>
+      <td class="mono" style="color:var(--a4);font-weight:700">${INR(a.amt)}</td>
+      <td class="mono">${a.oldest}</td>
+      <td class="mono" style="color:${a.days>365?'var(--red)':a.days>180?'var(--yellow)':'var(--green)'}">${a.days}</td>
+      <td class="mono">${a.avg}</td>
+      <td><span class="stt ${bc}">${a.bucket}</span></td>
+    </tr>`;
+  });
+  html+='</tbody></table>';
+  document.getElementById('ageingTable').innerHTML=html;
+}
+
+// ============================================================
+// DAYWISE
+// ============================================================
+function renderDaywiseTable(){
+  let html=`<table class="dt"><thead><tr>
+    <th>#</th><th>Debtors Name</th>
+    <th>0-30 Days</th><th>30-45 Days</th><th>45-60 Days</th><th>&lt;60 Days</th>
+    <th style="color:var(--a1)">Total</th>
+  </tr></thead><tbody>`;
+  DAYWISE.forEach(d=>{
+    html+=`<tr>
+      <td class="mono" style="color:var(--muted)">${d.sno}</td>
+      <td class="txt" style="font-weight:600">${esc(d.debtor)}</td>
+      <td class="mono" style="color:${d.d30>0?'var(--green)':'var(--muted)'}">${d.d30?INR(d.d30):'—'}</td>
+      <td class="mono" style="color:${d.d30_45>0?'var(--yellow)':'var(--muted)'}">${d.d30_45?INR(d.d30_45):'—'}</td>
+      <td class="mono" style="color:${d.d45_60>0?'var(--a4)':'var(--muted)'}">${d.d45_60?INR(d.d45_60):'—'}</td>
+      <td class="mono" style="color:${d.lt60>0?'var(--red)':'var(--muted)'}">${d.lt60?INR(d.lt60):'—'}</td>
+      <td class="mono" style="color:var(--a1);font-weight:700">${INR(d.total)}</td>
+    </tr>`;
+  });
+  const gt=DAYWISE.reduce((a,x)=>a+x.total,0);
+  const tll=1294114.89;
+  html+=`<tr style="background:var(--card2);font-weight:800">
+    <td></td><td class="txt" style="color:var(--muted)">Grand Total</td>
+    <td class="mono">${INR(DAYWISE.reduce((a,x)=>a+x.d30,0))}</td>
+    <td class="mono">${INR(DAYWISE.reduce((a,x)=>a+x.d30_45,0))}</td>
+    <td class="mono">${INR(DAYWISE.reduce((a,x)=>a+x.d45_60,0))}</td>
+    <td class="mono">${INR(DAYWISE.reduce((a,x)=>a+x.lt60,0))}</td>
+    <td class="mono" style="color:var(--a1)">${INR(gt)}</td>
+  </tr>
+  <tr style="background:rgba(180,79,255,.05)">
+    <td colspan="6" style="text-align:right;padding:10px;font-size:11px;font-weight:700;color:var(--a6)">TLL Hold Amount:</td>
+    <td class="mono" style="color:var(--a6);font-weight:700">${INR(tll)}</td>
+  </tr></tbody></table>`;
+  document.getElementById('daywiseTable').innerHTML=html;
+}
+
+// ============================================================
+// FINANCE WEEKLY
+// ============================================================
+function renderFinance(){
+  document.getElementById('financeCards').innerHTML=`
+    <div class="fw-card">
+      <div class="fw-title">Key Metrics</div>
+      <div class="fw-row"><span class="fw-lbl">Debtor (Mar)</span><span class="fw-val" style="color:var(--a1)">${FINANCE.debtor.mar}</span></div>
+      <div class="fw-row"><span class="fw-lbl">Debtor (Apr)</span><span class="fw-val">${INR(FINANCE.finance?.apr||70254966)}</spa
+n class="fw-val">${INR(FINANCE.revenue.mar)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">NP Margin</span><span class="fw-val" style="color:var(--a3)">${FINANCE.profitPct}</span></div>
+    </div>
+    <div class="fw-card">
+      <div class="fw-title">Month Trend</div>
+      <div class="fw-row"><span class="fw-lbl">Apr Revenue</span><span class="fw-val">${INR(2716732.47)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">May Revenue</span><span class="fw-val">${INR(1692645.79)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">Apr Debtors</span><span class="fw-val">${INR(70254966)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">May Debtors</span><span class="fw-val">${INR(66303627.08)}</span></div>
+    </div>`;
+  const cb=FINANCE.cashBlock;
+  document.getElementById('cashBlock').innerHTML=`
+    <div class="fw-card">
+      <div class="fw-title">Cash Block (Apr 2026)</div>
+      <div class="fw-row"><span class="fw-lbl">Debtor</span><span class="fw-val" style="color:var(--a1)">${INR(cb.debtor.apr)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">SD</span><span class="fw-val" style="color:var(--yellow)">${INR(cb.sd.apr)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">LD</span><span class="fw-val" style="color:var(--red)">${INR(cb.ld.apr)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">Inventory</span><span class="fw-val">${INR(cb.inventory.apr)}</span></div>
+      <div class="fw-row" style="border-top:1px solid var(--border);padding-top:8px"><span class="fw-lbl" style="font-weight:800;color:var(--txt)">Total Cash Block</span><span class="fw-val" style="color:var(--a1);font-size:14px">${INR(cb.debtor.apr+cb.sd.apr+cb.ld.apr+cb.inventory.apr)}</span></div>
+    </div>
+    <div class="fw-card" style="margin-top:12px">
+      <div class="fw-title">Cash Block (May 2026)</div>
+      <div class="fw-row"><span class="fw-lbl">Debtor</span><span class="fw-val" style="color:var(--a1)">${INR(cb.debtor.may)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">SD</span><span class="fw-val" style="color:var(--yellow)">${INR(cb.sd.may)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">LD</span><span class="fw-val" style="color:var(--red)">${INR(cb.ld.may)}</span></div>
+      <div class="fw-row"><span class="fw-lbl">Inventory</span><span class="fw-val">${INR(cb.inventory.may)}</span></div>
+      <div class="fw-row" style="border-top:1px solid var(--border);padding-top:8px"><span class="fw-lbl" style="font-weight:800;color:var(--txt)">Total</span><span class="fw-val" style="color:var(--a1);font-size:14px">${INR(cb.debtor.may+cb.sd.may+cb.ld.may+cb.inventory.may)}</span></div>
+    </div>`;
+}
+
+function renderRevenueTable(){
+  let html=`<table class="dt"><thead><tr>
+    <th>Date</th><th>Invoice No.</th><th>Party</th><th>Taxable</th><th>IGST</th><th>Total</th><th>Code</th><th>Month</th><th>Actions</th>
+  </tr></thead><tbody>`;
+  REVENUE.forEach((r,i)=>{
+    html+=`<tr>
+      <td class="mono">${esc(r.date)}</td>
+      <td class="txt" style="font-weight:700;color:var(--a1)">${esc(r.inv)}</td>
+      <td class="txt">${esc(r.party)}</td>
+      <td class="mono pos">${INR(r.taxable)}</td>
+      <td class="mono">${INR(r.igst)}</td>
+      <td class="mono" style="font-weight:700">${INR(r.total)}</td>
+      <td><span class="stt stt-g">${r.code}</span></td>
+      <td class="txt">${r.month}</td>
+      <td><button class="ab eb" onclick="openEditRev(${i})">Edit</button></td>
+    </tr>`;
+  });
+  html+=`<tr style="background:var(--card2)"><td colspan="3" class="txt" style="color:var(--muted);font-weight:700">TOTAL</td>
+    <td class="mono pos">${INR(REVENUE.reduce((a,r)=>a+r.taxable,0))}</td>
+    <td class="mono">${INR(REVENUE.reduce((a,r)=>a+r.igst,0))}</td>
+    <td class="mono" style="color:var(--a1);font-weight:700">${INR(REVENUE.reduce((a,r)=>a+r.total,0))}</td>
+    <td colspan="3"></td></tr></tbody></table>`;
+  document.getElementById('revenueTable').innerHTML=html;
+}
+
+function renderSiteDetail(siteName){
+  const s=SUMMARY.find(x=>x.site===siteName);
+  if(!s){document.getElementById('siteDetailTable').innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">No data</div>';return;}
+  document.getElementById('siteDetailTable').innerHTML=`
+    <div style="padding:20px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
+        ${[['Pending Bill',s.pending,'var(--a4)'],['SD Deduction',s.sd,'var(--yellow)'],['LD Deduction',s.ld,'var(--red)'],
+           ['Instant Release',s.instant,'var(--green)'],['Other',s.other,'var(--sub)'],['Withheld',s.withheld,'var(--a6)']
+        ].map(([lbl,val,c])=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">${lbl}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:${val>0?c:'var(--muted)'}">${val>0?INR(val):'—'}</div>
+        </div>`).join('')}
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(0,102,255,.1),rgba(0,212,255,.05));border:1px solid var(--a2);border-radius:12px;padding:18px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:4px">TOTAL OUTSTANDING</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:${s.total===0?'var(--green)':'var(--a1)'}">${s.total===0?'CLEAR':INR(s.total)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">PM: ${s.pm}</div>
+        </div>
+        <button class="btn btn-p" onclick="openEdit(${s.sno-1},'summary')"><i class="fa fa-pen"></i> Edit</button>
+      </div>
+    </div>`;
+}
+
+function openDetail(idx){
+  const s=summaryData[idx];if(!s)return;
+  document.getElementById('detailBody').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--card2);border-radius:10px;margin-bottom:16px">
+      <div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#003a99,#00d4ff);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:800">IO</div>
+      <div><div style="font-weight:700;font-size:15px">${esc(s.site)}</div><div style="font-size:11px;color:var(--muted)">PM: ${esc(s.pm)}</div></div>
+    </div>
+    <div class="dg">${[['Pending Bill',INR(s.pending)],['SD Deduction',INR(s.sd)],['LD Deduction',INR(s.ld)],['GST Hold',INR(s.gst)],['Instant Release',INR(s.instant)],['Other',INR(s.other)],['Withheld',INR(s.withheld)],['TOTAL OS',INR(s.total)]].map(([k,v])=>`<div class="dg-cell"><div class="dg-lbl">${k}</div><div class="dg-val" style="${k==='TOTAL OS'?'color:var(--a1);font-size:15px;font-weight:800':''}">${v}</div></div>`).join('')}</div>`;
+  currentEditCtx={idx,type:'summary'};openM('detailModal');
+}
+function openJhDetail(idx){
+  const r=JHARSUGUDA_BILLS[idx];
+  document.getElementById('detailBody').innerHTML=`
+    <div style="padding:12px;background:var(--card2);border-radius:8px;margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:var(--a1)">${esc(r.inv)}</div></div>
+    <div class="dg">${[['Invoice Date',r.date],['Pay Date',r.pdate||'—'],['Taxable Value',INR(r.taxable)],['GST',INR(r.gst)],['Total Invoice',INR(r.total)],['Received',INR(r.received)],['GST TDS',INR(r.gstTds)],['IT TDS',INR(r.itTds)],['SD',INR(r.sd)],['LD',INR(r.ld)]].map(([k,v])=>`<div class="dg-cell"><div class="dg-lbl">${k}</div><div class="dg-val">${esc(v)}</div></div>`).join('')}</div>`;
+  currentEditCtx={idx,type:'jh'};openM('detailModal');
+}
+function switchToEdit(){closeM('detailModal');if(currentEditCtx?.type==='summary')openEdit(currentEditCtx.idx,'summary');else if(currentEditCtx?.type==='jh')openEditJh(currentEditCtx.idx);}
+function openEdit(idx,type){
+  const isNew=idx===null;
+  const s=isNew?{site:'',pm:'Ravi',pending:0,sd:0,ld:0,gst:0,instant:0,other:0,withheld:0}:summaryData[idx];
+  document.getElementById('editTitle').textContent=(isNew?'Add New':'Edit')+' Site Record';
+  document.getElementById('editBody').innerHTML=`<div class="fg">
+    <div class="fgrp full"><label class="flbl">Site Name</label><input class="fin" id="ef_site" value="${esc(s.site||'')}"></div>
+    <div class="fgrp"><label class="flbl">PM</label><select class="fin" id="ef_pm">${['Ravi','Chandrashekhar','Vicky','Keshav'].map(pm=>`<option ${(s.pm||'')==pm?'selected':''}>${pm}</option>`).join('')}</select></div>
+    <div class="fgrp"><label class="flbl">Pending Bill (₹)</label><input class="fin" type="number" id="ef_pending" value="${s.pending||0}"></div>
+    <div class="fgrp"><label class="flbl">SD Deduction (₹)</label><input class="fin" type="number" id="ef_sd" value="${s.sd||0}"></div>
+    <div class="fgrp"><label class="flbl">LD Deduction (₹)</label><input class="fin" type="number" id="ef_ld" value="${s.ld||0}"></div>
+    <div class="fgrp"><label class="flbl">Instant Release (₹)</label><input class="fin" type="number" id="ef_instant" value="${s.instant||0}"></div>
+    <div class="fgrp"><label class="flbl">Other (₹)</label><input class="fin" type="number" id="ef_other" value="${s.other||0}"></div>
+    <div class="fgrp"><label class="flbl">Withheld (₹)</label><input class="fin" type="number" id="ef_withheld" value="${s.withheld||0}"></div>
+  </div>`;
+  currentEditCtx={idx,type,isNew};openM('editModal');
+}
+function openEditJh(idx){
+  const r=JHARSUGUDA_BILLS[idx]||{};
+  document.getElementById('editTitle').textContent='Edit Jharsuguda Bill';
+  document.getElementById('editBody').innerHTML=`<div class="fg">
+    <div class="fgrp"><label class="flbl">Invoice No.</label><input class="fin" id="jef_inv" value="${esc(r.inv||'')}"></div>
+    <div class="fgrp"><label class="flbl">Date</label><input class="fin" id="jef_date" value="${esc(r.date||'')}"></div>
+    <div class="fgrp"><label class="flbl">Taxable Value</label><input class="fin" type="number" id="jef_tax" value="${r.taxable||0}"></div>
+    <div class="fgrp"><label class="flbl">GST</label><input class="fin" type="number" id="jef_gst" value="${r.gst||0}"></div>
+    <div class="fgrp"><label class="flbl">Payment Date</label><input class="fin" id="jef_pdate" value="${esc(r.pdate||'')}"></div>
+    <div class="fgrp"><label class="flbl">Received</label><input class="fin" type="number" id="jef_rec" value="${r.received||0}"></div>
+    <div class="fgrp"><label class="flbl">GST TDS</label><input class="fin" type="number" id="jef_gstTds" value="${r.gstTds||0}"></div>
+    <div class="fgrp"><label class="flbl">IT TDS</label><input class="fin" type="number" id="jef_itTds" value="${r.itTds||0}"></div>
+    <div class="fgrp"><label class="flbl">SD</label><input class="fin" type="number" id="jef_sd" value="${r.sd||0}"></div>
+    <div class="fgrp"><label class="flbl">LD</label><input class="fin" type="number" id="jef_ld" value="${r.ld||0}"></div>
+    <div class="fgrp full"><label class="flbl">Drive Link</label><input class="fin" id="jef_link" value="${esc(r.link||'')}"></div>
+  </div>`;
+  currentEditCtx={idx,type:'jh'};openM('editModal');
+}
+function openEditRev(idx){
+  const r=REVENUE[idx]||{};
+  document.getElementById('editTitle').textContent='Edit Revenue Record';
+  document.getElementById('editBody').innerHTML=`<div class="fg">
+    <div class="fgrp"><label class="flbl">Invoice No.</label><input class="fin" id="ref_inv" value="${esc(r.inv||'')}"></div>
+    <div class="fgrp"><label class="flbl">Date</label><input class="fin" id="ref_date" value="${esc(r.date||'')}"></div>
+    <div class="fgrp full"><label class="flbl">Party</label><input class="fin" id="ref_party" value="${esc(r.party||'')}"></div>
+    <div class="fgrp"><label class="flbl">Taxable</label><input class="fin" type="number" id="ref_tax" value="${r.taxable||0}"></div>
+    <div class="fgrp"><label class="flbl">IGST</label><input class="fin" type="number" id="ref_igst" value="${r.igst||0}"></div>
+    <div class="fgrp"><label class="flbl">Month</label><input class="fin" id="ref_month" value="${esc(r.month||'')}"></div>
+    <div class="fgrp"><label class="flbl">Code</label><input class="fin" id="ref_code" value="${esc(r.code||'R')}"></div>
+  </div>`;
+  currentEditCtx={idx,type:'revenue'};openM('editModal');
+}
+function saveRec(){
+  const ctx=currentEditCtx;if(!ctx)return;
+  if(ctx.type==='summary'||ctx.type==='new'){
+    const g=id=>document.getElementById(id)?.value;
+    const n=id=>+(document.getElementById(id)?.value)||0;
+    const s={site:g('ef_site'),pm:g('ef_pm'),pending:n('ef_pending'),sd:n('ef_sd'),ld:n('ef_ld'),instant:n('ef_instant'),other:n('ef_other'),withheld:n('ef_withheld')};
+    s.total=s.pending+s.sd+s.ld+s.instant+s.other+s.withheld;
+    if(ctx.isNew){s.sno=summaryData.length+1;summaryData.push(s);}else Object.assign(summaryData[ctx.idx],s);
+  }
+  closeM('editModal');toast('Saved!');
+  const av=document.querySelector('.view.active')?.id?.replace('view-','');
+  if(av==='summary')renderSummaryTable();
+  if(av==='dashboard'){renderTopSites();renderBreakupChart();}
+  if(av==='revenue')renderRevenueTable();
+  if(av==='site')renderSiteDetail(currentSite);
+}
+buildSidebarSites();
+renderTopSites();renderBreakupChart();renderPMChart();renderAgeingBuckets();renderJharsugudaPreview();
+</script>
+</body>
+</html>
+
