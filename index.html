@@ -242,9 +242,134 @@ table.dt tr:hover td{background:rgba(0,212,255,.03);color:var(--txt)}
 .fu:nth-child(1){animation-delay:.04s}.fu:nth-child(2){animation-delay:.08s}
 .fu:nth-child(3){animation-delay:.12s}.fu:nth-child(4){animation-delay:.16s}
 .fu:nth-child(5){animation-delay:.2s}.fu:nth-child(6){animation-delay:.24s}
+
+/* ── AUDIT LOG ── */
+.audit-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(28,45,68,.4)}
+.audit-row:last-child{border-bottom:none}
+.audit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.audit-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.audit-msg{font-size:12px;font-weight:500}
+/* ── SHEETS SYNC ── */
+.sync-status{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700}
+.sync-ok{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.sync-err{background:rgba(255,64,64,.12);color:var(--red);border:1px solid rgba(255,64,64,.25)}
+.sync-loading{background:rgba(0,212,255,.12);color:var(--a1);border:1px solid rgba(0,212,255,.25)}
+/* ── EMAIL PARSER ── */
+.parse-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:12px;color:var(--txt);font-family:'Space Grotesk',sans-serif;width:100%;min-height:120px;outline:none;resize:vertical;line-height:1.6}
+.parse-box:focus{border-color:var(--a2)}
+.parse-result{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:12px}
+.parse-field{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(28,45,68,.4)}
+.parse-field:last-child{border-bottom:none}
+.parse-lbl{width:130px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.parse-val{flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txt);font-weight:600}
+.parse-edit{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--txt);font-size:11px;font-family:'JetBrains Mono',monospace;outline:none;flex:1}
+.parse-edit:focus{border-color:var(--a2)}
+/* ── HISTORY TAB ── */
+.hist-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.hf-btn{padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:var(--card2);transition:all .18s;font-family:'Space Grotesk',sans-serif}
+.hf-btn.active,.hf-btn:hover{border-color:var(--a2);color:var(--a1);background:rgba(0,102,255,.1)}
+
+
+/* ── INDIA MAP ── */
+.map-container { position: relative; width: 100%; background: var(--card2); border-radius: 12px; overflow: hidden; }
+.map-svg-wrap { width: 100%; position: relative; }
+.site-pin { cursor: pointer; transition: transform .2s; }
+.site-pin:hover { transform: scale(1.3); }
+.site-pin circle { filter: drop-shadow(0 0 6px currentColor); }
+.map-tooltip {
+  position: absolute; background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px; pointer-events: none;
+  font-size: 12px; z-index: 10; min-width: 200px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5); display: none;
+}
+.map-tooltip.visible { display: block; }
+.map-legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 12px 16px; border-top: 1px solid var(--border); }
+.map-leg-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--sub); }
+.map-leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.map-controls { display: flex; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.map-stat-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.map-stat { text-align: center; }
+.map-stat-val { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 800; }
+.map-stat-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+.site-list-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(28,45,68,.4); cursor: pointer; transition: all .18s; }
+.site-list-row:hover { padding-left: 6px; }
+.site-list-row:last-child { border-bottom: none; }
+
 </style>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#07090f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VE Dashboard">
+  <meta name="application-name" content="VE Dashboard">
+  <meta name="description" content="Vishal Electricals Outstanding Payment Dashboard">
+  <link rel="manifest" id="pwaManifest">
+
 </head>
 <body>
+
+  <!-- PWA Install Button (injected into header) -->
+  <style>
+  .pwa-install-btn {
+    display:none; align-items:center; gap:6px;
+    background: linear-gradient(135deg,#6c3fc7,#b44fff);
+    border:none; border-radius:8px; padding:7px 14px;
+    color:#fff; font-size:11px; font-weight:700; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; transition:opacity .2s;
+    animation: pwaGlow 2s infinite alternate;
+  }
+  .pwa-install-btn.visible { display:flex; }
+  @keyframes pwaGlow {
+    from { box-shadow: 0 0 8px rgba(180,79,255,.3); }
+    to   { box-shadow: 0 0 20px rgba(180,79,255,.7); }
+  }
+  .pwa-toast {
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--card); border:1px solid var(--a6); border-radius:14px;
+    padding:16px 20px; display:flex; align-items:center; gap:14px;
+    z-index:3000; opacity:0; transition:all .35s; max-width:360px; width:90%;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);
+  }
+  .pwa-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .pwa-toast-icon { font-size:28px; color:var(--a6); }
+  .pwa-toast-text h4 { font-size:13px; margin-bottom:3px; }
+  .pwa-toast-text p { font-size:11px; color:var(--muted); }
+  .pwa-toast-actions { display:flex; gap:8px; margin-top:10px; }
+  .offline-banner {
+    position:fixed; top:0; left:0; right:0; z-index:9999;
+    background:rgba(255,64,64,.9); color:#fff; text-align:center;
+    padding:8px; font-size:12px; font-weight:700; display:none;
+  }
+  .offline-banner.show { display:block; }
+  .install-guide {
+    background:var(--card2); border:1px solid var(--border); border-radius:10px;
+    padding:14px; margin-top:12px;
+  }
+  .install-step {
+    display:flex; align-items:flex-start; gap:10px; padding:8px 0;
+    border-bottom:1px solid rgba(28,45,68,.4); font-size:12px;
+  }
+  .install-step:last-child { border-bottom:none; }
+  .step-num {
+    width:22px; height:22px; border-radius:50%; background:var(--a6);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:800; flex-shrink:0;
+  }
+  </style>
+  <div class="offline-banner" id="offlineBanner"><i class="fa fa-wifi-slash"></i> You are offline — Dashboard running from cache</div>
+  <div class="pwa-toast" id="pwaToast">
+    <div class="pwa-toast-icon"><i class="fa fa-mobile-screen"></i></div>
+    <div class="pwa-toast-text">
+      <h4>Install Dashboard App</h4>
+      <p>Add to your home screen for quick access — works offline too!</p>
+      <div class="pwa-toast-actions">
+        <button class="btn btn-p" style="padding:6px 14px;font-size:11px;background:linear-gradient(135deg,#6c3fc7,#b44fff)" onclick="installPWA()">Install Now</button>
+        <button class="btn btn-s" style="padding:6px 14px;font-size:11px" onclick="dismissPWAToast()">Later</button>
+      </div>
+    </div>
+  </div>
+
 <!-- SIDEBAR -->
 <div id="sb">
   <div class="sb-logo">
@@ -266,6 +391,17 @@ table.dt tr:hover td{background:rgba(0,212,255,.03);color:var(--txt)}
     <div class="ni" data-view="daywise"><i class="fa fa-calendar-days ic"></i>Daywise Outstanding</div>
     <div class="ni" data-view="finance"><i class="fa fa-chart-line ic"></i>Finance Weekly</div>
     <div class="ni" data-view="revenue"><i class="fa fa-file-invoice ic"></i>VE Revenue 26-27</div>
+    <div class="sb-sec" style="margin-top:6px">Features</div>
+    <div class="ni" data-view="alerts"><i class="fa fa-bell ic"></i>Alerts & Reminders<span class="bd bd-red">!</span></div>
+    <div class="ni" data-view="pm-scorecard"><i class="fa fa-user-tie ic"></i>PM Scorecard</div>
+    <div class="ni" data-view="recovery"><i class="fa fa-chart-pie ic"></i>Recovery Tracker</div>
+    <div class="ni" data-view="notes"><i class="fa fa-note-sticky ic"></i>Notes & Remarks</div>
+    <div class="sb-sec" style="margin-top:6px">Integrations</div>
+    <div class="ni" data-view="pwa"><i class="fa fa-mobile-screen ic"></i>Install as App<span class="bd bd-purple">PWA</span></div>
+    <div class="ni" data-view="sheets-sync"><i class="fa fa-rotate ic"></i>Live Sheets Sync<span class="bd bd-green">NEW</span></div>
+    <div class="ni" data-view="email-parser"><i class="fa fa-envelope-open-text ic"></i>Email Parser<span class="bd bd-blue">AI</span></div>
+    <div class="ni" data-view="history"><i class="fa fa-clock-rotate-left ic"></i>Audit History</div>
+    <div class="ni" data-view="map"><i class="fa fa-map-location-dot ic"></i>India Map View<span class="bd bd-green">NEW</span></div>
     <div class="sb-sec" style="margin-top:6px">Site Sheets</div>
     <div id="siteNavItems"></div>
   </div>
@@ -294,6 +430,7 @@ table.dt tr:hover td{background:rgba(0,212,255,.03);color:var(--txt)}
       <div class="hdr-date">As on 20 May 2026</div>
       <button class="btn-ic" onclick="openEdit(null,'new')" title="Add Entry"><i class="fa fa-plus"></i></button>
       <button class="btn-ic" title="Export"><i class="fa fa-download"></i></button>
+      <button class="pwa-install-btn" id="pwaInstallHeaderBtn" onclick="installPWA()"><i class="fa fa-mobile-screen"></i>Install App</button>
       <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTIdqeYJVJRbkK0rk1OPzE2nWRdyfseDrLs0UXoSZf9i3Jq_CJBdNR1eMRJGLl49eRa2FXJWbbHsoiH/pub?output=csv" target="_blank">
         <button class="csv-btn"><i class="fa fa-table"></i>CSV Source</button>
       </a>
@@ -392,9 +529,21 @@ table.dt tr:hover td{background:rgba(0,212,255,.03);color:var(--txt)}
           <div class="pa">
             <button class="pa-btn" onclick="openEdit(null,'new')"><i class="fa fa-plus"></i> Add</button>
             <button class="pa-btn" id="sortBtn" onclick="toggleSort()"><i class="fa fa-sort-amount-down"></i> Sort</button>
+            <button class="pa-btn" onclick="toggleBulkMode()"><i class="fa fa-check-square"></i> Bulk Edit</button>
+            <button class="pa-btn" onclick="generatePDF()"><i class="fa fa-file-pdf"></i> PDF</button>
           </div>
         </div>
-        <div class="tw" id="summaryTable"></div>
+        <div id="bulkBar" style="display:none;align-items:center;gap:12px;padding:10px 18px;background:rgba(255,193,7,.08);border-bottom:1px solid rgba(255,193,7,.3)">
+        <i class="fa fa-check-square" style="color:var(--yellow)"></i>
+        <span id="bulkCount" style="font-size:12px;font-weight:700;color:var(--yellow)">0 selected</span>
+        <select id="bulkPMSelect" class="fin" style="width:160px;padding:5px 10px;font-size:12px">
+          <option value="">— Change PM —</option>
+          <option>Ravi</option><option>Chandrashekhar</option><option>Vicky</option><option>Keshav</option>
+        </select>
+        <button class="btn btn-p" style="padding:5px 14px;font-size:11px" onclick="applyBulkPM()">Apply</button>
+        <button class="btn btn-s" style="padding:5px 14px;font-size:11px" onclick="toggleBulkMode()">Cancel</button>
+      </div>
+      <div class="tw" id="summaryTable"></div>
       </div>
     </div>
 
@@ -461,7 +610,280 @@ table.dt tr:hover td{background:rgba(0,212,255,.03);color:var(--txt)}
       </div>
     </div>
 
-  </div><!-- /content -->
+  
+    <!-- ALERTS VIEW -->
+    <div class="view" id="view-alerts">
+      <div class="panel fu">
+        <div class="ph"><div class="ph-title">Auto Follow-Up Alerts</div><span class="pb pb-orange">Urgent</span>
+          <div class="pa"><button class="pa-btn" onclick="generatePDF()"><i class="fa fa-file-pdf"></i> PDF Report</button></div>
+        </div>
+        <div class="pb-body" id="alertsContent"><div style="padding:30px;text-align:center;color:var(--muted)">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- PM SCORECARD VIEW -->
+    <div class="view" id="view-pm-scorecard">
+      <div class="panel fu">
+        <div class="ph"><div class="ph-title">PM Performance Scorecard</div><span class="pb pb-purple">By Manager</span></div>
+        <div class="pb-body" id="pmScorecardContent"><div style="padding:30px;text-align:center;color:var(--muted)">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- RECOVERY TRACKER VIEW -->
+    <div class="view" id="view-recovery">
+      <div class="panel fu">
+        <div class="ph"><div class="ph-title">Recovery Rate Tracker</div><span class="pb pb-green">IOCL Jharsuguda</span></div>
+        <div class="pb-body" id="recoveryContent"><div style="padding:30px;text-align:center;color:var(--muted)">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- NOTES VIEW -->
+    <div class="view" id="view-notes">
+      <div class="panel fu">
+        <div class="ph"><div class="ph-title">Site Notes & Remarks</div><span class="pb pb-blue">Editable</span></div>
+        <div class="pb-body" id="notesContent"><div style="padding:30px;text-align:center;color:var(--muted)">Loading...</div></div>
+      </div>
+    </div>
+
+
+    <!-- SHEETS SYNC VIEW -->
+    <div class="view" id="view-sheets-sync">
+      <div class="row2">
+        <div class="panel fu">
+          <div class="ph">
+            <div class="ph-title">Live Google Sheets Sync</div>
+            <span class="pb pb-green">Two-Way</span>
+            <div class="pa">
+              <button class="pa-btn" onclick="syncFromSheets()"><i class="fa fa-cloud-arrow-down"></i> Pull from Sheets</button>
+              <button class="pa-btn" onclick="pushToSheets()"><i class="fa fa-cloud-arrow-up"></i> Push to Sheets</button>
+            </div>
+          </div>
+          <div class="pb-body" id="syncStatusPanel">
+            <div style="text-align:center;padding:30px;color:var(--muted)">Click Pull to fetch latest data from Google Sheets</div>
+          </div>
+        </div>
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Sync Log</div></div>
+          <div class="pb-body" id="syncLogPanel" style="max-height:400px;overflow-y:auto">
+            <div style="text-align:center;padding:30px;color:var(--muted)">No sync activity yet</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel fu">
+        <div class="ph"><div class="ph-title">Sheet Connection Settings</div><span class="pb pb-blue">Config</span></div>
+        <div class="pb-body">
+          <div class="fg" style="max-width:700px">
+            <div class="fgrp full"><label class="flbl">Google Sheets CSV URL (Published)</label>
+              <input class="fin" id="csvUrlInput" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vTIdqeYJVJRbkK0rk1OPzE2nWRdyfseDrLs0UXoSZf9i3Jq_CJBdNR1eMRJGLl49eRa2FXJWbbHsoiH/pub?output=csv" placeholder="Paste CSV URL here">
+            </div>
+            <div class="fgrp"><label class="flbl">Auto-Sync Interval</label>
+              <select class="fin" id="syncInterval">
+                <option value="0">Manual only</option>
+                <option value="60">Every 1 minute</option>
+                <option value="300">Every 5 minutes</option>
+                <option value="900">Every 15 minutes</option>
+              </select>
+            </div>
+            <div class="fgrp"><label class="flbl">Conflict Resolution</label>
+              <select class="fin" id="conflictMode">
+                <option value="sheets">Sheets wins (overwrite local)</option>
+                <option value="local">Local wins (keep edits)</option>
+                <option value="ask">Ask each time</option>
+              </select>
+            </div>
+            <div class="fgrp full">
+              <button class="btn btn-p" onclick="saveAndTestSync()" style="width:fit-content"><i class="fa fa-plug"></i> Save & Test Connection</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMAIL PARSER VIEW -->
+    <div class="view" id="view-email-parser">
+      <div class="row2">
+        <div class="panel fu">
+          <div class="ph">
+            <div class="ph-title">Email / Payment Advice Parser</div>
+            <span class="pb pb-blue">AI-Powered</span>
+          </div>
+          <div class="pb-body">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Paste a payment confirmation email or advice text below. The AI will extract invoice number, amount, date and site automatically.</div>
+            <textarea class="parse-box" id="emailInput" placeholder="Paste payment advice email here...
+
+Example:
+Dear Sir, Payment of Rs. 1,25,000/- has been processed against Invoice No. VE/25-26/37 dated 30.06.2025 for IOCL Jharsuguda. UTR No: HDFC0001234. Payment Date: 13.08.2025..."></textarea>
+            <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+              <button class="btn btn-p" onclick="parseEmail()"><i class="fa fa-wand-magic-sparkles"></i> Parse with AI</button>
+              <button class="btn btn-s" onclick="loadSampleEmail()"><i class="fa fa-file-lines"></i> Load Sample</button>
+              <button class="btn btn-s" onclick="document.getElementById('emailInput').value='';document.getElementById('parseResultArea').style.display='none'"><i class="fa fa-xmark"></i> Clear</button>
+            </div>
+            <div id="parseResultArea" style="display:none">
+              <div style="margin:14px 0 8px;font-size:11px;font-weight:700;color:var(--a3)"><i class="fa fa-circle-check"></i> Extracted Data — Review & Confirm</div>
+              <div class="parse-result" id="parseResult"></div>
+              <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+                <button class="btn btn-p" onclick="applyParsedData()"><i class="fa fa-floppy-disk"></i> Apply to Dashboard</button>
+                <button class="btn btn-s" onclick="document.getElementById('parseResultArea').style.display='none'">Discard</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Recent Parsed Emails</div></div>
+          <div class="pb-body" id="parsedHistory">
+            <div style="text-align:center;padding:30px;color:var(--muted)"><i class="fa fa-inbox" style="font-size:32px;opacity:.3;display:block;margin-bottom:10px"></i>No emails parsed yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY / AUDIT LOG VIEW -->
+    <div class="view" id="view-history">
+      <div class="panel fu">
+        <div class="ph">
+          <div class="ph-title">Audit Trail — Edit History</div>
+          <span class="pb pb-purple">Multi-User</span>
+          <div class="pa">
+            <button class="pa-btn" onclick="exportAuditLog()"><i class="fa fa-download"></i> Export Log</button>
+            <button class="pa-btn" onclick="clearAuditLog()" style="color:var(--red)"><i class="fa fa-trash"></i> Clear</button>
+          </div>
+        </div>
+        <div class="pb-body">
+          <div class="hist-filter" id="histFilter">
+            <button class="hf-btn active" onclick="filterAudit('all',this)">All</button>
+            <button class="hf-btn" onclick="filterAudit('edit',this)">Edits</button>
+            <button class="hf-btn" onclick="filterAudit('add',this)">Additions</button>
+            <button class="hf-btn" onclick="filterAudit('delete',this)">Deletions</button>
+            <button class="hf-btn" onclick="filterAudit('sync',this)">Syncs</button>
+            <button class="hf-btn" onclick="filterAudit('parse',this)">Parsed</button>
+          </div>
+          <div id="auditLogContent">
+            <div style="text-align:center;padding:40px;color:var(--muted)"><i class="fa fa-clock-rotate-left" style="font-size:36px;opacity:.3;display:block;margin-bottom:10px"></i>No activity recorded yet. Start editing records to see the audit trail.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- MAP VIEW -->
+    <div class="view" id="view-map">
+      <div class="panel fu" style="margin-bottom:16px">
+        <div class="ph">
+          <div class="ph-title">India Site Map — Outstanding Visualization</div>
+          <span class="pb pb-blue">43 Sites</span>
+          <div class="pa">
+            <button class="pa-btn" onclick="setMapFilter('all')" id="mf-all">All Sites</button>
+            <button class="pa-btn" onclick="setMapFilter('critical')" id="mf-critical">Critical Only</button>
+            <button class="pa-btn" onclick="setMapFilter('pending')" id="mf-pending">Pending Bill</button>
+          </div>
+        </div>
+        <div class="map-stat-bar">
+          <div class="map-stat"><div class="map-stat-val" style="color:var(--a1)">43</div><div class="map-stat-lbl">Total Sites</div></div>
+          <div class="map-stat"><div class="map-stat-val" style="color:var(--red)">35</div><div class="map-stat-lbl">Critical (180+ days)</div></div>
+          <div class="map-stat"><div class="map-stat-val" style="color:var(--green)">2</div><div class="map-stat-lbl">Cleared</div></div>
+          <div class="map-stat"><div class="map-stat-val" style="color:var(--yellow)">₹5.17Cr</div><div class="map-stat-lbl">Total Outstanding</div></div>
+        </div>
+        <div class="map-controls">
+          <button class="pa-btn" onclick="mapZoom(1.2)"><i class="fa fa-magnifying-glass-plus"></i> Zoom In</button>
+          <button class="pa-btn" onclick="mapZoom(0.8)"><i class="fa fa-magnifying-glass-minus"></i> Zoom Out</button>
+          <button class="pa-btn" onclick="resetMapZoom()"><i class="fa fa-expand"></i> Reset</button>
+          <select class="fin" id="mapPMFilter" style="width:160px;padding:5px 10px;font-size:11px" onchange="filterMapByPM(this.value)">
+            <option value="">— Filter by PM —</option>
+            <option>Ravi</option><option>Chandrashekhar</option><option>Vicky</option><option>Keshav</option>
+          </select>
+        </div>
+        <div class="map-container">
+          <div class="map-svg-wrap" id="mapSvgWrap"></div>
+          <div class="map-tooltip" id="mapTooltip"></div>
+        </div>
+        <div class="map-legend">
+          <div class="map-leg-item"><div class="map-leg-dot" style="background:#ff4040"></div>Critical (&gt;₹50L)</div>
+          <div class="map-leg-item"><div class="map-leg-dot" style="background:#ffc107"></div>High (₹10L–₹50L)</div>
+          <div class="map-leg-item"><div class="map-leg-dot" style="background:#00d4ff"></div>Medium (₹1L–₹10L)</div>
+          <div class="map-leg-item"><div class="map-leg-dot" style="background:#00e676"></div>Cleared / Low</div>
+          <div class="map-leg-item"><div class="map-leg-dot" style="background:#b44fff"></div>Non-IOCL</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">State-wise Summary</div></div>
+          <div class="pb-body" id="stateWiseSummary"></div>
+        </div>
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Site List</div><span class="pb pb-orange">Click to highlight</span></div>
+          <div class="pb-body" style="max-height:400px;overflow-y:auto" id="mapSiteList"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- PWA VIEW -->
+    <div class="view" id="view-pwa">
+      <div class="row2">
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">Install as Mobile App</div><span class="pb pb-purple">PWA</span></div>
+          <div class="pb-body">
+            <div style="text-align:center;padding:20px 0 24px">
+              <div style="font-size:64px;margin-bottom:12px">📱</div>
+              <div style="font-size:18px;font-weight:700;margin-bottom:6px">Vishal Electricals Dashboard</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Install this dashboard as an app on your phone.<br>Works offline, loads instantly, no browser needed!</div>
+              <button class="btn btn-p" id="pwaInstallMainBtn" style="padding:12px 28px;font-size:14px;background:linear-gradient(135deg,#6c3fc7,#b44fff);margin-bottom:10px" onclick="installPWA()">
+                <i class="fa fa-download"></i> Install App Now
+              </button>
+              <div style="font-size:11px;color:var(--muted)" id="pwaInstallStatus">Checking install availability...</div>
+            </div>
+            <div style="background:rgba(180,79,255,.08);border:1px solid rgba(180,79,255,.25);border-radius:10px;padding:16px;margin-bottom:16px">
+              <div style="font-size:11px;font-weight:700;color:var(--a6);margin-bottom:10px"><i class="fa fa-star"></i> App Features</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--sub)">
+                <div><i class="fa fa-check" style="color:var(--green);margin-right:6px"></i>Works offline</div>
+                <div><i class="fa fa-check" style="color:var(--green);margin-right:6px"></i>Home screen icon</div>
+                <div><i class="fa fa-check" style="color:var(--green);margin-right:6px"></i>Full screen mode</div>
+                <div><i class="fa fa-check" style="color:var(--green);margin-right:6px"></i>Fast loading</div>
+                <div><i class="fa fa-check" style="color:var(--green);margin-right:6px"></i>Push notifications</div>
+                <div><i class="fa fa-check" style="color:var(--green);margin-right:6px"></i>No app store needed</div>
+              </div>
+            </div>
+            <div class="install-guide">
+              <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Manual Install Guide</div>
+              <div class="install-step"><div class="step-num">1</div><div><b>Android Chrome:</b> Tap the 3-dot menu → "Add to Home Screen" → Confirm</div></div>
+              <div class="install-step"><div class="step-num">2</div><div><b>iPhone Safari:</b> Tap Share <i class="fa fa-arrow-up-from-bracket"></i> → "Add to Home Screen" → Add</div></div>
+              <div class="install-step"><div class="step-num">3</div><div><b>Desktop Chrome/Edge:</b> Click the install icon <i class="fa fa-download"></i> in the address bar</div></div>
+              <div class="install-step"><div class="step-num">4</div><div><b>Samsung Browser:</b> Tap menu → "Add page to" → Home screen</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel fu">
+          <div class="ph"><div class="ph-title">App Status</div></div>
+          <div class="pb-body">
+            <div id="pwaStatusCards">
+              <div style="display:grid;gap:12px">
+                <div style="background:var(--card2);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+                  <i class="fa fa-wifi" style="font-size:20px;color:var(--green)"></i>
+                  <div><div style="font-weight:700;font-size:13px">Connection</div><div style="font-size:11px;color:var(--muted)" id="connStatus">Online</div></div>
+                  <div style="margin-left:auto"><span class="stt stt-g" id="connBadge">ONLINE</span></div>
+                </div>
+                <div style="background:var(--card2);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+                  <i class="fa fa-hard-drive" style="font-size:20px;color:var(--a1)"></i>
+                  <div><div style="font-weight:700;font-size:13px">Service Worker</div><div style="font-size:11px;color:var(--muted)" id="swStatus">Checking...</div></div>
+                  <div style="margin-left:auto"><span class="stt" id="swBadge" style="background:rgba(0,212,255,.15);color:var(--a1)">LOADING</span></div>
+                </div>
+                <div style="background:var(--card2);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+                  <i class="fa fa-mobile-screen" style="font-size:20px;color:var(--a6)"></i>
+                  <div><div style="font-weight:700;font-size:13px">Install Status</div><div style="font-size:11px;color:var(--muted)" id="installStatus">Checking...</div></div>
+                  <div style="margin-left:auto"><span class="stt stt-p" id="installBadge">PENDING</span></div>
+                </div>
+                <div style="background:var(--card2);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+                  <i class="fa fa-database" style="font-size:20px;color:var(--yellow)"></i>
+                  <div><div style="font-weight:700;font-size:13px">Local Storage</div><div style="font-size:11px;color:var(--muted)" id="storageStatus">Calculating...</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div><!-- /content -->
 </div>
 
 <!-- DETAIL MODAL -->
@@ -630,7 +1052,7 @@ let currentEditCtx=null;
 function toast(msg,type='success'){
   const t=document.getElementById('toast');
   t.className=type+' show';
-  document.getElementById('tmsg').textContent=msg;
+  const _tmsg=document.getElementById('tmsg'); if(_tmsg) _tmsg.textContent=msg;
   document.getElementById('ticon').className=type==='success'?'fa fa-circle-check':'fa fa-circle-xmark';
   clearTimeout(window._tt);
   window._tt=setTimeout(()=>t.className='',3000);
@@ -681,7 +1103,7 @@ function showView(v){
   const ni=document.querySelector(`.ni[data-view="${v}"]`);
   if(ni){ni.classList.add('active');}
   const labels={dashboard:'/ Dashboard',summary:'/ All Sites',ageing:'/ Ageing',daywise:'/ Daywise OS',finance:'/ Finance Weekly',revenue:'/ Revenue 26-27',site:`/ ${currentSite}`};
-  document.getElementById('bc').textContent=labels[v]||`/ ${v}`;
+  const _bc=document.getElementById('bc'); if(_bc) _bc.textContent=labels[v]||('/ '+v);
   if(v==='summary')renderSummaryTable();
   if(v==='ageing'){renderAgeingDetail();renderAgeingSummary();renderAgeingTable();}
   if(v==='daywise')renderDaywiseTable();
@@ -692,9 +1114,9 @@ function showView(v){
 function showSiteView(siteName){
   currentSite=siteName;
   showView('site');
-  document.getElementById('siteViewTitle').textContent=siteName;
+  const _svt=document.getElementById('siteViewTitle'); if(_svt) _svt.textContent=siteName;
   const s=SUMMARY.find(x=>x.site===siteName)||{};
-  document.getElementById('siteViewPM').textContent=s.pm?'PM: '+s.pm:'';
+  const _svp=document.getElementById('siteViewPM'); if(_svp) _svp.textContent=s.pm?'PM: '+s.pm:'';
   renderSiteDetail(siteName);
   document.querySelectorAll('.ni[data-site]').forEach(x=>x.classList.remove('active'));
   const match=document.querySelector(`.ni[data-site="${siteName}"]`);
@@ -732,6 +1154,7 @@ function renderTopSites(){
       <td class="mono" style="color:var(--a1);font-weight:700">${INR(s.total)}</td>
       <td><div class="acts">
         <button class="ab vb" onclick="openDetail(${s.sno-1})">View</button>
+        <button class="ab" style="border-color:var(--a3);color:var(--a3);background:rgba(0,255,179,.08)" onclick="openShareModal(${s.sno-1})"><i class="fa fa-share-nodes"></i></button>
         <button class="ab eb" onclick="openEdit(${s.sno-1},'summary')">Edit</button>
       </div></td>
     </tr>`;
@@ -826,7 +1249,7 @@ function renderJharsugudaPreview(){
       <td><div class="acts">
         <button class="ab vb" onclick="openJhDetail(${i})">View</button>
         <button class="ab eb" onclick="openEditJh(${i})">Edit</button>
-        ${r.link&&r.link!=='CREDIT NOTE'?`<a href="${r.link}" target="_blank"><button class="ab" style="border-color:var(--a3);color:var(--a3);background:rgba(0,255,179,.08)">Link</button></a>`:''}
+        ${r.link&&r.link!=='CREDIT NOTE'?`<button class="ab" style="border-color:var(--a3);color:var(--a3);background:rgba(0,255,179,.08)" onclick="openDocViewer('${r.link}','${r.inv}')"><i class="fa fa-eye"></i> Doc</button>`:''}
       </div></td>
     </tr>`;
   });
@@ -1111,7 +1534,7 @@ function switchToEdit(){closeM('detailModal');if(currentEditCtx?.type==='summary
 function openEdit(idx,type){
   const isNew=idx===null;
   const s=isNew?{site:'',pm:'Ravi',pending:0,sd:0,ld:0,gst:0,instant:0,other:0,withheld:0}:summaryData[idx];
-  document.getElementById('editTitle').textContent=(isNew?'Add New':'Edit')+' Site Record';
+  const _et1=document.getElementById('editTitle'); if(_et1) _et1.textContent=(isNew?'Add New':'Edit')+' Site Record';
   document.getElementById('editBody').innerHTML=`<div class="fg">
     <div class="fgrp full"><label class="flbl">Site Name</label><input class="fin" id="ef_site" value="${esc(s.site||'')}"></div>
     <div class="fgrp"><label class="flbl">PM</label><select class="fin" id="ef_pm">${['Ravi','Chandrashekhar','Vicky','Keshav'].map(pm=>`<option ${(s.pm||'')==pm?'selected':''}>${pm}</option>`).join('')}</select></div>
@@ -1126,7 +1549,7 @@ function openEdit(idx,type){
 }
 function openEditJh(idx){
   const r=JHARSUGUDA_BILLS[idx]||{};
-  document.getElementById('editTitle').textContent='Edit Jharsuguda Bill';
+  const _et2=document.getElementById('editTitle'); if(_et2) _et2.textContent='Edit Jharsuguda Bill';
   document.getElementById('editBody').innerHTML=`<div class="fg">
     <div class="fgrp"><label class="flbl">Invoice No.</label><input class="fin" id="jef_inv" value="${esc(r.inv||'')}"></div>
     <div class="fgrp"><label class="flbl">Date</label><input class="fin" id="jef_date" value="${esc(r.date||'')}"></div>
@@ -1144,7 +1567,7 @@ function openEditJh(idx){
 }
 function openEditRev(idx){
   const r=REVENUE[idx]||{};
-  document.getElementById('editTitle').textContent='Edit Revenue Record';
+  const _et3=document.getElementById('editTitle'); if(_et3) _et3.textContent='Edit Revenue Record';
   document.getElementById('editBody').innerHTML=`<div class="fg">
     <div class="fgrp"><label class="flbl">Invoice No.</label><input class="fin" id="ref_inv" value="${esc(r.inv||'')}"></div>
     <div class="fgrp"><label class="flbl">Date</label><input class="fin" id="ref_date" value="${esc(r.date||'')}"></div>
@@ -1174,7 +1597,1268 @@ function saveRec(){
 }
 buildSidebarSites();
 renderTopSites();renderBreakupChart();renderPMChart();renderAgeingBuckets();renderJharsugudaPreview();
+
+
+// ============================================================
+// FEATURE 1: AUTO FOLLOW-UP ALERTS
+// ============================================================
+function renderAlerts() {
+  const critical = SUMMARY.filter(s => s.total > 0);
+  const ageing180 = AGEING.filter(a => a.bucket === '180+ Days');
+  const sites180 = [...new Set(ageing180.map(a => a.site))];
+  
+  let html = `<div style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.5s infinite"></div>
+      <span style="font-size:12px;font-weight:700;color:var(--red)">${sites180.length} SITES REQUIRE URGENT FOLLOW-UP (180+ Days)</span>
+    </div>
+    <div style="display:grid;gap:10px">`;
+  
+  sites180.slice(0,8).forEach(site => {
+    const s = SUMMARY.find(x=>x.site===site)||{};
+    const entries = ageing180.filter(a=>a.site===site);
+    const totalAmt = entries.reduce((a,e)=>a+e.amt,0);
+    const maxDays = Math.max(...entries.map(e=>e.days));
+    html += `<div style="background:rgba(255,64,64,.06);border:1px solid rgba(255,64,64,.2);border-left:3px solid var(--red);border-radius:10px;padding:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:160px">
+        <div style="font-weight:700;font-size:13px">${esc(site)}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">PM: ${esc(s.pm||'—')} | Max Ageing: <span style="color:var(--red)">${maxDays} days</span></div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--red)">${INR(totalAmt)}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="ab vb" onclick="openWhatsApp('${esc(site)}','${esc(s.pm||'')}',${totalAmt})">
+          <i class="fab fa-whatsapp"></i> WhatsApp
+        </button>
+        <button class="ab eb" onclick="openEmailDraft('${esc(site)}','${esc(s.pm||'')}',${totalAmt},${maxDays})">
+          <i class="fa fa-envelope"></i> Email Draft
+        </button>
+      </div>
+    </div>`;
+  });
+  html += `</div></div>`;
+  
+  // Payment due reminders
+  html += `<div style="background:rgba(255,193,7,.06);border:1px solid rgba(255,193,7,.2);border-radius:12px;padding:16px;margin-top:16px">
+    <div style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:12px"><i class="fa fa-bell"></i> Payment Due Reminders</div>
+    <div style="display:grid;gap:8px">`;
+  
+  const reminders = [
+    {site:'IOCL JHARSUGUDA', due:'15 Jun 2026', amt:2492968.36, days:25, pm:'Ravi'},
+    {site:'IOCL AHMEDNAGAR', due:'01 Jun 2026', amt:5709636.14, days:11, pm:'Chandrashekhar'},
+    {site:'IOCL PANIPAT REFINERY', due:'30 May 2026', amt:5708178.85, days:9, pm:'Chandrashekhar'},
+    {site:'PARADIP PORT AUTH', due:'10 Jun 2026', amt:8164332, days:20, pm:'Keshav'},
+    {site:'IOCL HISSAR', due:'05 Jun 2026', amt:3200670.42, days:15, pm:'Ravi'},
+  ];
+  reminders.forEach(r=>{
+    const urgent = r.days <= 10;
+    html += `<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--card2);border-radius:8px;border-left:3px solid ${urgent?'var(--red)':'var(--yellow)'}">
+      <i class="fa fa-clock" style="color:${urgent?'var(--red)':'var(--yellow)'}"></i>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600">${esc(r.site)}</div>
+        <div style="font-size:10px;color:var(--muted)">Target: ${r.due} · PM: ${r.pm}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${urgent?'var(--red)':'var(--yellow)'}">${INR(r.amt)}</div>
+        <div style="font-size:10px;color:${urgent?'var(--red)':'var(--muted)'}">in ${r.days} days</div>
+      </div>
+    </div>`;
+  });
+  html += `</div></div>`;
+  
+  const el = document.getElementById('alertsContent');
+  if(el) el.innerHTML = html;
+}
+
+// ============================================================
+// FEATURE 2: PM PERFORMANCE SCORECARD
+// ============================================================
+function renderPMScorecard() {
+  const pms = {};
+  SUMMARY.forEach(s=>{
+    if(!pms[s.pm]) pms[s.pm]={pm:s.pm,sites:[],total:0,pending:0,sd:0,ld:0,cleared:0};
+    pms[s.pm].sites.push(s.site);
+    pms[s.pm].total += s.total;
+    pms[s.pm].pending += s.pending;
+    pms[s.pm].sd += s.sd;
+    pms[s.pm].ld += s.ld;
+    if(s.total===0) pms[s.pm].cleared++;
+  });
+  const colors={'Ravi':'#00d4ff','Chandrashekhar':'#ffc107','Vicky':'#00e676','Keshav':'#b44fff'};
+  const grandTotal = SUMMARY.reduce((a,s)=>a+s.total,0);
+  
+  let html = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">`;
+  Object.values(pms).sort((a,b)=>b.total-a.total).forEach(p=>{
+    const c = colors[p.pm]||'#00d4ff';
+    const pctShare = grandTotal ? ((p.total/grandTotal)*100).toFixed(1) : 0;
+    const clearRate = p.sites.length ? ((p.cleared/p.sites.length)*100).toFixed(0) : 0;
+    html += `<div style="background:var(--card2);border:1px solid var(--border);border-top:3px solid ${c};border-radius:12px;padding:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;border-radius:50%;background:${c}22;border:2px solid ${c};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:${c}">${p.pm[0]}</div>
+        <div>
+          <div style="font-weight:700;font-size:14px">${esc(p.pm)}</div>
+          <div style="font-size:10px;color:var(--muted)">${p.sites.length} sites · ${clearRate}% cleared</div>
+        </div>
+        <div style="margin-left:auto;font-size:11px;font-weight:700;color:${c}">${pctShare}% of total</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:${c};margin-bottom:10px">${INR(p.total)}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px">
+        <div style="padding:6px;background:rgba(255,107,53,.08);border-radius:6px"><div style="color:var(--muted)">Pending</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--a4)">${INR(p.pending)}</div></div>
+        <div style="padding:6px;background:rgba(255,64,64,.08);border-radius:6px"><div style="color:var(--muted)">LD</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--red)">${INR(p.ld)}</div></div>
+        <div style="padding:6px;background:rgba(255,193,7,.08);border-radius:6px"><div style="color:var(--muted)">SD</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--yellow)">${INR(p.sd)}</div></div>
+        <div style="padding:6px;background:rgba(0,230,118,.08);border-radius:6px"><div style="color:var(--muted)">Cleared</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--green)">${p.cleared} sites</div></div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:9px;color:var(--muted);margin-bottom:4px">PORTFOLIO SHARE</div>
+        <div style="height:5px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pctShare}%;background:${c};border-radius:3px;transition:width 1s ease"></div></div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  const el = document.getElementById('pmScorecardContent');
+  if(el) el.innerHTML = html;
+}
+
+// ============================================================
+// FEATURE 3: RECOVERY RATE TRACKER
+// ============================================================
+function renderRecoveryTracker() {
+  const data = JHARSUGUDA_BILLS.map(r=>({
+    inv: r.inv,
+    date: r.date,
+    total: r.total,
+    received: r.received,
+    pending: Math.max(0, r.total - r.received),
+    pct: r.total > 0 ? Math.min(100,(r.received/r.total)*100).toFixed(1) : 0
+  }));
+  
+  let html = `<div style="margin-bottom:12px;padding:12px;background:var(--card2);border-radius:10px;display:flex;gap:16px;flex-wrap:wrap">`;
+  const totInv = data.reduce((a,r)=>a+r.total,0);
+  const totRec = data.reduce((a,r)=>a+r.received,0);
+  const overallPct = totInv>0?((totRec/totInv)*100).toFixed(1):0;
+  html += `<div style="flex:1;min-width:100px;text-align:center"><div style="font-size:10px;color:var(--muted)">Total Invoiced</div><div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--a1)">${INR(totInv)}</div></div>
+    <div style="flex:1;min-width:100px;text-align:center"><div style="font-size:10px;color:var(--muted)">Total Received</div><div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--green)">${INR(totRec)}</div></div>
+    <div style="flex:1;min-width:100px;text-align:center"><div style="font-size:10px;color:var(--muted)">Recovery Rate</div><div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:${overallPct>=80?'var(--green)':overallPct>=50?'var(--yellow)':'var(--red)'}">${overallPct}%</div></div>
+  </div>`;
+  
+  data.forEach(r=>{
+    const color = r.pct>=80?'var(--green)':r.pct>=50?'var(--yellow)':'var(--red)';
+    html += `<div style="margin-bottom:10px;padding:12px;background:var(--card2);border-radius:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div>
+          <span style="font-weight:700;font-size:12px;color:var(--a1)">${esc(r.inv)}</span>
+          <span style="font-size:10px;color:var(--muted);margin-left:8px">${r.date}</span>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${color}">${r.pct}%</span>
+      </div>
+      <div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-bottom:6px">
+        <div style="height:100%;width:${r.pct}%;background:${color};border-radius:4px;transition:width 1s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px">
+        <span style="color:var(--green)">Received: ${INR(r.received)}</span>
+        <span style="color:${r.pending>0?'var(--red)':'var(--muted)'}">Pending: ${INR(r.pending)}</span>
+        <span style="color:var(--muted)">Invoice: ${INR(r.total)}</span>
+      </div>
+    </div>`;
+  });
+  const el = document.getElementById('recoveryContent');
+  if(el) el.innerHTML = html;
+}
+
+// ============================================================
+// FEATURE 4: NOTES / REMARKS
+// ============================================================
+const NOTES = {
+  'IOCL PANIPAT DO': 'OK by Jitendra sir',
+  'IOCL COIMBATORE': 'OK by Jitendra sir',
+  'IOCL MADURAI': 'OK by Jitendra sir',
+};
+function saveNote(site) {
+  const val = document.getElementById('note_'+site.replace(/\s/g,'_'))?.value || '';
+  NOTES[site] = val;
+  toast('Note saved for '+site);
+}
+function renderNotes() {
+  const sitesWithOS = SUMMARY.filter(s=>s.total>0).sort((a,b)=>b.total-a.total);
+  let html = `<div style="display:grid;gap:10px">`;
+  sitesWithOS.forEach(s=>{
+    const note = NOTES[s.site]||'';
+    const id = 'note_'+s.site.replace(/\s/g,'_');
+    html += `<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-weight:700;font-size:12px">${esc(s.site)}</span>
+        <span style="font-size:9px;padding:1px 7px;border-radius:10px;background:rgba(0,212,255,.1);color:var(--a1)">${esc(s.pm)}</span>
+        <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--a1)">${INR(s.total)}</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <textarea id="${id}" placeholder="Add remarks, follow-up notes..." style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--txt);font-size:11px;font-family:'Space Grotesk',sans-serif;resize:none;height:52px;outline:none">${esc(note)}</textarea>
+        <button class="btn btn-p" style="padding:6px 12px;font-size:11px;align-self:flex-end" onclick="saveNote('${esc(s.site)}')"><i class="fa fa-save"></i></button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  const el = document.getElementById('notesContent');
+  if(el) el.innerHTML = html;
+}
+
+// ============================================================
+// FEATURE 5: DOCUMENT VIEWER (Drive links inline)
+// ============================================================
+function openDocViewer(url, title) {
+  if(!url || url==='CREDIT NOTE') { toast('No document link available','error'); return; }
+  const _dvt=document.getElementById('docViewerTitle'); if(_dvt) _dvt.textContent = title || 'Document';
+  const frame = document.getElementById('docViewerFrame');
+  // Convert drive view link to preview embed
+  let embedUrl = url;
+  if(url.includes('drive.google.com/file/d/')) {
+    const match = url.match(/\/d\/([^\/]+)/);
+    if(match) embedUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
+  }
+  frame.src = embedUrl;
+  openM('docViewerModal');
+}
+
+// ============================================================
+// FEATURE 6: BULK EDIT
+// ============================================================
+let bulkSelected = new Set();
+function toggleBulkMode() {
+  const isBulk = document.getElementById('bulkBar').style.display !== 'none';
+  if(isBulk) {
+    document.getElementById('bulkBar').style.display = 'none';
+    bulkSelected.clear();
+    renderSummaryTable();
+  } else {
+    document.getElementById('bulkBar').style.display = 'flex';
+    renderSummaryTableBulk();
+  }
+}
+function toggleBulkSelect(idx) {
+  if(bulkSelected.has(idx)) bulkSelected.delete(idx);
+  else bulkSelected.add(idx);
+  const _bc2=document.getElementById('bulkCount'); if(_bc2) _bc2.textContent=bulkSelected.size+' selected';
+}
+function applyBulkPM() {
+  const pm = document.getElementById('bulkPMSelect').value;
+  bulkSelected.forEach(idx=>{ summaryData[idx].pm = pm; });
+  toast(`PM updated to ${pm} for ${bulkSelected.size} sites`);
+  bulkSelected.clear();
+  document.getElementById('bulkBar').style.display = 'none';
+  renderSummaryTable();
+}
+function renderSummaryTableBulk() {
+  const wrap = document.getElementById('summaryTable');
+  const data = [...summaryData].sort((a,b)=>b.total-a.total);
+  let html = `<table class="dt"><thead><tr>
+    <th><input type="checkbox" onchange="if(this.checked){data.forEach((_,i)=>bulkSelected.add(i))}else{bulkSelected.clear()}" style="cursor:pointer"></th>
+    <th>#</th><th>Site</th><th>PM</th><th>Pending</th><th>SD</th><th>LD</th><th>Total OS</th><th>Actions</th>
+  </tr></thead><tbody>`;
+  data.forEach((s,i)=>{
+    html += `<tr>
+      <td><input type="checkbox" ${bulkSelected.has(i)?'checked':''} onchange="toggleBulkSelect(${i})" style="cursor:pointer"></td>
+      <td class="mono" style="color:var(--muted)">${i+1}</td>
+      <td class="txt" style="font-weight:600">${esc(s.site)}</td>
+      <td class="txt"><span style="padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;background:rgba(0,212,255,.1);color:var(--a1)">${esc(s.pm)}</span></td>
+      <td class="mono" style="color:${s.pending>0?'var(--a4)':'var(--muted)'}">${s.pending>0?INR(s.pending):'—'}</td>
+      <td class="mono" style="color:${s.sd>0?'var(--yellow)':'var(--muted)'}">${s.sd>0?INR(s.sd):'—'}</td>
+      <td class="mono" style="color:${s.ld>0?'var(--red)':'var(--muted)'}">${s.ld>0?INR(s.ld):'—'}</td>
+      <td class="mono" style="color:var(--a1);font-weight:700">${INR(s.total)}</td>
+      <td><div class="acts"><button class="ab vb" onclick="openDetail(${s.sno-1})">View</button><button class="ab eb" onclick="openEdit(${s.sno-1},'summary')">Edit</button></div></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+// ============================================================
+// FEATURE 7: PDF REPORT GENERATOR
+// ============================================================
+function generatePDF() {
+  const grandTotal = SUMMARY.reduce((a,s)=>a+s.total,0);
+  const totPending = SUMMARY.reduce((a,s)=>a+s.pending,0);
+  const totSD = SUMMARY.reduce((a,s)=>a+s.sd,0);
+  const totLD = SUMMARY.reduce((a,s)=>a+s.ld,0);
+  const today = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  
+  const rows = SUMMARY.filter(s=>s.total>0).sort((a,b)=>b.total-a.total).map((s,i)=>`
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd">${i+1}</td>
+      <td style="padding:8px;border:1px solid #ddd;font-weight:600">${s.site}</td>
+      <td style="padding:8px;border:1px solid #ddd">${s.pm}</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right">${s.pending>0?INR(s.pending):'—'}</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right">${s.sd>0?INR(s.sd):'—'}</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right">${s.ld>0?INR(s.ld):'—'}</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;font-weight:700;color:#0066ff">${INR(s.total)}</td>
+    </tr>`).join('');
+  
+  const pdfHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body{font-family:Arial,sans-serif;margin:30px;color:#222;font-size:12px}
+    h1{color:#0044cc;font-size:20px;margin-bottom:4px}
+    h2{color:#444;font-size:13px;font-weight:normal;margin-bottom:20px}
+    .header{border-bottom:3px solid #0044cc;padding-bottom:12px;margin-bottom:20px}
+    .kpi-row{display:flex;gap:16px;margin-bottom:24px}
+    .kpi{flex:1;padding:12px;border:1px solid #ddd;border-radius:8px;border-top:3px solid #0044cc}
+    .kpi-lbl{font-size:10px;color:#666;text-transform:uppercase;margin-bottom:4px}
+    .kpi-val{font-size:18px;font-weight:800;color:#0044cc}
+    table{width:100%;border-collapse:collapse;margin-top:16px}
+    th{background:#0044cc;color:#fff;padding:8px;text-align:left;font-size:11px}
+    tr:nth-child(even){background:#f5f8ff}
+    tfoot td{background:#0044cc;color:#fff;font-weight:700;padding:8px;border:1px solid #003a99}
+    .footer{margin-top:20px;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:10px}
+  </style></head><body>
+  <div class="header">
+    <h1>VISHAL ELECTRICALS</h1>
+    <h2>Outstanding Payment Break-Up Report &nbsp;|&nbsp; As on ${today}</h2>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">Total Outstanding</div><div class="kpi-val">${INR(grandTotal)}</div></div>
+    <div class="kpi"><div class="kpi-lbl">Pending Bills</div><div class="kpi-val" style="color:#ff6b35">${INR(totPending)}</div></div>
+    <div class="kpi"><div class="kpi-lbl">SD Deduction</div><div class="kpi-val" style="color:#ffc107">${INR(totSD)}</div></div>
+    <div class="kpi"><div class="kpi-lbl">LD Deduction</div><div class="kpi-val" style="color:#ff4040">${INR(totLD)}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Site Name</th><th>PM</th><th>Pending Bill</th><th>SD</th><th>LD</th><th>Total OS</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td colspan="3">TOTAL</td><td>${INR(totPending)}</td><td>${INR(totSD)}</td><td>${INR(totLD)}</td><td>${INR(grandTotal)}</td></tr></tfoot>
+  </table>
+  <div class="footer">Generated by Vishal Electricals Dashboard &nbsp;|&nbsp; ${today} &nbsp;|&nbsp; Confidential</div>
+  </body></html>`;
+  
+  const win = window.open('','_blank');
+  win.document.write(pdfHTML);
+  win.document.close();
+  setTimeout(()=>{ win.print(); }, 500);
+  toast('PDF report opened — use Print → Save as PDF');
+}
+
+// ============================================================
+// FEATURE 8: WHATSAPP & EMAIL SHARE
+// ============================================================
+function openWhatsApp(site, pm, amt) {
+  const today = new Date().toLocaleDateString('en-IN');
+  const msg = `*Vishal Electricals — Payment Follow-Up*\n\nDear ${pm} Sir,\n\nKindly note the following outstanding payment:\n\n*Site:* ${site}\n*Outstanding Amount:* ${INR(amt)}\n*Date:* ${today}\n\nRequest you to kindly expedite the payment at the earliest.\n\nRegards,\nVishal Electricals`;
+  const encoded = encodeURIComponent(msg);
+  window.open(`https://wa.me/?text=${encoded}`, '_blank');
+}
+
+function openEmailDraft(site, pm, amt, days) {
+  const today = new Date().toLocaleDateString('en-IN');
+  const subject = encodeURIComponent(`Payment Follow-Up: ${site} — Outstanding ${INR(amt)}`);
+  const body = encodeURIComponent(`Dear ${pm} Sir,\n\nI hope this message finds you well.\n\nThis is a gentle reminder regarding the outstanding payment for the following project:\n\nSite: ${site}\nOutstanding Amount: ${INR(amt)}\nAgeing: ${days} days\nDate: ${today}\n\nWe request you to kindly process the payment at the earliest convenience.\n\nFor any queries, please feel free to reach out.\n\nThanks & Regards,\nVishal Electricals`);
+  window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+  toast('Email draft opened');
+}
+
+function openShareModal(idx) {
+  const s = summaryData[idx];
+  document.getElementById('shareModalBody').innerHTML = `
+    <div style="padding:14px;background:var(--card2);border-radius:10px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:14px">${esc(s.site)}</div>
+      <div style="font-size:11px;color:var(--muted)">PM: ${esc(s.pm)} | Outstanding: ${INR(s.total)}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <button class="btn btn-p" style="padding:14px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(135deg,#25d366,#128c7e)" onclick="openWhatsApp('${esc(s.site)}','${esc(s.pm)}',${s.total})">
+        <i class="fab fa-whatsapp" style="font-size:22px"></i>Share on WhatsApp
+      </button>
+      <button class="btn btn-p" style="padding:14px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px" onclick="openEmailDraft('${esc(s.site)}','${esc(s.pm)}',${s.total},0)">
+        <i class="fa fa-envelope" style="font-size:22px"></i>Send via Email
+      </button>
+      <button class="btn btn-s" style="padding:14px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px" onclick="navigator.clipboard.writeText('Site: ${esc(s.site)}\\nPM: ${esc(s.pm)}\\nOutstanding: ${INR(s.total)}');toast('Copied to clipboard!')">
+        <i class="fa fa-copy" style="font-size:22px"></i>Copy to Clipboard
+      </button>
+      <button class="btn btn-s" style="padding:14px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px" onclick="generatePDF()">
+        <i class="fa fa-file-pdf" style="font-size:22px"></i>PDF Report
+      </button>
+    </div>`;
+  openM('shareModal');
+}
+
+// ============================================================
+// NEW VIEWS INIT
+// ============================================================
+const origShowView = showView;
+window.showView = function(v) {
+  origShowView(v);
+  if(v==='alerts') renderAlerts();
+  if(v==='pm-scorecard') renderPMScorecard();
+  if(v==='recovery') renderRecoveryTracker();
+  if(v==='notes') renderNotes();
+};
+
+// ============================================================
+// AUDIT LOG SYSTEM (Feature 10)
+// ============================================================
+let auditLog = JSON.parse(localStorage.getItem('ve_audit_log')||'[]');
+const USERS = ['Admin','Ravi','Chandrashekhar','Vicky','Keshav'];
+let currentUser = localStorage.getItem('ve_user')||'Admin';
+
+function logAudit(type, msg, detail='') {
+  const entry = {
+    id: Date.now(),
+    type,
+    user: currentUser,
+    msg,
+    detail,
+    time: new Date().toISOString(),
+    timeStr: new Date().toLocaleString('en-IN')
+  };
+  auditLog.unshift(entry);
+  if(auditLog.length > 200) auditLog = auditLog.slice(0,200);
+  localStorage.setItem('ve_audit_log', JSON.stringify(auditLog));
+  renderAuditLog('all');
+}
+
+const typeConfig = {
+  edit:   {color:'var(--yellow)', icon:'fa-pen',          label:'EDIT'},
+  add:    {color:'var(--green)',  icon:'fa-plus',          label:'ADD'},
+  delete: {color:'var(--red)',    icon:'fa-trash',         label:'DELETE'},
+  sync:   {color:'var(--a1)',     icon:'fa-rotate',        label:'SYNC'},
+  parse:  {color:'var(--a6)',     icon:'fa-wand-magic-sparkles', label:'PARSE'},
+  view:   {color:'var(--sub)',    icon:'fa-eye',           label:'VIEW'},
+};
+
+function renderAuditLog(filterType='all') {
+  const el = document.getElementById('auditLogContent');
+  if(!el) return;
+  const filtered = filterType==='all' ? auditLog : auditLog.filter(e=>e.type===filterType);
+  if(!filtered.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted)"><i class="fa fa-clock-rotate-left" style="font-size:36px;opacity:.3;display:block;margin-bottom:10px"></i>No ${filterType==='all'?'':filterType+' '}activity yet.</div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(e=>{
+    const cfg = typeConfig[e.type]||typeConfig.edit;
+    return `<div class="audit-row">
+      <div class="audit-dot" style="background:${cfg.color}"></div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:9px;font-weight:800;padding:1px 7px;border-radius:10px;background:${cfg.color}22;color:${cfg.color};border:1px solid ${cfg.color}44"><i class="fa ${cfg.icon}"></i> ${cfg.label}</span>
+          <span class="audit-msg">${esc(e.msg)}</span>
+        </div>
+        ${e.detail?`<div style="font-size:10px;color:var(--sub);margin-top:2px">${esc(e.detail)}</div>`:''}
+        <div class="audit-meta"><i class="fa fa-user" style="margin-right:4px"></i>${esc(e.user)} &nbsp;·&nbsp; <i class="fa fa-clock" style="margin-right:4px"></i>${esc(e.timeStr)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterAudit(type, btn) {
+  document.querySelectorAll('.hf-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAuditLog(type);
+}
+
+function exportAuditLog() {
+  const csv = ['Type,User,Message,Detail,Time',
+    ...auditLog.map(e=>`"${e.type}","${e.user}","${e.msg}","${e.detail}","${e.timeStr}"`)
+  ].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'VE_Audit_Log_'+new Date().toLocaleDateString('en-IN').replace(/\//g,'-')+'.csv';
+  a.click();
+  toast('Audit log exported as CSV');
+}
+
+function clearAuditLog() {
+  if(!confirm('Clear entire audit log? This cannot be undone.')) return;
+  auditLog = [];
+  localStorage.setItem('ve_audit_log','[]');
+  renderAuditLog('all');
+  toast('Audit log cleared');
+}
+
+// Patch saveRec to log edits
+const _origSaveRec = saveRec;
+window.saveRec = function() {
+  const ctx = currentEditCtx;
+  _origSaveRec();
+  if(ctx) {
+    const site = ctx.isNew ? (document.getElementById('ef_site')?.value||'New Site') : (summaryData[ctx.idx]?.site||'Unknown');
+    logAudit(ctx.isNew?'add':'edit',
+      ctx.isNew ? `Added new site: ${site}` : `Edited record: ${site}`,
+      ctx.type==='jh' ? 'Jharsuguda bill record' : 'Summary record'
+    );
+  }
+};
+
+// User switcher in sidebar footer
+document.querySelector('.sb-foot').insertAdjacentHTML('beforeend',
+  `<select id="userSelect" style="position:absolute;opacity:0;width:1px;height:1px" onchange="currentUser=this.value;localStorage.setItem('ve_user',this.value);document.querySelector('.sb-foot .user-name').textContent=this.value;toast('Switched to '+this.value)">
+    ${USERS.map(u=>`<option ${u===currentUser?'selected':''}>${u}</option>`).join('')}
+  </select>`
+);
+document.querySelector('.sb-foot .av').style.cursor='pointer';
+document.querySelector('.sb-foot .av').onclick = ()=>document.getElementById('userSelect').click();
+const _unEl = document.querySelector('.sb-foot .user-name'); if(_unEl) _unEl.textContent = currentUser;
+
+// ============================================================
+// LIVE GOOGLE SHEETS SYNC (Feature 6)
+// ============================================================
+let syncTimer = null;
+let syncLogs = [];
+
+function addSyncLog(msg, status='info') {
+  const colors = {info:'var(--a1)', success:'var(--green)', error:'var(--red)', warning:'var(--yellow)'};
+  syncLogs.unshift({msg, status, time: new Date().toLocaleTimeString('en-IN'), color: colors[status]||colors.info});
+  renderSyncLog();
+}
+
+function renderSyncLog() {
+  const el = document.getElementById('syncLogPanel');
+  if(!el) return;
+  if(!syncLogs.length) { el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">No sync activity</div>'; return; }
+  el.innerHTML = syncLogs.slice(0,30).map(l=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(28,45,68,.3)">
+      <div style="width:7px;height:7px;border-radius:50%;background:${l.color};flex-shrink:0;margin-top:4px"></div>
+      <div style="flex:1"><div style="font-size:12px">${esc(l.msg)}</div><div style="font-size:10px;color:var(--muted)">${l.time}</div></div>
+    </div>`).join('');
+}
+
+async function syncFromSheets() {
+  const csvUrl = document.getElementById('csvUrlInput')?.value || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTIdqeYJVJRbkK0rk1OPzE2nWRdyfseDrLs0UXoSZf9i3Jq_CJBdNR1eMRJGLl49eRa2FXJWbbHsoiH/pub?output=csv';
+  const statusEl = document.getElementById('syncStatusPanel');
+  if(statusEl) statusEl.innerHTML = `<div style="display:flex;align-items:center;gap:12px;padding:20px"><div class="loader"></div><span>Fetching from Google Sheets...</span></div>`;
+  addSyncLog('Pull started from Google Sheets...', 'info');
+  logAudit('sync', 'Pull from Google Sheets initiated', csvUrl.slice(0,60)+'...');
+
+  try {
+    const res = await fetch(csvUrl);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    const rows = text.split('\n').filter(r=>r.trim());
+    const dataRows = rows.slice(2).filter(r=>r.trim() && !/^,+$/.test(r));
+
+    // Parse CSV and update SUMMARY
+    let updated = 0, added = 0;
+    dataRows.forEach(row=>{
+      const cols = parseCSVRow(row);
+      if(!cols[0]||isNaN(parseFloat(cols[0]))) return;
+      const sno = parseFloat(cols[0]);
+      const site = (cols[1]||'').trim();
+      if(!site) return;
+      const existing = summaryData.find(s=>s.sno===Math.round(sno));
+      const parsed = {
+        sno: Math.round(sno), site,
+        pm: cols[3]||'—',
+        pending: parseFloat((cols[4]||'').replace(/,/g,''))||0,
+        sd: parseFloat((cols[5]||'').replace(/,/g,''))||0,
+        ld: parseFloat((cols[6]||'').replace(/,/g,''))||0,
+        gst: parseFloat((cols[7]||'').replace(/,/g,''))||0,
+        instant: parseFloat((cols[8]||'').replace(/,/g,''))||0,
+        other: parseFloat((cols[9]||'').replace(/,/g,''))||0,
+        withheld: parseFloat((cols[10]||'').replace(/,/g,''))||0,
+        total: parseFloat((cols[11]||'').replace(/,/g,''))||0,
+      };
+      const conflictMode = document.getElementById('conflictMode')?.value||'sheets';
+      if(existing) {
+        if(conflictMode==='sheets'||conflictMode==='local'&&!existing._localEdit) {
+          Object.assign(existing, parsed); updated++;
+        }
+      } else { summaryData.push(parsed); added++; }
+    });
+
+    const now = new Date().toLocaleTimeString('en-IN');
+    const _lsl = document.getElementById('lastSyncLabel'); if(_lsl) _lsl.textContent = 'Last sync: '+now;
+
+    if(statusEl) statusEl.innerHTML = `
+      <div style="padding:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <span class="sync-status sync-ok"><i class="fa fa-circle-check"></i> Sync Successful</span>
+          <span style="font-size:11px;color:var(--muted)">${now}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:10px;color:var(--muted)">Rows Fetched</div>
+            <div style="font-size:22px;font-weight:800;color:var(--a1)">${dataRows.length}</div>
+          </div>
+          <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:10px;color:var(--muted)">Updated</div>
+            <div style="font-size:22px;font-weight:800;color:var(--yellow)">${updated}</div>
+          </div>
+          <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:10px;color:var(--muted)">Added</div>
+            <div style="font-size:22px;font-weight:800;color:var(--green)">${added}</div>
+          </div>
+        </div>
+      </div>`;
+
+    addSyncLog(`✓ Pulled ${dataRows.length} rows · ${updated} updated · ${added} added`, 'success');
+    logAudit('sync', `Sync complete: ${updated} updated, ${added} added`, `${dataRows.length} total rows`);
+    toast(`Synced! ${updated} updated · ${added} added`);
+  } catch(e) {
+    if(statusEl) statusEl.innerHTML = `<div style="padding:20px"><span class="sync-status sync-err"><i class="fa fa-circle-xmark"></i> Sync Failed: ${esc(e.message)}</span><div style="margin-top:10px;font-size:11px;color:var(--muted)">Ensure the sheet is publicly published as CSV. Go to File → Share → Publish to web → CSV.</div></div>`;
+    addSyncLog('✗ Sync failed: '+e.message, 'error');
+    logAudit('sync','Sync failed: '+e.message,'');
+    toast('Sync failed: '+e.message, 'error');
+  }
+}
+
+function pushToSheets() {
+  toast('Push requires Google Sheets API key — configure in Settings', 'error');
+  addSyncLog('Push attempted — API key required for write access', 'warning');
+  logAudit('sync','Push to Sheets attempted (requires API)','');
+}
+
+function saveAndTestSync() {
+  const url = document.getElementById('csvUrlInput')?.value;
+  if(!url) { toast('Enter a CSV URL first','error'); return; }
+  toast('Settings saved! Testing connection...');
+  syncFromSheets();
+  const interval = parseInt(document.getElementById('syncInterval')?.value||'0');
+  if(syncTimer) clearInterval(syncTimer);
+  if(interval>0) {
+    syncTimer = setInterval(syncFromSheets, interval*1000);
+    addSyncLog(`Auto-sync enabled every ${interval}s`, 'info');
+  }
+}
+
+function parseCSVRow(row) {
+  const cols=[]; let cur='', inq=false;
+  for(let i=0;i<row.length;i++){
+    const c=row[i];
+    if(c==='"'){inq=!inq;}
+    else if(c===','&&!inq){cols.push(cur.trim());cur='';}
+    else cur+=c;
+  }
+  cols.push(cur.trim());
+  return cols;
+}
+
+// ============================================================
+// EMAIL PARSER - AI POWERED (Feature 9)
+// ============================================================
+let parsedData = null;
+let parsedHistory = [];
+
+function loadSampleEmail() {
+  document.getElementById('emailInput').value = `Dear Sir,
+
+This is to inform you that payment has been processed for the following invoice:
+
+Party Name: Indian Oil Corporation Ltd - Jharsuguda
+Invoice No.: VE/25-26/37
+Invoice Date: 30.06.2025
+Payment Amount: Rs. 5,45,400.78
+GST TDS Deducted: Rs. 13,309.96
+Income Tax TDS: Rs. 6,654.98
+LD Deduction: Rs. 2,19,921.80
+Net Payment: Rs. 5,45,400.78
+Payment Date: 13.08.2025
+UTR No.: HDFC00098765432
+Bank: HDFC Bank
+
+Regards,
+Accounts Department
+Indian Oil Corporation Ltd`;
+}
+
+async function parseEmail() {
+  const emailText = document.getElementById('emailInput').value.trim();
+  if (!emailText) { toast('Please paste an email first','error'); return; }
+
+  const parseBtn = document.querySelector('[onclick="parseEmail()"]');
+  parseBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Parsing...';
+  parseBtn.disabled = true;
+
+  try {
+    const text = emailText;
+    const extracted = {
+      invoice : extractInvoice(text),
+      site    : extractSite(text),
+      amount  : extractAmt(text, ['payment amount','net payment','amount paid','total payment','paid amount']),
+      gstTds  : extractAmt(text, ['gst tds','gst tds deducted']),
+      itTds   : extractAmt(text, ['income tax tds','it tds','tds deducted']),
+      ld      : extractAmt(text, ['ld deduction','liquidated damage']),
+      sd      : extractAmt(text, ['sd deduction','security deposit']),
+      payDate : extractDate(text, ['payment date','date']),
+      utr     : extractUTR(text),
+      bank    : extractBank(text),
+    };
+    parsedData = extracted;
+    renderParseResult(extracted);
+    document.getElementById('parseResultArea').style.display = 'block';
+    parsedHistory.unshift({...extracted, rawText: emailText.slice(0,100)+'...', time: new Date().toLocaleString('en-IN')});
+    renderParsedHistory();
+    logAudit('parse', 'Email parsed: ' + (extracted.invoice||'Unknown invoice'), 'Site: ' + (extracted.site||'Unknown'));
+    toast('Email parsed successfully!');
+  } catch(e) {
+    toast('Parse failed: ' + e.message, 'error');
+  } finally {
+    parseBtn.innerHTML = '<i class="fa fa-wand-magic-sparkles"></i> Parse with AI';
+    parseBtn.disabled = false;
+  }
+}
+
+// --- Pure string parsers (zero dynamic RegExp) ---
+
+function extractInvoice(text) {
+  // Look for VE/XX-XX/NNN pattern
+  var lines = text.split('\n');
+  for (var i = 0; i < lines.length; i++) {
+    var l = lines[i];
+    var li = l.toLowerCase();
+    if (li.indexOf('invoice') !== -1 || li.indexOf('inv.') !== -1 || li.indexOf('inv no') !== -1) {
+      // Find colon and grab next token
+      var ci = l.indexOf(':');
+      if (ci !== -1) {
+        var after = l.slice(ci+1).trim();
+        var tok = after.split(/\s/)[0].trim().replace(/[,;.]+$/, '');
+        if (tok.length > 3) return tok;
+      }
+    }
+    // Also scan for VE/ pattern directly
+    var vi = l.indexOf('VE/');
+    if (vi !== -1) {
+      var tok2 = l.slice(vi).split(/\s/)[0].trim().replace(/[,;.]+$/, '');
+      if (tok2.length > 3) return tok2;
+    }
+  }
+  return '';
+}
+
+function extractSite(text) {
+  var lines = text.split('\n');
+  for (var i = 0; i < lines.length; i++) {
+    var l = lines[i];
+    var li = l.toLowerCase();
+    if (li.indexOf('party name') !== -1 || li.indexOf('party:') !== -1) {
+      var ci = l.indexOf(':');
+      if (ci !== -1) return l.slice(ci+1).trim();
+    }
+    if (li.indexOf('site') !== -1 && l.indexOf(':') !== -1) {
+      var ci2 = l.indexOf(':');
+      var val = l.slice(ci2+1).trim();
+      if (val.length > 3) return val;
+    }
+  }
+  return '';
+}
+
+function extractAmt(text, labels) {
+  var lower = text.toLowerCase();
+  for (var k = 0; k < labels.length; k++) {
+    var lbl = labels[k];
+    var pos = lower.indexOf(lbl);
+    if (pos === -1) continue;
+    var i = pos + lbl.length;
+    // Skip past :, -, spaces, Rs, INR, currency symbols
+    while (i < text.length && ':\- \tRsINr.\u20B9'.indexOf(text[i]) !== -1) i++;
+    var numStr = '';
+    while (i < text.length && '0123456789,.'.indexOf(text[i]) !== -1) {
+      numStr += text[i]; i++;
+    }
+    if (numStr) {
+      var val = parseFloat(numStr.replace(/,/g,''));
+      if (!isNaN(val) && val > 0) return val;
+    }
+  }
+  return 0;
+}
+
+function extractDate(text, labels) {
+  var lower = text.toLowerCase();
+  for (var k = 0; k < labels.length; k++) {
+    var pos = lower.indexOf(labels[k]);
+    if (pos === -1) continue;
+    var i = pos + labels[k].length;
+    while (i < text.length && ':\-  '.indexOf(text[i]) !== -1) i++;
+    // Read date: DD.MM.YYYY or DD-MM-YYYY or DD/MM/YYYY
+    var dateStr = '';
+    var count = 0;
+    while (i < text.length && count < 10) {
+      var c = text[i];
+      if ('0123456789.-/'.indexOf(c) !== -1) { dateStr += c; count++; }
+      else if (count > 0) break;
+      i++;
+    }
+    if (dateStr.length >= 8) return dateStr;
+  }
+  return '';
+}
+
+function extractUTR(text) {
+  var lower = text.toLowerCase();
+  var pos = lower.indexOf('utr');
+  if (pos === -1) pos = lower.indexOf('reference no');
+  if (pos === -1) return '';
+  var i = pos;
+  while (i < text.length && text[i] !== ':') i++;
+  i++; // skip colon
+  while (i < text.length && text[i] === ' ') i++;
+  var tok = '';
+  while (i < text.length && text[i] !== ' ' && text[i] !== '\n') { tok += text[i]; i++; }
+  return tok.trim();
+}
+
+function extractBank(text) {
+  var lower = text.toLowerCase();
+  var pos = lower.indexOf('bank');
+  if (pos === -1) return '';
+  var ci = text.indexOf(':', pos);
+  if (ci === -1) return '';
+  var line = text.slice(ci+1).split('\n')[0].trim();
+  return line;
+}
+
+function applyParsedData() {
+  if(!parsedData) return;
+  const inv = parsedData.invoice;
+  const row = JHARSUGUDA_BILLS.find(r=>r.inv===inv);
+  if(row) {
+    if(parsedData.amount) row.received = parseFloat(parsedData.amount)||row.received;
+    if(parsedData.gstTds) row.gstTds = parseFloat(parsedData.gstTds)||row.gstTds;
+    if(parsedData.itTds) row.itTds = parseFloat(parsedData.itTds)||row.itTds;
+    if(parsedData.ld) row.ld = parseFloat(parsedData.ld)||row.ld;
+    if(parsedData.sd) row.sd = parseFloat(parsedData.sd)||row.sd;
+    if(parsedData.payDate) row.pdate = parsedData.payDate;
+    logAudit('parse',`Applied parsed email data to ${inv}`,`Received: ${INR(row.received)}`);
+    toast(`Applied to ${inv} successfully!`);
+    document.getElementById('parseResultArea').style.display='none';
+    document.getElementById('emailInput').value='';
+    if(document.getElementById('view-dashboard').classList.contains('active')) renderJharsugudaPreview();
+  } else {
+    logAudit('parse',`Invoice ${inv} not found — data not applied`,'');
+    toast(`Invoice ${inv} not found in Jharsuguda records`, 'error');
+  }
+}
+
+function renderParsedHistory() {
+  const el = document.getElementById('parsedHistory');
+  if(!el||!parsedHistory.length) return;
+  el.innerHTML = parsedHistory.slice(0,10).map((h,i)=>`
+    <div style="padding:10px;border-bottom:1px solid var(--border);cursor:pointer" onclick="reParse(${i})">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;font-size:12px;color:var(--a1)">${esc(h.invoice||'Unknown')}</span>
+        <span class="stt stt-p" style="font-size:9px">PARSED</span>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-top:2px">${esc((h.site||'').slice(0,40))}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">${h.time} · ${h.amount?INR(h.amount):''}</div>
+    </div>`).join('');
+}
+
+// ============================================================
+// SHOW VIEW EXTENSION
+// ============================================================
+const _origShowView2 = window.showView;
+window.showView = function(v) {
+  _origShowView2(v);
+  if(v==='history') { renderAuditLog('all'); }
+  if(v==='sheets-sync') { renderSyncLog(); }
+  if(v==='email-parser') { renderParsedHistory(); }
+};
+
+// Log initial load
+logAudit('view','Dashboard loaded','Vishal Electricals Payment Dashboard');
+renderAuditLog('all');
+
+
+// ============================================================
+// FEATURE 12: INDIA MAP VIEW
+// ============================================================
+const SITE_COORDS = {
+  'IOCL MATHURA BDFP':     {x:290,y:220,state:'Uttar Pradesh'},
+  'IOCL PANIPAT DO':       {x:268,y:190,state:'Haryana'},
+  'IOCL SALEM':            {x:295,y:490,state:'Tamil Nadu'},
+  'IOCL COIMBATORE':       {x:275,y:500,state:'Tamil Nadu'},
+  'IOCL TRICHY':           {x:300,y:500,state:'Tamil Nadu'},
+  'IOCL MADURAI':          {x:290,y:515,state:'Tamil Nadu'},
+  'IOCL CHENNAI':          {x:325,y:475,state:'Tamil Nadu'},
+  'IOCL HISSAR':           {x:255,y:195,state:'Haryana'},
+  'IOCL PANIPAT REFINERY': {x:265,y:188,state:'Haryana'},
+  'IOCL BARAUNI':          {x:370,y:255,state:'Bihar'},
+  'IOCL KANPUR':           {x:310,y:235,state:'Uttar Pradesh'},
+  'IOCL HOWRAH':           {x:405,y:290,state:'West Bengal'},
+  'IOCL LONI':             {x:285,y:208,state:'Uttar Pradesh'},
+  'IOCL JATNI':            {x:390,y:330,state:'Odisha'},
+  'IOCL PARADEEP AUTO':    {x:405,y:320,state:'Odisha'},
+  'IOCL AHMEDNAGAR':       {x:230,y:360,state:'Maharashtra'},
+  'IOCL ALLAHABAD':        {x:330,y:240,state:'Uttar Pradesh'},
+  'IOCL KHUNTI':           {x:375,y:290,state:'Jharkhand'},
+  'IOCL JHARSUGUDA':       {x:370,y:305,state:'Odisha'},
+  'IOCL NASHIK':           {x:218,y:355,state:'Maharashtra'},
+  'HPCL LONI':             {x:284,y:207,state:'Uttar Pradesh'},
+  'NFC KOTA TOWNSHIP':     {x:252,y:245,state:'Rajasthan'},
+  'NFC KOTA':              {x:256,y:248,state:'Rajasthan'},
+  'NFC HYDERABAD':         {x:295,y:400,state:'Telangana'},
+  'IOCL MUMBAI DO':        {x:200,y:375,state:'Maharashtra'},
+  'GENPACT GURGAON':       {x:270,y:200,state:'Haryana'},
+  'IOCL SARPARA':          {x:380,y:310,state:'Odisha'},
+  'IOCL MORADABAD DO':     {x:295,y:215,state:'Uttar Pradesh'},
+  'Transrail Lighting':    {x:315,y:262,state:'Multi-State'},
+  'IOCL BANGALORE':        {x:270,y:470,state:'Karnataka'},
+  'IOCL VIZAG':            {x:360,y:390,state:'Andhra Pradesh'},
+  'IOCL RAIPUR':           {x:340,y:320,state:'Chhattisgarh'},
+  'IOCL BHATINDA':         {x:248,y:178,state:'Punjab'},
+  'IOCL SECUNDERABAD':     {x:298,y:395,state:'Telangana'},
+  'IOCL WARANGAL':         {x:308,y:400,state:'Telangana'},
+  'IOCL TIRUPATI':         {x:305,y:455,state:'Andhra Pradesh'},
+  'IOCL NIZAMABAD':        {x:285,y:390,state:'Telangana'},
+  'IOCL VIJAYWADA':        {x:320,y:430,state:'Andhra Pradesh'},
+  'AAI AMRITSAR':          {x:238,y:168,state:'Punjab'},
+  'IOCL PARADEEP HM':      {x:407,y:318,state:'Odisha'},
+  'PARADIP PORT AUTH':     {x:410,y:316,state:'Odisha'},
+  'NTPC DADRI':            {x:283,y:212,state:'Uttar Pradesh'},
+  'GAIL VIJAIPUR':         {x:285,y:250,state:'Madhya Pradesh'},
+};
+
+let currentMapFilter = 'all';
+let currentMapPM = '';
+let mapScale = 1;
+let mapTranslate = {x:0, y:0};
+
+function getPinColor(site) {
+  const s = SUMMARY.find(x=>x.site===site);
+  if(!s||s.total===0) return '#00e676';
+  if(!s.site.startsWith('IOCL')&&!s.site.startsWith('HPCL')) return '#b44fff';
+  if(s.total>=5000000) return '#ff4040';
+  if(s.total>=1000000) return '#ffc107';
+  return '#00d4ff';
+}
+
+function getPinRadius(site) {
+  const s = SUMMARY.find(x=>x.site===site);
+  if(!s||s.total===0) return 5;
+  if(s.total>=5000000) return 14;
+  if(s.total>=1000000) return 10;
+  if(s.total>=500000) return 8;
+  return 6;
+}
+
+function renderIndiaMap(filter='all', pmFilter='') {
+  const wrap = document.getElementById('mapSvgWrap');
+  if(!wrap) return;
+
+  // Simple India outline SVG path
+  const indiaPath = `M 238 90 L 252 82 L 268 85 L 282 78 L 298 80 L 310 75 L 325 82 L 340 78 L 358 85 L 372 82 L 388 90 L 398 100 L 408 115 L 415 130 L 418 148 L 412 165 L 418 180 L 422 200 L 418 218 L 412 235 L 420 255 L 425 275 L 420 295 L 415 315 L 420 330 L 415 348 L 408 362 L 395 375 L 382 388 L 372 400 L 365 418 L 355 435 L 345 450 L 335 465 L 325 478 L 318 492 L 310 505 L 305 518 L 298 530 L 292 520 L 285 510 L 278 498 L 270 485 L 262 470 L 255 458 L 248 445 L 240 430 L 232 415 L 225 400 L 218 385 L 212 368 L 208 350 L 205 332 L 202 315 L 198 298 L 195 280 L 192 262 L 190 245 L 192 228 L 195 212 L 198 195 L 202 178 L 208 162 L 215 148 L 222 135 L 228 120 L 232 108 Z`;
+
+  // Kashmir extension
+  const kashmirPath = `M 238 90 L 228 78 L 220 65 L 228 55 L 242 52 L 255 58 L 265 65 L 272 75 L 268 85 Z`;
+
+  // NE states
+  const nePath = `M 415 130 L 425 122 L 440 125 L 452 132 L 458 145 L 450 155 L 440 160 L 428 155 L 418 148 Z`;
+
+  let pins = '';
+  let filteredSites = SUMMARY;
+  if(filter==='critical') filteredSites = SUMMARY.filter(s=>s.total>=1000000);
+  if(filter==='pending') filteredSites = SUMMARY.filter(s=>s.pending>0);
+  if(pmFilter) filteredSites = filteredSites.filter(s=>s.pm===pmFilter);
+
+  filteredSites.forEach(s=>{
+    const coord = SITE_COORDS[s.site];
+    if(!coord) return;
+    const color = getPinColor(s.site);
+    const r = getPinRadius(s.site);
+    pins += `<g class="site-pin" data-site="${esc(s.site)}"
+      onmouseenter="showMapTooltip(event,'${esc(s.site)}')"
+      onmouseleave="hideMapTooltip()"
+      onclick="highlightSite('${esc(s.site)}')">
+      <circle cx="${coord.x}" cy="${coord.y}" r="${r+4}" fill="${color}" opacity="0.2"/>
+      <circle cx="${coord.x}" cy="${coord.y}" r="${r}" fill="${color}" stroke="#fff" stroke-width="1.2"/>
+      ${s.total>=3000000 ? `<text x="${coord.x}" y="${coord.y+4}" text-anchor="middle" fill="#fff" font-size="7" font-weight="800" font-family="JetBrains Mono">${Math.round(s.total/100000)}L</text>` : ''}
+    </g>`;
+  });
+
+  wrap.innerHTML = `<svg viewBox="150 50 320 510" style="width:100%;max-height:580px;display:block" id="mapSvg">
+    <defs>
+      <pattern id="mapGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(28,45,68,.4)" stroke-width="0.5"/>
+      </pattern>
+      <filter id="glow"><feGaussianBlur stdDeviation="2" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <!-- Grid -->
+    <rect width="600" height="650" fill="url(#mapGrid)"/>
+    <!-- Ocean -->
+    <rect width="600" height="650" fill="rgba(0,100,200,.04)"/>
+    <!-- India mainland -->
+    <path d="${indiaPath}" fill="rgba(0,60,150,.15)" stroke="rgba(0,150,255,.4)" stroke-width="1.5"/>
+    <!-- Kashmir -->
+    <path d="${kashmirPath}" fill="rgba(0,60,150,.12)" stroke="rgba(0,150,255,.3)" stroke-width="1"/>
+    <!-- Northeast -->
+    <path d="${nePath}" fill="rgba(0,60,150,.12)" stroke="rgba(0,150,255,.3)" stroke-width="1"/>
+    <!-- Labels -->
+    <text x="290" y="160" fill="rgba(255,255,255,.2)" font-size="9" text-anchor="middle">RAJASTHAN</text>
+    <text x="310" y="230" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">UTTAR PRADESH</text>
+    <text x="240" y="340" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">MAHARASHTRA</text>
+    <text x="390" y="310" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">ODISHA</text>
+    <text x="295" y="420" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">ANDHRA PRADESH</text>
+    <text x="298" y="495" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">TAMIL NADU</text>
+    <!-- Site Pins -->
+    ${pins}
+  </svg>`;
+
+  renderStateWiseSummary(filteredSites);
+  renderMapSiteList(filteredSites);
+}
+
+function showMapTooltip(e, site) {
+  const s = SUMMARY.find(x=>x.site===site)||{};
+  const tip = document.getElementById('mapTooltip');
+  const coord = SITE_COORDS[site]||{};
+  const color = getPinColor(site);
+  tip.innerHTML = `
+    <div style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
+      <div style="font-weight:800;font-size:13px;color:${color}">${esc(site)}</div>
+      <div style="font-size:10px;color:var(--muted)">${coord.state||''} · PM: ${esc(s.pm||'—')}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">
+      <div><div style="color:var(--muted);font-size:9px">PENDING</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--a4)">${INR(s.pending)}</div></div>
+      <div><div style="color:var(--muted);font-size:9px">SD</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--yellow)">${INR(s.sd)}</div></div>
+      <div><div style="color:var(--muted);font-size:9px">LD</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--red)">${INR(s.ld)}</div></div>
+      <div><div style="color:var(--muted);font-size:9px">TOTAL OS</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${color}">${INR(s.total)}</div></div>
+    </div>`;
+  const wrap = document.getElementById('mapSvgWrap');
+  const rect = wrap.getBoundingClientRect();
+  const x = e.clientX - rect.left + 10;
+  const y = e.clientY - rect.top + 10;
+  tip.style.left = Math.min(x, rect.width-220)+'px';
+  tip.style.top = Math.min(y, rect.height-180)+'px';
+  tip.classList.add('visible');
+}
+
+function hideMapTooltip() {
+  document.getElementById('mapTooltip').classList.remove('visible');
+}
+
+function highlightSite(site) {
+  showSiteView(site);
+}
+
+function setMapFilter(f) {
+  currentMapFilter = f;
+  document.querySelectorAll('[id^="mf-"]').forEach(b=>b.style.color='');
+  const btn = document.getElementById('mf-'+f);
+  if(btn) btn.style.color='var(--a1)';
+  renderIndiaMap(f, currentMapPM);
+}
+
+function filterMapByPM(pm) {
+  currentMapPM = pm;
+  renderIndiaMap(currentMapFilter, pm);
+}
+
+function mapZoom(factor) {
+  mapScale = Math.min(Math.max(mapScale*factor, 0.5), 4);
+  const svg = document.getElementById('mapSvg');
+  if(svg) svg.style.transform = `scale(${mapScale})`;
+}
+
+function resetMapZoom() {
+  mapScale = 1;
+  const svg = document.getElementById('mapSvg');
+  if(svg) svg.style.transform = 'scale(1)';
+}
+
+function renderStateWiseSummary(sites) {
+  const states = {};
+  sites.forEach(s=>{
+    const coord = SITE_COORDS[s.site];
+    const state = coord?.state||'Other';
+    if(!states[state]) states[state]={state,sites:0,total:0};
+    states[state].sites++;
+    states[state].total+=s.total;
+  });
+  const sorted = Object.values(states).sort((a,b)=>b.total-a.total);
+  const maxT = sorted[0]?.total||1;
+  const colors=['#ff4040','#ffc107','#00d4ff','#00e676','#b44fff','#ff6b35','#82b1ff'];
+  document.getElementById('stateWiseSummary').innerHTML = sorted.map((st,i)=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:12px;font-weight:600">${esc(st.state)}</span>
+        <span style="font-size:10px;color:var(--muted)">${st.sites} site${st.sites>1?'s':''}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1;height:7px;background:var(--bg);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${(st.total/maxT*100).toFixed(1)}%;background:${colors[i%colors.length]};border-radius:4px;transition:width 1s ease"></div>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${colors[i%colors.length]};width:90px;text-align:right">${INR(st.total)}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderMapSiteList(sites) {
+  const sorted = [...sites].sort((a,b)=>b.total-a.total);
+  document.getElementById('mapSiteList').innerHTML = sorted.map(s=>{
+    const color = getPinColor(s.site);
+    return `<div class="site-list-row" onclick="showSiteView('${esc(s.site)}')">
+      <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></div>
+      <div style="flex:1;overflow:hidden">
+        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.site)}</div>
+        <div style="font-size:10px;color:var(--muted)">${esc(s.pm)}</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${color}">${INR(s.total)}</div>
+      <i class="fa fa-chevron-right" style="font-size:10px;color:var(--muted)"></i>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// FEATURE 20: PWA — PROGRESSIVE WEB APP
+// ============================================================
+let deferredPrompt = null;
+
+
+document.addEventListener('DOMContentLoaded', function() {
+// Register Service Worker
+if('serviceWorker' in navigator) {
+  const swCode = `
+const CACHE = 've-dashboard-v1';
+const ASSETS = [location.href];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+    const clone = res.clone();
+    caches.open(CACHE).then(c=>c.put(e.request,clone));
+    return res;
+  }).catch(()=>caches.match(e.request))));
+});`;
+
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).then(reg=>{
+    const _sws = document.getElementById('swStatus'); if(_sws) _sws.textContent = 'Active & Caching';
+    const _swb = document.getElementById('swBadge'); if(_swb) { _swb.textContent = 'ACTIVE'; _swb.className = 'stt stt-g'; }
+  }).catch(e=>{
+    const _sws2 = document.getElementById('swStatus'); if(_sws2) _sws2.textContent = 'Not available in this context';
+    const _swb2 = document.getElementById('swBadge'); if(_swb2) _swb2.textContent = 'N/A';
+  });
+}
+
+// PWA Manifest (dynamic)
+const manifest = {
+  name: 'Vishal Electricals Dashboard',
+  short_name: 'VE Dashboard',
+  description: 'Outstanding Payment Tracker',
+  start_url: './',
+  display: 'standalone',
+  background_color: '#07090f',
+  theme_color: '#07090f',
+  orientation: 'any',
+  icons: [{
+    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='20' fill='%230e1420'/%3E%3Ctext x='96' y='128' text-anchor='middle' fill='%2300d4ff' font-size='100' font-family='Arial' font-weight='900'%3EVE%3C/text%3E%3C/svg%3E",
+    sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable'
+  }]
+};
+const manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const manifestUrl = URL.createObjectURL(manifestBlob);
+document.getElementById('pwaManifest')?.setAttribute('href', manifestUrl);
+
+// Install prompt capture
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('pwaInstallHeaderBtn')?.classList.add('visible');
+  const _pimb = document.getElementById('pwaInstallMainBtn'); if(_pimb) _pimb.disabled = false;
+  const _pis = document.getElementById('pwaInstallStatus'); if(_pis) _pis.textContent = 'Ready to install!';
+  const _iss = document.getElementById('installStatus'); if(_iss) _iss.textContent = 'Ready to install';
+  const _isb = document.getElementById('installBadge'); if(_isb) { _isb.textContent = 'READY'; _isb.className = 'stt stt-g'; }
+  // Show toast after 3 seconds
+  setTimeout(()=>{ document.getElementById('pwaToast')?.classList.add('show'); }, 3000);
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwaInstallHeaderBtn')?.classList.remove('visible');
+  const _pis2 = document.getElementById('pwaInstallStatus'); if(_pis2) _pis2.textContent = 'App installed successfully!';
+  const _iss2 = document.getElementById('installStatus'); if(_iss2) _iss2.textContent = 'Installed';
+  const _isb2 = document.getElementById('installBadge'); if(_isb2) { _isb2.textContent = 'INSTALLED'; _isb2.className = 'stt stt-g'; }
+  toast('App installed! Open from your home screen.');
+  logAudit('view','PWA App installed on device','');
+});
+
+async function installPWA() {
+  if(deferredPrompt) {
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    dismissPWAToast();
+    if(result.outcome==='accepted') toast('Installing app...');
+    else toast('Installation cancelled','error');
+  } else {
+    // Show manual guide
+    toast('Use browser menu → "Add to Home Screen"');
+  }
+}
+
+function dismissPWAToast() {
+  document.getElementById('pwaToast')?.classList.remove('show');
+}
+
+
+});
+
+// Online/Offline detection
+window.addEventListener('online', ()=>{
+  document.getElementById('offlineBanner')?.classList.remove('show');
+  const _cs1=document.getElementById('connStatus'); if(_cs1) _cs1.textContent='Online';
+  const _cb1=document.getElementById('connBadge'); if(_cb1){_cb1.className='stt stt-g';_cb1.textContent='ONLINE';}
+});
+window.addEventListener('offline', ()=>{
+  document.getElementById('offlineBanner')?.classList.add('show');
+  const _cs2=document.getElementById('connStatus'); if(_cs2) _cs2.textContent='Offline — using cached data';
+  const _cb2=document.getElementById('connBadge'); if(_cb2){_cb2.className='stt stt-r';_cb2.textContent='OFFLINE';}
+});
+
+// Storage usage
+if(navigator.storage?.estimate) {
+  navigator.storage.estimate().then(est=>{
+    const used = (est.usage/1024/1024).toFixed(2);
+    const quota = (est.quota/1024/1024/1024).toFixed(2);
+    const _stor = document.getElementById('storageStatus');
+    if(_stor) _stor.textContent = used + ' MB used of ' + quota + ' GB';
+  });
+} else {
+  const _stor2 = document.getElementById('storageStatus');
+  if(_stor2) _stor2.textContent = 'Storage API not available';
+}
+
+if(!deferredPrompt) {
+  const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
+  const el = document.getElementById('installStatus');
+  const badge = document.getElementById('installBadge');
+  if(el && badge) {
+    if(isInstalled) {
+      if(el) el.textContent = 'Already installed as app';
+      if(badge) { badge.textContent = 'INSTALLED'; badge.className = 'stt stt-g'; }
+    } else {
+      if(el) el.textContent = 'Not installed yet — use browser prompt';
+      if(badge) { badge.textContent = 'NOT INSTALLED'; badge.className = 'stt stt-y'; }
+    }
+  }
+}
+
+// ── EXTEND showView for new views ──
+const _sv3 = window.showView;
+window.showView = function(v) {
+  _sv3(v);
+  if(v==='map') { renderIndiaMap(currentMapFilter, currentMapPM); }
+};
+
 </script>
+
+<!-- DOC VIEWER MODAL -->
+<div class="mbd" id="docViewerModal">
+  <div class="modal" style="max-width:800px">
+    <div class="mh"><i class="fa fa-file" style="color:var(--a1)"></i><div class="mt" id="docViewerTitle">Document</div><button class="mcl" onclick="closeM('docViewerModal')"><i class="fa fa-xmark"></i></button></div>
+    <div style="flex:1;padding:0">
+      <iframe id="docViewerFrame" src="" style="width:100%;height:500px;border:none;border-radius:0 0 16px 16px"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="mbd" id="shareModal">
+  <div class="modal" style="max-width:480px">
+    <div class="mh"><i class="fa fa-share-nodes" style="color:var(--a3)"></i><div class="mt">Share Outstanding Details</div><button class="mcl" onclick="closeM('shareModal')"><i class="fa fa-xmark"></i></button></div>
+    <div class="mb" id="shareModalBody"></div>
+    <div class="mf"><button class="btn btn-s" onclick="closeM('shareModal')">Close</button></div>
+  </div>
+</div>
+
 </body>
 </html>
 
