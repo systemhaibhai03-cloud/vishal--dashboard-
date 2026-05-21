@@ -295,6 +295,19 @@ table.dt tr:hover td{background:rgba(0,212,255,.03);color:var(--txt)}
 .site-list-row:hover { padding-left: 6px; }
 .site-list-row:last-child { border-bottom: none; }
 
+
+/* CRM Email */
+.crm-field-row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(28,45,68,.3)}
+.crm-field-row:last-child{border-bottom:none}
+/* Leaflet dark override */
+.leaflet-container{background:#0c1424 !important;font-family:'Space Grotesk',sans-serif}
+.leaflet-popup-content-wrapper{background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--txt);box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.leaflet-popup-content{margin:12px 16px;font-family:'Space Grotesk',sans-serif}
+.leaflet-popup-tip{background:var(--card)}
+.leaflet-control-zoom a{background:var(--card)!important;color:var(--txt)!important;border-color:var(--border)!important}
+.leaflet-control-zoom a:hover{background:var(--card2)!important;color:var(--a1)!important}
+.leaflet-tile{filter:brightness(0.7) saturate(0.8) hue-rotate(200deg)}
+
 </style>
 
   <!-- PWA Meta Tags -->
@@ -306,6 +319,9 @@ table.dt tr:hover td{background:rgba(0,212,255,.03);color:var(--txt)}
   <meta name="description" content="Vishal Electricals Outstanding Payment Dashboard">
   <link rel="manifest" id="pwaManifest">
 
+  <!-- Leaflet Maps -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
 
@@ -704,34 +720,101 @@ table.dt tr:hover td{background:rgba(0,212,255,.03);color:var(--txt)}
       <div class="row2">
         <div class="panel fu">
           <div class="ph">
-            <div class="ph-title">Email / Payment Advice Parser</div>
-            <span class="pb pb-blue">AI-Powered</span>
+            <div class="ph-title">CRM Email Generator</div>
+            <span class="pb pb-purple">Auto Generate</span>
           </div>
           <div class="pb-body">
-            <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Paste a payment confirmation email or advice text below. The AI will extract invoice number, amount, date and site automatically.</div>
-            <textarea class="parse-box" id="emailInput" placeholder="Paste payment advice email here...
-
-Example:
-Dear Sir, Payment of Rs. 1,25,000/- has been processed against Invoice No. VE/25-26/37 dated 30.06.2025 for IOCL Jharsuguda. UTR No: HDFC0001234. Payment Date: 13.08.2025..."></textarea>
-            <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-              <button class="btn btn-p" onclick="parseEmail()"><i class="fa fa-wand-magic-sparkles"></i> Parse with AI</button>
-              <button class="btn btn-s" onclick="loadSampleEmail()"><i class="fa fa-file-lines"></i> Load Sample</button>
-              <button class="btn btn-s" onclick="document.getElementById('emailInput').value='';document.getElementById('parseResultArea').style.display='none'"><i class="fa fa-xmark"></i> Clear</button>
+            <!-- Site Selector -->
+            <div style="margin-bottom:14px">
+              <label class="flbl" style="display:block;margin-bottom:6px">Select Site / Party</label>
+              <select class="fin" id="crmSiteSelect" onchange="onCrmSiteChange()">
+                <option value="">— Select Site —</option>
+              </select>
             </div>
-            <div id="parseResultArea" style="display:none">
-              <div style="margin:14px 0 8px;font-size:11px;font-weight:700;color:var(--a3)"><i class="fa fa-circle-check"></i> Extracted Data — Review & Confirm</div>
-              <div class="parse-result" id="parseResult"></div>
-              <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-                <button class="btn btn-p" onclick="applyParsedData()"><i class="fa fa-floppy-disk"></i> Apply to Dashboard</button>
-                <button class="btn btn-s" onclick="document.getElementById('parseResultArea').style.display='none'">Discard</button>
+            <div class="fg" style="margin-bottom:14px">
+              <div class="fgrp">
+                <label class="flbl">Email Type</label>
+                <select class="fin" id="crmEmailType" onchange="generateCRMEmail()">
+                  <option value="followup">Payment Follow-Up</option>
+                  <option value="reminder">Gentle Reminder</option>
+                  <option value="urgent">Urgent Recovery Notice</option>
+                  <option value="statement">Account Statement Request</option>
+                  <option value="acknowledgement">Payment Acknowledgement</option>
+                </select>
+              </div>
+              <div class="fgrp">
+                <label class="flbl">Recipient Name</label>
+                <input class="fin" id="crmRecipient" placeholder="e.g. Mr. Sharma" oninput="generateCRMEmail()">
+              </div>
+              <div class="fgrp">
+                <label class="flbl">Recipient Email</label>
+                <input class="fin" id="crmEmail" placeholder="accounts@iocl.com" type="email">
+              </div>
+              <div class="fgrp">
+                <label class="flbl">CC Email</label>
+                <input class="fin" id="crmCC" placeholder="manager@company.com" type="email">
+              </div>
+            </div>
+            <button class="btn btn-p" style="width:100%;margin-bottom:14px" onclick="generateCRMEmail()">
+              <i class="fa fa-wand-magic-sparkles"></i> Auto Generate Email
+            </button>
+            <!-- Generated Email Preview (White Theme) -->
+            <div id="crmEmailPreview" style="display:none">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <span style="font-size:11px;font-weight:700;color:var(--a3)"><i class="fa fa-circle-check"></i> Email Generated</span>
+                <div style="display:flex;gap:8px">
+                  <button class="pa-btn" onclick="copyCRMEmail()"><i class="fa fa-copy"></i> Copy</button>
+                  <button class="pa-btn" onclick="openGmailDraft()"><i class="fa fa-envelope"></i> Open Gmail</button>
+                  <button class="pa-btn" onclick="printCRMEmail()"><i class="fa fa-print"></i> Print</button>
+                </div>
+              </div>
+              <!-- WHITE THEME EMAIL -->
+              <div id="crmEmailWhite" style="
+                background:#ffffff;color:#1a1a2e;border-radius:12px;overflow:hidden;
+                box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:Arial,sans-serif;
+              ">
+                <!-- Email Header -->
+                <div style="background:linear-gradient(135deg,#003399,#0055cc);padding:20px 24px;display:flex;align-items:center;gap:14px">
+                  <div style="width:48px;height:48px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;font-family:Arial">VE</div>
+                  <div>
+                    <div style="color:#fff;font-size:16px;font-weight:800;letter-spacing:.5px">VISHAL ELECTRICALS</div>
+                    <div style="color:rgba(255,255,255,.75);font-size:11px">Outstanding Payment Communication</div>
+                  </div>
+                  <div style="margin-left:auto;text-align:right">
+                    <div style="color:rgba(255,255,255,.75);font-size:10px" id="crm_date"></div>
+                    <div style="color:rgba(255,255,255,.6);font-size:10px">Ref: VE/FIN/2026</div>
+                  </div>
+                </div>
+                <!-- Meta bar -->
+                <div style="background:#f0f4ff;padding:10px 24px;border-bottom:1px solid #dde3f0;font-size:11px;color:#445;display:flex;gap:20px;flex-wrap:wrap">
+                  <span><b>To:</b> <span id="crm_to_display"></span></span>
+                  <span><b>CC:</b> <span id="crm_cc_display">accounts@vishalelectricals.com</span></span>
+                  <span><b>Subject:</b> <span id="crm_subject_display" style="color:#003399;font-weight:700"></span></span>
+                </div>
+                <!-- Email Body -->
+                <div style="padding:24px;line-height:1.7;font-size:13px;color:#222" id="crmEmailBody"></div>
+                <!-- Footer -->
+                <div style="background:#f8f9ff;border-top:2px solid #003399;padding:16px 24px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+                  <div style="font-size:11px;color:#555">
+                    <div style="font-weight:800;color:#003399;font-size:13px;margin-bottom:4px">Vishal Electricals</div>
+                    <div>Electrical Contractors & Project Consultants</div>
+                    <div>📞 +91-XXXXXXXXXX &nbsp;|&nbsp; ✉ info@vishalelectricals.com</div>
+                  </div>
+                  <div style="font-size:10px;color:#999;text-align:right;max-width:200px">
+                    This is an auto-generated communication. Please do not reply to this email directly.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div class="panel fu">
-          <div class="ph"><div class="ph-title">Recent Parsed Emails</div></div>
-          <div class="pb-body" id="parsedHistory">
-            <div style="text-align:center;padding:30px;color:var(--muted)"><i class="fa fa-inbox" style="font-size:32px;opacity:.3;display:block;margin-bottom:10px"></i>No emails parsed yet</div>
+          <div class="ph"><div class="ph-title">Sent Email Log</div><span class="pb pb-green">History</span></div>
+          <div class="pb-body" id="crmSentLog">
+            <div style="text-align:center;padding:30px;color:var(--muted)">
+              <i class="fa fa-inbox" style="font-size:32px;opacity:.3;display:block;margin-bottom:10px"></i>
+              No emails generated yet
+            </div>
           </div>
         </div>
       </div>
@@ -769,39 +852,31 @@ Dear Sir, Payment of Rs. 1,25,000/- has been processed against Invoice No. VE/25
     <div class="view" id="view-map">
       <div class="panel fu" style="margin-bottom:16px">
         <div class="ph">
-          <div class="ph-title">India Site Map — Outstanding Visualization</div>
-          <span class="pb pb-blue">43 Sites</span>
+          <div class="ph-title">India Site Map — Live Locations</div>
+          <span class="pb pb-blue">Leaflet Maps</span>
           <div class="pa">
             <button class="pa-btn" onclick="setMapFilter('all')" id="mf-all">All Sites</button>
             <button class="pa-btn" onclick="setMapFilter('critical')" id="mf-critical">Critical Only</button>
             <button class="pa-btn" onclick="setMapFilter('pending')" id="mf-pending">Pending Bill</button>
+            <select class="fin" id="mapPMFilter" style="width:150px;padding:5px 10px;font-size:11px" onchange="filterMapByPM(this.value)">
+              <option value="">All PMs</option>
+              <option>Ravi</option><option>Chandrashekhar</option><option>Vicky</option><option>Keshav</option>
+            </select>
           </div>
         </div>
         <div class="map-stat-bar">
           <div class="map-stat"><div class="map-stat-val" style="color:var(--a1)">43</div><div class="map-stat-lbl">Total Sites</div></div>
-          <div class="map-stat"><div class="map-stat-val" style="color:var(--red)">35</div><div class="map-stat-lbl">Critical (180+ days)</div></div>
+          <div class="map-stat"><div class="map-stat-val" style="color:var(--red)">35</div><div class="map-stat-lbl">Critical 180+ Days</div></div>
           <div class="map-stat"><div class="map-stat-val" style="color:var(--green)">2</div><div class="map-stat-lbl">Cleared</div></div>
           <div class="map-stat"><div class="map-stat-val" style="color:var(--yellow)">₹5.17Cr</div><div class="map-stat-lbl">Total Outstanding</div></div>
         </div>
-        <div class="map-controls">
-          <button class="pa-btn" onclick="mapZoom(1.2)"><i class="fa fa-magnifying-glass-plus"></i> Zoom In</button>
-          <button class="pa-btn" onclick="mapZoom(0.8)"><i class="fa fa-magnifying-glass-minus"></i> Zoom Out</button>
-          <button class="pa-btn" onclick="resetMapZoom()"><i class="fa fa-expand"></i> Reset</button>
-          <select class="fin" id="mapPMFilter" style="width:160px;padding:5px 10px;font-size:11px" onchange="filterMapByPM(this.value)">
-            <option value="">— Filter by PM —</option>
-            <option>Ravi</option><option>Chandrashekhar</option><option>Vicky</option><option>Keshav</option>
-          </select>
-        </div>
-        <div class="map-container">
-          <div class="map-svg-wrap" id="mapSvgWrap"></div>
-          <div class="map-tooltip" id="mapTooltip"></div>
-        </div>
+        <!-- Leaflet Map -->
+        <div id="leafletMap" style="height:520px;width:100%;z-index:1;border-radius:0"></div>
         <div class="map-legend">
           <div class="map-leg-item"><div class="map-leg-dot" style="background:#ff4040"></div>Critical (&gt;₹50L)</div>
           <div class="map-leg-item"><div class="map-leg-dot" style="background:#ffc107"></div>High (₹10L–₹50L)</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#00d4ff"></div>Medium (₹1L–₹10L)</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#00e676"></div>Cleared / Low</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#b44fff"></div>Non-IOCL</div>
+          <div class="map-leg-item"><div class="map-leg-dot" style="background:#00d4ff"></div>Medium (&lt;₹10L)</div>
+          <div class="map-leg-item"><div class="map-leg-dot" style="background:#00e676"></div>Cleared</div>
         </div>
       </div>
       <div class="row2">
@@ -810,12 +885,11 @@ Dear Sir, Payment of Rs. 1,25,000/- has been processed against Invoice No. VE/25
           <div class="pb-body" id="stateWiseSummary"></div>
         </div>
         <div class="panel fu">
-          <div class="ph"><div class="ph-title">Site List</div><span class="pb pb-orange">Click to highlight</span></div>
-          <div class="pb-body" style="max-height:400px;overflow-y:auto" id="mapSiteList"></div>
+          <div class="ph"><div class="ph-title">Site List</div><span class="pb pb-orange">Click to locate</span></div>
+          <div class="pb-body" style="max-height:380px;overflow-y:auto" id="mapSiteList"></div>
         </div>
       </div>
     </div>
-
 
     <!-- PWA VIEW -->
     <div class="view" id="view-pwa">
@@ -2121,8 +2195,16 @@ async function syncFromSheets() {
   logAudit('sync', 'Pull from Google Sheets initiated', csvUrl.slice(0,60)+'...');
 
   try {
-    const res = await fetch(csvUrl);
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    // Try direct fetch first, fallback to CORS proxy
+    let res;
+    try {
+      res = await fetch(csvUrl);
+      if (!res.ok) throw new Error('direct');
+    } catch(_e) {
+      const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(csvUrl);
+      res = await fetch(proxyUrl);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+    }
     const text = await res.text();
     const rows = text.split('\n').filter(r=>r.trim());
     const dataRows = rows.slice(2).filter(r=>r.trim() && !/^,+$/.test(r));
@@ -2399,6 +2481,230 @@ function extractBank(text) {
   return line;
 }
 
+
+// ============================================================
+// CRM EMAIL GENERATOR — AUTO GENERATE + WHITE THEME
+// ============================================================
+let crmSentLog = JSON.parse(localStorage.getItem('ve_crm_log') || '[]');
+
+function initCRMSiteSelect() {
+  const sel = document.getElementById('crmSiteSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Select Site —</option>';
+  SUMMARY.filter(function(s){return s.total > 0;}).sort(function(a,b){return b.total-a.total;}).forEach(function(s) {
+    const opt = document.createElement('option');
+    opt.value = s.site;
+    opt.textContent = s.site + ' (' + INR(s.total) + ')';
+    sel.appendChild(opt);
+  });
+}
+
+function onCrmSiteChange() {
+  generateCRMEmail();
+}
+
+function generateCRMEmail() {
+  const site    = document.getElementById('crmSiteSelect') ? document.getElementById('crmSiteSelect').value : '';
+  const type    = document.getElementById('crmEmailType') ? document.getElementById('crmEmailType').value : 'followup';
+  const recip   = document.getElementById('crmRecipient') ? document.getElementById('crmRecipient').value || 'Sir/Madam' : 'Sir/Madam';
+  const toEmail = document.getElementById('crmEmail') ? document.getElementById('crmEmail').value || 'accounts@client.com' : 'accounts@client.com';
+  const ccEmail = document.getElementById('crmCC') ? document.getElementById('crmCC').value || '' : '';
+
+  if (!site) return;
+
+  const s = SUMMARY.find(function(x){return x.site===site;}) || {};
+  const today = new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+  const refNo  = 'VE/FIN/' + new Date().getFullYear() + '/' + String(Math.floor(Math.random()*9000)+1000);
+
+  // Subject lines
+  const subjects = {
+    followup:        'Payment Follow-Up: Outstanding Amount — ' + site,
+    reminder:        'Gentle Reminder: Pending Payment — ' + site,
+    urgent:          'URGENT: Immediate Payment Required — ' + site,
+    statement:       'Account Statement & Outstanding Details — ' + site,
+    acknowledgement: 'Payment Acknowledgement — ' + site,
+  };
+
+  // Email bodies
+  const bodies = {
+    followup: generateFollowupBody(recip, site, s, today, refNo),
+    reminder:  generateReminderBody(recip, site, s, today, refNo),
+    urgent:    generateUrgentBody(recip, site, s, today, refNo),
+    statement: generateStatementBody(recip, site, s, today, refNo),
+    acknowledgement: generateAckBody(recip, site, s, today, refNo),
+  };
+
+  const subject = subjects[type] || subjects.followup;
+  const body    = bodies[type]   || bodies.followup;
+
+  // Update preview
+  const preview = document.getElementById('crmEmailPreview');
+  if (preview) preview.style.display = 'block';
+
+  const dateEl = document.getElementById('crm_date');
+  if (dateEl) dateEl.textContent = today;
+
+  const toEl = document.getElementById('crm_to_display');
+  if (toEl) toEl.textContent = recip + ' <' + toEmail + '>';
+
+  const ccEl = document.getElementById('crm_cc_display');
+  if (ccEl) ccEl.textContent = (ccEmail || 'accounts@vishalelectricals.com');
+
+  const subjEl = document.getElementById('crm_subject_display');
+  if (subjEl) subjEl.textContent = subject;
+
+  const bodyEl = document.getElementById('crmEmailBody');
+  if (bodyEl) bodyEl.innerHTML = body;
+
+  // Store for send log
+  window._currentCRMEmail = {site, type, subject, body, toEmail, ccEmail, recip, today, refNo, s};
+}
+
+function generateFollowupBody(recip, site, s, today, refNo) {
+  return '<p>Dear ' + recip + ',</p>' +
+    '<p>I hope this message finds you well.</p>' +
+    '<p>We are writing to bring to your attention the outstanding payment against the work executed by <strong>Vishal Electricals</strong> at your esteemed facility.</p>' +
+    buildAmountTable(s) +
+    '<p>We request you to kindly arrange the release of the outstanding amount at the earliest. Your prompt attention to this matter will be greatly appreciated.</p>' +
+    '<p>Please find below the payment details for your reference:</p>' +
+    '<ul style="color:#333;margin:10px 0;padding-left:20px">' +
+    '<li>Bank: HDFC Bank Ltd</li>' +
+    '<li>Account Name: Vishal Electricals</li>' +
+    '<li>Account No: XXXXXXXXXXXX</li>' +
+    '<li>IFSC: HDFC0XXXXXX</li>' +
+    '</ul>' +
+    '<p>Kindly acknowledge receipt of this email and confirm the expected payment date.</p>' +
+    '<p>Ref No: <strong>' + refNo + '</strong> | Date: ' + today + '</p>' +
+    '<p>Thanking you,<br><strong>Accounts Department</strong><br>Vishal Electricals</p>';
+}
+
+function generateReminderBody(recip, site, s, today, refNo) {
+  return '<p>Dear ' + recip + ',</p>' +
+    '<p>This is a gentle reminder regarding the pending payment for work completed at <strong>' + site + '</strong>.</p>' +
+    '<p>Despite our earlier communication, we observe that the following amounts remain outstanding:</p>' +
+    buildAmountTable(s) +
+    '<p>We understand that delays can occur due to internal processes. However, we request your kind intervention to expedite the payment clearance.</p>' +
+    '<p>Please feel free to contact us if you require any documentation or clarification.</p>' +
+    '<p>Ref No: <strong>' + refNo + '</strong> | Date: ' + today + '</p>' +
+    '<p>With warm regards,<br><strong>Accounts Team</strong><br>Vishal Electricals</p>';
+}
+
+function generateUrgentBody(recip, site, s, today, refNo) {
+  return '<p style="color:#cc0000;font-weight:bold">⚠️ URGENT PAYMENT NOTICE</p>' +
+    '<p>Dear ' + recip + ',</p>' +
+    '<p>This is to bring to your immediate attention that the following payments have been outstanding for a considerable period and require <strong>urgent resolution</strong>:</p>' +
+    buildAmountTable(s) +
+    '<p style="color:#cc0000">The delayed payment is affecting our operations significantly. We request you to kindly process the release on <strong>priority basis within 7 working days</strong>.</p>' +
+    '<p>Failure to receive the payment may compel us to escalate the matter to senior management and initiate legal proceedings as per our agreement terms.</p>' +
+    '<p>We sincerely hope this will not be necessary and look forward to your immediate positive response.</p>' +
+    '<p>Ref No: <strong>' + refNo + '</strong> | Date: ' + today + '</p>' +
+    '<p>Regards,<br><strong>Management</strong><br>Vishal Electricals</p>';
+}
+
+function generateStatementBody(recip, site, s, today, refNo) {
+  return '<p>Dear ' + recip + ',</p>' +
+    '<p>Please find below the account statement and outstanding payment details for <strong>' + site + '</strong> as on ' + today + ':</p>' +
+    buildAmountTable(s) +
+    '<p>We request you to kindly reconcile the above amounts on your records and confirm the outstanding balance. In case of any discrepancy, please revert with supporting documents.</p>' +
+    '<p>We also request you to share the expected payment release schedule so that we can update our financial records accordingly.</p>' +
+    '<p>Ref No: <strong>' + refNo + '</strong> | Date: ' + today + '</p>' +
+    '<p>Best regards,<br><strong>Finance Department</strong><br>Vishal Electricals</p>';
+}
+
+function generateAckBody(recip, site, s, today, refNo) {
+  return '<p>Dear ' + recip + ',</p>' +
+    '<p>We are pleased to acknowledge receipt of your recent payment for <strong>' + site + '</strong>.</p>' +
+    '<p>Your payment has been duly credited to our account. Below is the updated statement for your records:</p>' +
+    buildAmountTable(s) +
+    '<p>We appreciate your continued trust and timely cooperation. We look forward to a long and mutually beneficial association.</p>' +
+    '<p>If you have any queries regarding this acknowledgement, please do not hesitate to contact us.</p>' +
+    '<p>Ref No: <strong>' + refNo + '</strong> | Date: ' + today + '</p>' +
+    '<p>Warm regards,<br><strong>Accounts Department</strong><br>Vishal Electricals</p>';
+}
+
+function buildAmountTable(s) {
+  const rows = [
+    {lbl:'Pending Bill Amount', val:s.pending, color:'#ff6b35'},
+    {lbl:'SD Deduction', val:s.sd, color:'#e6ac00'},
+    {lbl:'LD Deduction', val:s.ld, color:'#cc0000'},
+    {lbl:'Withheld Amount', val:s.withheld, color:'#7700cc'},
+    {lbl:'Other Deduction', val:s.other, color:'#555'},
+  ].filter(function(r){return r.val > 0;});
+
+  let html = '<table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:12px">' +
+    '<tr style="background:#003399;color:#fff"><th style="padding:10px 12px;text-align:left">Description</th><th style="padding:10px 12px;text-align:right">Amount</th></tr>';
+  rows.forEach(function(r, i) {
+    html += '<tr style="background:' + (i%2===0?'#f5f8ff':'#fff') + '">' +
+      '<td style="padding:9px 12px;border-bottom:1px solid #e0e8ff;color:#333">' + r.lbl + '</td>' +
+      '<td style="padding:9px 12px;border-bottom:1px solid #e0e8ff;text-align:right;font-weight:700;color:' + r.color + ';font-family:monospace">' + INR(r.val) + '</td></tr>';
+  });
+  html += '<tr style="background:#003399;color:#fff">' +
+    '<td style="padding:10px 12px;font-weight:800">TOTAL OUTSTANDING</td>' +
+    '<td style="padding:10px 12px;text-align:right;font-weight:800;font-size:14px;font-family:monospace">' + INR(s.total) + '</td></tr></table>';
+  return html;
+}
+
+function copyCRMEmail() {
+  const bodyEl = document.getElementById('crmEmailWhite');
+  if (!bodyEl) return;
+  const text = bodyEl.innerText;
+  navigator.clipboard.writeText(text).then(function() { toast('Email copied to clipboard!'); });
+}
+
+function openGmailDraft() {
+  const e = window._currentCRMEmail;
+  if (!e) { toast('Generate email first','error'); return; }
+  const to      = encodeURIComponent(e.toEmail || '');
+  const cc      = encodeURIComponent(e.ccEmail || '');
+  const subject = encodeURIComponent(e.subject || '');
+  const bodyEl  = document.getElementById('crmEmailBody');
+  const body    = encodeURIComponent(bodyEl ? bodyEl.innerText : '');
+  window.open('https://mail.google.com/mail/?view=cm&fs=1&to=' + to + '&cc=' + cc + '&su=' + subject + '&body=' + body, '_blank');
+  saveToCRMLog();
+  logAudit('parse', 'CRM email opened in Gmail: ' + (e.subject||''), e.site||'');
+  toast('Gmail opened with draft!');
+}
+
+function printCRMEmail() {
+  const el = document.getElementById('crmEmailWhite');
+  if (!el) return;
+  const win = window.open('', '_blank');
+  win.document.write('<html><head><title>Email</title><style>body{margin:20px;font-family:Arial,sans-serif}</style></head><body>' + el.outerHTML + '</body></html>');
+  win.document.close();
+  setTimeout(function(){win.print();}, 400);
+  saveToCRMLog();
+  toast('Print dialog opened');
+}
+
+function saveToCRMLog() {
+  const e = window._currentCRMEmail;
+  if (!e) return;
+  crmSentLog.unshift({
+    site: e.site, type: e.type, subject: e.subject,
+    to: e.toEmail, time: new Date().toLocaleString('en-IN')
+  });
+  localStorage.setItem('ve_crm_log', JSON.stringify(crmSentLog.slice(0,50)));
+  renderCRMSentLog();
+}
+
+function renderCRMSentLog() {
+  const el = document.getElementById('crmSentLog');
+  if (!el) return;
+  if (!crmSentLog.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)"><i class="fa fa-inbox" style="font-size:32px;opacity:.3;display:block;margin-bottom:10px"></i>No emails generated yet</div>';
+    return;
+  }
+  const typeColors = {followup:'var(--a1)',reminder:'var(--yellow)',urgent:'var(--red)',statement:'var(--a6)',acknowledgement:'var(--green)'};
+  el.innerHTML = crmSentLog.map(function(e) {
+    return '<div style="padding:10px;border-bottom:1px solid var(--border)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">' +
+      '<span style="font-weight:700;font-size:12px">' + esc(e.site) + '</span>' +
+      '<span style="font-size:9px;padding:1px 7px;border-radius:10px;background:rgba(0,212,255,.1);color:' + (typeColors[e.type]||'var(--a1)') + ';text-transform:uppercase;font-weight:700">' + esc(e.type) + '</span></div>' +
+      '<div style="font-size:10px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(e.subject) + '</div>' +
+      '<div style="font-size:10px;color:var(--muted);margin-top:2px">' + esc(e.time) + ' → ' + esc(e.to) + '</div></div>';
+  }).join('');
+}
+
 function applyParsedData() {
   if(!parsedData) return;
   const inv = parsedData.invoice;
@@ -2452,181 +2758,155 @@ renderAuditLog('all');
 
 
 // ============================================================
-// FEATURE 12: INDIA MAP VIEW
+// FEATURE 12: INDIA MAP — LEAFLET REAL MAP
 // ============================================================
-const SITE_COORDS = {
-  'IOCL MATHURA BDFP':     {x:290,y:220,state:'Uttar Pradesh'},
-  'IOCL PANIPAT DO':       {x:268,y:190,state:'Haryana'},
-  'IOCL SALEM':            {x:295,y:490,state:'Tamil Nadu'},
-  'IOCL COIMBATORE':       {x:275,y:500,state:'Tamil Nadu'},
-  'IOCL TRICHY':           {x:300,y:500,state:'Tamil Nadu'},
-  'IOCL MADURAI':          {x:290,y:515,state:'Tamil Nadu'},
-  'IOCL CHENNAI':          {x:325,y:475,state:'Tamil Nadu'},
-  'IOCL HISSAR':           {x:255,y:195,state:'Haryana'},
-  'IOCL PANIPAT REFINERY': {x:265,y:188,state:'Haryana'},
-  'IOCL BARAUNI':          {x:370,y:255,state:'Bihar'},
-  'IOCL KANPUR':           {x:310,y:235,state:'Uttar Pradesh'},
-  'IOCL HOWRAH':           {x:405,y:290,state:'West Bengal'},
-  'IOCL LONI':             {x:285,y:208,state:'Uttar Pradesh'},
-  'IOCL JATNI':            {x:390,y:330,state:'Odisha'},
-  'IOCL PARADEEP AUTO':    {x:405,y:320,state:'Odisha'},
-  'IOCL AHMEDNAGAR':       {x:230,y:360,state:'Maharashtra'},
-  'IOCL ALLAHABAD':        {x:330,y:240,state:'Uttar Pradesh'},
-  'IOCL KHUNTI':           {x:375,y:290,state:'Jharkhand'},
-  'IOCL JHARSUGUDA':       {x:370,y:305,state:'Odisha'},
-  'IOCL NASHIK':           {x:218,y:355,state:'Maharashtra'},
-  'HPCL LONI':             {x:284,y:207,state:'Uttar Pradesh'},
-  'NFC KOTA TOWNSHIP':     {x:252,y:245,state:'Rajasthan'},
-  'NFC KOTA':              {x:256,y:248,state:'Rajasthan'},
-  'NFC HYDERABAD':         {x:295,y:400,state:'Telangana'},
-  'IOCL MUMBAI DO':        {x:200,y:375,state:'Maharashtra'},
-  'GENPACT GURGAON':       {x:270,y:200,state:'Haryana'},
-  'IOCL SARPARA':          {x:380,y:310,state:'Odisha'},
-  'IOCL MORADABAD DO':     {x:295,y:215,state:'Uttar Pradesh'},
-  'Transrail Lighting':    {x:315,y:262,state:'Multi-State'},
-  'IOCL BANGALORE':        {x:270,y:470,state:'Karnataka'},
-  'IOCL VIZAG':            {x:360,y:390,state:'Andhra Pradesh'},
-  'IOCL RAIPUR':           {x:340,y:320,state:'Chhattisgarh'},
-  'IOCL BHATINDA':         {x:248,y:178,state:'Punjab'},
-  'IOCL SECUNDERABAD':     {x:298,y:395,state:'Telangana'},
-  'IOCL WARANGAL':         {x:308,y:400,state:'Telangana'},
-  'IOCL TIRUPATI':         {x:305,y:455,state:'Andhra Pradesh'},
-  'IOCL NIZAMABAD':        {x:285,y:390,state:'Telangana'},
-  'IOCL VIJAYWADA':        {x:320,y:430,state:'Andhra Pradesh'},
-  'AAI AMRITSAR':          {x:238,y:168,state:'Punjab'},
-  'IOCL PARADEEP HM':      {x:407,y:318,state:'Odisha'},
-  'PARADIP PORT AUTH':     {x:410,y:316,state:'Odisha'},
-  'NTPC DADRI':            {x:283,y:212,state:'Uttar Pradesh'},
-  'GAIL VIJAIPUR':         {x:285,y:250,state:'Madhya Pradesh'},
-};
-
+let leafletMap = null;
+let mapMarkers = [];
 let currentMapFilter = 'all';
 let currentMapPM = '';
-let mapScale = 1;
-let mapTranslate = {x:0, y:0};
 
-function getPinColor(site) {
-  const s = SUMMARY.find(x=>x.site===site);
-  if(!s||s.total===0) return '#00e676';
-  if(!s.site.startsWith('IOCL')&&!s.site.startsWith('HPCL')) return '#b44fff';
-  if(s.total>=5000000) return '#ff4040';
-  if(s.total>=1000000) return '#ffc107';
+// Real Indian city coordinates for each site
+const SITE_COORDS = {
+  'IOCL MATHURA BDFP':     {lat:27.4924, lng:77.6737, city:'Mathura, UP'},
+  'IOCL PANIPAT DO':       {lat:29.3909, lng:76.9635, city:'Panipat, Haryana'},
+  'IOCL SALEM':            {lat:11.6643, lng:78.1460, city:'Salem, Tamil Nadu'},
+  'IOCL COIMBATORE':       {lat:11.0168, lng:76.9558, city:'Coimbatore, Tamil Nadu'},
+  'IOCL TRICHY':           {lat:10.7905, lng:78.7047, city:'Tiruchirappalli, Tamil Nadu'},
+  'IOCL MADURAI':          {lat:9.9252, lng:78.1198, city:'Madurai, Tamil Nadu'},
+  'IOCL CHENNAI':          {lat:13.0827, lng:80.2707, city:'Chennai, Tamil Nadu'},
+  'IOCL HISSAR':           {lat:29.1492, lng:75.7217, city:'Hisar, Haryana'},
+  'IOCL PANIPAT REFINERY': {lat:29.4739, lng:76.9676, city:'Panipat Refinery, Haryana'},
+  'IOCL BARAUNI':          {lat:25.4670, lng:85.9870, city:'Barauni, Bihar'},
+  'IOCL KANPUR':           {lat:26.4499, lng:80.3319, city:'Kanpur, UP'},
+  'IOCL HOWRAH':           {lat:22.5958, lng:88.2636, city:'Howrah, West Bengal'},
+  'IOCL LONI':             {lat:28.7460, lng:77.2883, city:'Loni, UP'},
+  'IOCL JATNI':            {lat:20.1670, lng:85.7010, city:'Jatni, Odisha'},
+  'IOCL PARADEEP AUTO':    {lat:20.3165, lng:86.6104, city:'Paradip, Odisha'},
+  'IOCL AHMEDNAGAR':       {lat:19.0952, lng:74.7496, city:'Ahmednagar, Maharashtra'},
+  'IOCL ALLAHABAD':        {lat:25.4358, lng:81.8463, city:'Prayagraj, UP'},
+  'IOCL KHUNTI':           {lat:23.0717, lng:85.2772, city:'Khunti, Jharkhand'},
+  'IOCL JHARSUGUDA':       {lat:21.8553, lng:84.0063, city:'Jharsuguda, Odisha'},
+  'IOCL NASHIK':           {lat:19.9975, lng:73.7898, city:'Nashik, Maharashtra'},
+  'HPCL LONI':             {lat:28.7460, lng:77.2883, city:'Loni, UP'},
+  'NFC KOTA TOWNSHIP':     {lat:25.1802, lng:75.8330, city:'Kota, Rajasthan'},
+  'NFC KOTA':              {lat:25.1900, lng:75.8400, city:'Kota, Rajasthan'},
+  'NFC HYDERABAD':         {lat:17.3850, lng:78.4867, city:'Hyderabad, Telangana'},
+  'IOCL MUMBAI DO':        {lat:19.0760, lng:72.8777, city:'Mumbai, Maharashtra'},
+  'GENPACT GURGAON':       {lat:28.4595, lng:77.0266, city:'Gurugram, Haryana'},
+  'IOCL SARPARA':          {lat:20.9517, lng:85.0985, city:'Sarpara, Odisha'},
+  'IOCL MORADABAD DO':     {lat:28.8386, lng:78.7733, city:'Moradabad, UP'},
+  'Transrail Lighting':    {lat:19.9975, lng:73.7898, city:'Nashik, Maharashtra'},
+  'IOCL BANGALORE':        {lat:12.9716, lng:77.5946, city:'Bengaluru, Karnataka'},
+  'IOCL VIZAG':            {lat:17.6868, lng:83.2185, city:'Visakhapatnam, AP'},
+  'IOCL RAIPUR':           {lat:21.2514, lng:81.6296, city:'Raipur, Chhattisgarh'},
+  'IOCL BHATINDA':         {lat:30.2110, lng:74.9455, city:'Bathinda, Punjab'},
+  'IOCL SECUNDERABAD':     {lat:17.4399, lng:78.4983, city:'Secunderabad, Telangana'},
+  'IOCL WARANGAL':         {lat:17.9784, lng:79.5941, city:'Warangal, Telangana'},
+  'IOCL TIRUPATI':         {lat:13.6288, lng:79.4192, city:'Tirupati, AP'},
+  'IOCL NIZAMABAD':        {lat:18.6725, lng:78.0941, city:'Nizamabad, Telangana'},
+  'IOCL VIJAYWADA':        {lat:16.5062, lng:80.6480, city:'Vijayawada, AP'},
+  'AAI AMRITSAR':          {lat:31.6340, lng:74.8723, city:'Amritsar, Punjab'},
+  'IOCL PARADEEP HM':      {lat:20.3165, lng:86.6104, city:'Paradip, Odisha'},
+  'PARADIP PORT AUTH':     {lat:20.3200, lng:86.6200, city:'Paradip Port, Odisha'},
+  'NTPC DADRI':            {lat:28.5535, lng:77.5598, city:'Dadri, UP'},
+  'GAIL VIJAIPUR':         {lat:23.5474, lng:78.2011, city:'Vijaipur, MP'},
+};
+
+function getPinColor(s) {
+  if (!s || s.total === 0) return '#00e676';
+  if (s.total >= 5000000) return '#ff4040';
+  if (s.total >= 1000000) return '#ffc107';
   return '#00d4ff';
 }
 
-function getPinRadius(site) {
-  const s = SUMMARY.find(x=>x.site===site);
-  if(!s||s.total===0) return 5;
-  if(s.total>=5000000) return 14;
-  if(s.total>=1000000) return 10;
-  if(s.total>=500000) return 8;
-  return 6;
+function getPinSize(s) {
+  if (!s || s.total === 0) return 10;
+  if (s.total >= 5000000) return 26;
+  if (s.total >= 2000000) return 20;
+  if (s.total >= 1000000) return 16;
+  return 12;
 }
 
-function renderIndiaMap(filter='all', pmFilter='') {
-  const wrap = document.getElementById('mapSvgWrap');
-  if(!wrap) return;
+function createCircleIcon(color, size, label) {
+  return L.divIcon({
+    className: '',
+    html: '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + color + ';border:2px solid #fff;box-shadow:0 0 ' + (size/2) + 'px ' + color + ';display:flex;align-items:center;justify-content:center;font-size:' + Math.max(7,size/3) + 'px;font-weight:800;color:#fff;font-family:JetBrains Mono,monospace;">' + (size >= 18 ? label : '') + '</div>',
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+    popupAnchor: [0, -size/2]
+  });
+}
 
-  // Simple India outline SVG path
-  const indiaPath = `M 238 90 L 252 82 L 268 85 L 282 78 L 298 80 L 310 75 L 325 82 L 340 78 L 358 85 L 372 82 L 388 90 L 398 100 L 408 115 L 415 130 L 418 148 L 412 165 L 418 180 L 422 200 L 418 218 L 412 235 L 420 255 L 425 275 L 420 295 L 415 315 L 420 330 L 415 348 L 408 362 L 395 375 L 382 388 L 372 400 L 365 418 L 355 435 L 345 450 L 335 465 L 325 478 L 318 492 L 310 505 L 305 518 L 298 530 L 292 520 L 285 510 L 278 498 L 270 485 L 262 470 L 255 458 L 248 445 L 240 430 L 232 415 L 225 400 L 218 385 L 212 368 L 208 350 L 205 332 L 202 315 L 198 298 L 195 280 L 192 262 L 190 245 L 192 228 L 195 212 L 198 195 L 202 178 L 208 162 L 215 148 L 222 135 L 228 120 L 232 108 Z`;
+function renderIndiaMap(filter, pmFilter) {
+  filter = filter || 'all';
+  pmFilter = pmFilter || '';
+  currentMapFilter = filter;
+  currentMapPM = pmFilter;
 
-  // Kashmir extension
-  const kashmirPath = `M 238 90 L 228 78 L 220 65 L 228 55 L 242 52 L 255 58 L 265 65 L 272 75 L 268 85 Z`;
+  // Init map once
+  if (!leafletMap) {
+    leafletMap = L.map('leafletMap', {
+      center: [20.5937, 78.9629],
+      zoom: 5,
+      zoomControl: true,
+      scrollWheelZoom: true
+    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 18
+    }).addTo(leafletMap);
+  }
 
-  // NE states
-  const nePath = `M 415 130 L 425 122 L 440 125 L 452 132 L 458 145 L 450 155 L 440 160 L 428 155 L 418 148 Z`;
+  // Clear old markers
+  mapMarkers.forEach(m => leafletMap.removeLayer(m));
+  mapMarkers = [];
 
-  let pins = '';
-  let filteredSites = SUMMARY;
-  if(filter==='critical') filteredSites = SUMMARY.filter(s=>s.total>=1000000);
-  if(filter==='pending') filteredSites = SUMMARY.filter(s=>s.pending>0);
-  if(pmFilter) filteredSites = filteredSites.filter(s=>s.pm===pmFilter);
+  // Filter sites
+  let sites = SUMMARY.filter(s => s.total >= 0);
+  if (filter === 'critical') sites = sites.filter(s => s.total >= 1000000);
+  if (filter === 'pending')  sites = sites.filter(s => s.pending > 0);
+  if (pmFilter) sites = sites.filter(s => s.pm === pmFilter);
 
-  filteredSites.forEach(s=>{
+  sites.forEach(function(s) {
     const coord = SITE_COORDS[s.site];
-    if(!coord) return;
-    const color = getPinColor(s.site);
-    const r = getPinRadius(s.site);
-    pins += `<g class="site-pin" data-site="${esc(s.site)}"
-      onmouseenter="showMapTooltip(event,'${esc(s.site)}')"
-      onmouseleave="hideMapTooltip()"
-      onclick="highlightSite('${esc(s.site)}')">
-      <circle cx="${coord.x}" cy="${coord.y}" r="${r+4}" fill="${color}" opacity="0.2"/>
-      <circle cx="${coord.x}" cy="${coord.y}" r="${r}" fill="${color}" stroke="#fff" stroke-width="1.2"/>
-      ${s.total>=3000000 ? `<text x="${coord.x}" y="${coord.y+4}" text-anchor="middle" fill="#fff" font-size="7" font-weight="800" font-family="JetBrains Mono">${Math.round(s.total/100000)}L</text>` : ''}
-    </g>`;
+    if (!coord) return;
+    const color = getPinColor(s);
+    const size  = getPinSize(s);
+    const shortAmt = s.total >= 100000 ? Math.round(s.total/100000) + 'L' : '';
+    const icon  = createCircleIcon(color, size, shortAmt);
+
+    const siteKey = s.site.replace(/[^a-zA-Z0-9]/g, '_');
+    window._mapSites = window._mapSites || {};
+    window._mapSites[siteKey] = s.site;
+
+    const popup = '<div style="min-width:210px">' +
+      '<div style="font-weight:800;font-size:13px;color:#003399;margin-bottom:6px">' + s.site + '</div>' +
+      '<div style="font-size:11px;color:#666;margin-bottom:8px">' + coord.city + ' | PM: ' + s.pm + '</div>' +
+      '<table style="width:100%;font-size:11px;border-collapse:collapse">' +
+      '<tr><td style="color:#888;padding:3px 0">Pending Bill</td><td style="font-weight:700;color:#ff6b35;text-align:right">' + INR(s.pending) + '</td></tr>' +
+      '<tr><td style="color:#888;padding:3px 0">SD Deduction</td><td style="font-weight:700;color:#ffc107;text-align:right">' + INR(s.sd) + '</td></tr>' +
+      '<tr><td style="color:#888;padding:3px 0">LD Deduction</td><td style="font-weight:700;color:#ff4040;text-align:right">' + INR(s.ld) + '</td></tr>' +
+      '<tr style="border-top:1px solid #eee"><td style="padding:5px 0;font-weight:700">Total OS</td><td style="font-weight:800;color:' + color + ';text-align:right;font-size:13px">' + INR(s.total) + '</td></tr>' +
+      '</table>' +
+      '<button data-sitekey="' + siteKey + '" class="map-popup-btn" style="margin-top:10px;width:100%;padding:6px;background:#003399;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700">View Full Details &#8594;</button>' +
+      '</div>';
+
+const marker = L.marker([coord.lat, coord.lng], {icon: icon})
+      .bindPopup(popup, {maxWidth: 260})
+      .addTo(leafletMap);
+    mapMarkers.push(marker);
   });
 
-  wrap.innerHTML = `<svg viewBox="150 50 320 510" style="width:100%;max-height:580px;display:block" id="mapSvg">
-    <defs>
-      <pattern id="mapGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(28,45,68,.4)" stroke-width="0.5"/>
-      </pattern>
-      <filter id="glow"><feGaussianBlur stdDeviation="2" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    </defs>
-    <!-- Grid -->
-    <rect width="600" height="650" fill="url(#mapGrid)"/>
-    <!-- Ocean -->
-    <rect width="600" height="650" fill="rgba(0,100,200,.04)"/>
-    <!-- India mainland -->
-    <path d="${indiaPath}" fill="rgba(0,60,150,.15)" stroke="rgba(0,150,255,.4)" stroke-width="1.5"/>
-    <!-- Kashmir -->
-    <path d="${kashmirPath}" fill="rgba(0,60,150,.12)" stroke="rgba(0,150,255,.3)" stroke-width="1"/>
-    <!-- Northeast -->
-    <path d="${nePath}" fill="rgba(0,60,150,.12)" stroke="rgba(0,150,255,.3)" stroke-width="1"/>
-    <!-- Labels -->
-    <text x="290" y="160" fill="rgba(255,255,255,.2)" font-size="9" text-anchor="middle">RAJASTHAN</text>
-    <text x="310" y="230" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">UTTAR PRADESH</text>
-    <text x="240" y="340" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">MAHARASHTRA</text>
-    <text x="390" y="310" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">ODISHA</text>
-    <text x="295" y="420" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">ANDHRA PRADESH</text>
-    <text x="298" y="495" fill="rgba(255,255,255,.2)" font-size="8" text-anchor="middle">TAMIL NADU</text>
-    <!-- Site Pins -->
-    ${pins}
-  </svg>`;
-
-  renderStateWiseSummary(filteredSites);
-  renderMapSiteList(filteredSites);
-}
-
-function showMapTooltip(e, site) {
-  const s = SUMMARY.find(x=>x.site===site)||{};
-  const tip = document.getElementById('mapTooltip');
-  const coord = SITE_COORDS[site]||{};
-  const color = getPinColor(site);
-  tip.innerHTML = `
-    <div style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
-      <div style="font-weight:800;font-size:13px;color:${color}">${esc(site)}</div>
-      <div style="font-size:10px;color:var(--muted)">${coord.state||''} · PM: ${esc(s.pm||'—')}</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">
-      <div><div style="color:var(--muted);font-size:9px">PENDING</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--a4)">${INR(s.pending)}</div></div>
-      <div><div style="color:var(--muted);font-size:9px">SD</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--yellow)">${INR(s.sd)}</div></div>
-      <div><div style="color:var(--muted);font-size:9px">LD</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--red)">${INR(s.ld)}</div></div>
-      <div><div style="color:var(--muted);font-size:9px">TOTAL OS</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${color}">${INR(s.total)}</div></div>
-    </div>`;
-  const wrap = document.getElementById('mapSvgWrap');
-  const rect = wrap.getBoundingClientRect();
-  const x = e.clientX - rect.left + 10;
-  const y = e.clientY - rect.top + 10;
-  tip.style.left = Math.min(x, rect.width-220)+'px';
-  tip.style.top = Math.min(y, rect.height-180)+'px';
-  tip.classList.add('visible');
-}
-
-function hideMapTooltip() {
-  document.getElementById('mapTooltip').classList.remove('visible');
-}
-
-function highlightSite(site) {
-  showSiteView(site);
+  renderStateWiseSummary(sites);
+  renderMapSiteList(sites);
 }
 
 function setMapFilter(f) {
   currentMapFilter = f;
-  document.querySelectorAll('[id^="mf-"]').forEach(b=>b.style.color='');
-  const btn = document.getElementById('mf-'+f);
-  if(btn) btn.style.color='var(--a1)';
+  ['all','critical','pending'].forEach(function(x) {
+    const btn = document.getElementById('mf-' + x);
+    if (btn) btn.style.color = x === f ? 'var(--a1)' : '';
+  });
   renderIndiaMap(f, currentMapPM);
 }
 
@@ -2635,60 +2915,82 @@ function filterMapByPM(pm) {
   renderIndiaMap(currentMapFilter, pm);
 }
 
-function mapZoom(factor) {
-  mapScale = Math.min(Math.max(mapScale*factor, 0.5), 4);
-  const svg = document.getElementById('mapSvg');
-  if(svg) svg.style.transform = `scale(${mapScale})`;
-}
-
-function resetMapZoom() {
-  mapScale = 1;
-  const svg = document.getElementById('mapSvg');
-  if(svg) svg.style.transform = 'scale(1)';
+function flyToSite(site) {
+  const coord = SITE_COORDS[site];
+  if (coord && leafletMap) {
+    leafletMap.flyTo([coord.lat, coord.lng], 10, {animate: true, duration: 1.5});
+    mapMarkers.forEach(function(m) {
+      if (m.getLatLng().lat === coord.lat && m.getLatLng().lng === coord.lng) {
+        m.openPopup();
+      }
+    });
+  }
 }
 
 function renderStateWiseSummary(sites) {
   const states = {};
-  sites.forEach(s=>{
+  sites.forEach(function(s) {
     const coord = SITE_COORDS[s.site];
-    const state = coord?.state||'Other';
-    if(!states[state]) states[state]={state,sites:0,total:0};
+    const state = coord ? coord.city.split(', ')[1] || 'Other' : 'Other';
+    if (!states[state]) states[state] = {sites:0, total:0};
     states[state].sites++;
-    states[state].total+=s.total;
+    states[state].total += s.total;
   });
-  const sorted = Object.values(states).sort((a,b)=>b.total-a.total);
-  const maxT = sorted[0]?.total||1;
-  const colors=['#ff4040','#ffc107','#00d4ff','#00e676','#b44fff','#ff6b35','#82b1ff'];
-  document.getElementById('stateWiseSummary').innerHTML = sorted.map((st,i)=>`
-    <div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-        <span style="font-size:12px;font-weight:600">${esc(st.state)}</span>
-        <span style="font-size:10px;color:var(--muted)">${st.sites} site${st.sites>1?'s':''}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="flex:1;height:7px;background:var(--bg);border-radius:4px;overflow:hidden">
-          <div style="height:100%;width:${(st.total/maxT*100).toFixed(1)}%;background:${colors[i%colors.length]};border-radius:4px;transition:width 1s ease"></div>
-        </div>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${colors[i%colors.length]};width:90px;text-align:right">${INR(st.total)}</span>
-      </div>
-    </div>`).join('');
+  const sorted = Object.entries(states).sort(function(a,b){return b[1].total-a[1].total;});
+  const maxT = sorted[0] ? sorted[0][1].total : 1;
+  const colors = ['#ff4040','#ffc107','#00d4ff','#00e676','#b44fff','#ff6b35','#82b1ff'];
+  const el = document.getElementById('stateWiseSummary');
+  if (!el) return;
+  el.innerHTML = sorted.map(function(entry, i) {
+    const st = entry[0]; const v = entry[1];
+    return '<div style="margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:3px">' +
+      '<span style="font-size:12px;font-weight:600">' + st + '</span>' +
+      '<span style="font-size:10px;color:var(--muted)">' + v.sites + ' site' + (v.sites>1?'s':'') + '</span></div>' +
+      '<div style="display:flex;align-items:center;gap:8px">' +
+      '<div style="flex:1;height:7px;background:var(--bg);border-radius:4px;overflow:hidden">' +
+      '<div style="height:100%;width:' + (v.total/maxT*100).toFixed(1) + '%;background:' + colors[i%colors.length] + ';border-radius:4px"></div></div>' +
+      '<span style="font-family:JetBrains Mono,monospace;font-size:10px;color:' + colors[i%colors.length] + ';width:90px;text-align:right">' + INR(v.total) + '</span></div></div>';
+  }).join('');
 }
 
 function renderMapSiteList(sites) {
-  const sorted = [...sites].sort((a,b)=>b.total-a.total);
-  document.getElementById('mapSiteList').innerHTML = sorted.map(s=>{
-    const color = getPinColor(s.site);
-    return `<div class="site-list-row" onclick="showSiteView('${esc(s.site)}')">
-      <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></div>
-      <div style="flex:1;overflow:hidden">
-        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.site)}</div>
-        <div style="font-size:10px;color:var(--muted)">${esc(s.pm)}</div>
-      </div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${color}">${INR(s.total)}</div>
-      <i class="fa fa-chevron-right" style="font-size:10px;color:var(--muted)"></i>
-    </div>`;
+  const sorted = sites.slice().sort(function(a,b){return b.total-a.total;});
+  const el = document.getElementById('mapSiteList');
+  if (!el) return;
+  el.innerHTML = sorted.map(function(s) {
+    const color = getPinColor(s);
+    const coord = SITE_COORDS[s.site];
+    return '<div class="site-list-row map-fly-btn" data-sitekey="' + s.site.replace(/[^a-zA-Z0-9]/g,'_') + '" style="cursor:pointer">' +
+      '<div style="width:10px;height:10px;border-radius:50%;background:' + color + ';flex-shrink:0"></div>' +
+      '<div style="flex:1;overflow:hidden">' +
+      '<div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + s.site + '</div>' +
+      '<div style="font-size:10px;color:var(--muted)">' + (coord ? coord.city : '') + ' - ' + s.pm + '</div></div>' +
+      '<div style="font-family:JetBrains Mono,monospace;font-size:11px;font-weight:700;color:' + color + '">' + INR(s.total) + '</div>' +
+      '<i class="fa fa-location-dot" style="font-size:10px;color:var(--muted)"></i></div>'
   }).join('');
 }
+
+// Map popup button delegation
+document.addEventListener('click', function(e) {
+  // Map popup view button
+  var btn = e.target.closest('.map-popup-btn');
+  if (btn) {
+    var key = btn.getAttribute('data-sitekey');
+    if (key && window._mapSites && window._mapSites[key]) {
+      showSiteView(window._mapSites[key]);
+    }
+    return;
+  }
+  // Map site list fly button
+  var flyBtn = e.target.closest('.map-fly-btn');
+  if (flyBtn) {
+    var key2 = flyBtn.getAttribute('data-sitekey');
+    if (key2 && window._mapSites && window._mapSites[key2]) {
+      flyToSite(window._mapSites[key2]);
+    }
+  }
+});
 
 // ============================================================
 // FEATURE 20: PWA — PROGRESSIVE WEB APP
@@ -2836,6 +3138,7 @@ const _sv3 = window.showView;
 window.showView = function(v) {
   _sv3(v);
   if(v==='map') { renderIndiaMap(currentMapFilter, currentMapPM); }
+  if(v==='email-parser') { initCRMSiteSelect(); renderCRMSentLog(); }
 };
 
 </script>
