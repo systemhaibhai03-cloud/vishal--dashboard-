@@ -1,870 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vishal Electricals - Payment Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:14px;}
-:root{
-  --primary:#1565c0;--primary-light:#e3f0ff;--primary-dark:#0d47a1;
-  --sidebar-bg:#fff;--sidebar-width:240px;
-  --accent:#0288d1;--success:#2e7d32;--warning:#e65100;--danger:#c62828;
-  --border:#e0e6f0;--card-bg:#fff;--text-muted:#6b7a99;
-}
-.layout{display:flex;min-height:100vh;}
-
-/* SIDEBAR */
-.sidebar{width:var(--sidebar-width);background:var(--sidebar-bg);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;display:flex;flex-direction:column;}
-.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);}
-.logo-text{font-size:16px;font-weight:700;color:var(--primary);letter-spacing:-0.3px;}
-.logo-sub{font-size:10px;color:var(--text-muted);font-weight:400;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;}
-.sidebar-section{padding:12px 0;}
-.sidebar-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);padding:6px 20px 4px;}
-.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;color:#374161;font-size:13px;font-weight:500;border-left:3px solid transparent;transition:all 0.15s;text-decoration:none;}
-.sidebar-item:hover{background:#f5f8ff;color:var(--primary);}
-.sidebar-item.active{background:var(--primary-light);color:var(--primary);border-left:3px solid var(--primary);}
-.sidebar-item .dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;}
-.sidebar-item.active .dot{background:var(--primary);}
-.sidebar-item .badge{margin-left:auto;background:#e3f0ff;color:var(--primary);font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;}
-
-/* MAIN */
-.main{margin-left:var(--sidebar-width);flex:1;min-width:0;}
-.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.topbar-title{font-size:15px;font-weight:600;color:#1a1a2e;}
-.topbar-right{display:flex;align-items:center;gap:12px;}
-.topbar-date{font-size:12px;color:var(--text-muted);background:#f5f7fa;padding:5px 12px;border-radius:20px;border:1px solid var(--border);}
-.btn{padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:12px;font-weight:500;cursor:pointer;color:#374161;transition:all 0.15s;}
-.btn:hover{background:#f5f8ff;border-color:var(--primary);color:var(--primary);}
-.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);}
-.btn-primary:hover{background:var(--primary-dark);color:#fff;}
-
-/* CONTENT */
-.content{padding:24px 28px;}
-
-/* TABS */
-.tab-nav{display:flex;gap:2px;margin-bottom:24px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:4px;width:fit-content;}
-.tab-btn{padding:7px 18px;border-radius:6px;border:none;background:transparent;font-size:12px;font-weight:500;cursor:pointer;color:var(--text-muted);transition:all 0.15s;}
-.tab-btn.active{background:var(--primary);color:#fff;}
-.tab-btn:hover:not(.active){background:#f5f8ff;color:var(--primary);}
-
-/* SECTIONS */
-.tab-section{display:none;}
-.tab-section.active{display:block;}
-
-/* STAT CARDS */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-.stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;}
-.stat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent-color,var(--primary));}
-.stat-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;}
-.stat-value{font-size:22px;font-weight:700;color:#1a1a2e;line-height:1;}
-.stat-sub{font-size:11px;color:var(--text-muted);margin-top:6px;}
-.stat-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;margin-top:8px;}
-.badge-danger{background:#fdecea;color:var(--danger);}
-.badge-warning{background:#fff3e0;color:var(--warning);}
-.badge-success{background:#e8f5e9;color:var(--success);}
-
-/* TABLE */
-.table-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px;}
-.table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.table-title{font-size:13px;font-weight:600;color:#1a1a2e;}
-.table-search{display:flex;align-items:center;gap:8px;}
-.search-input{padding:6px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;width:200px;}
-.search-input:focus{border-color:var(--primary);}
-table{width:100%;border-collapse:collapse;}
-thead tr{background:#f8f9fb;}
-th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);border-bottom:1px solid var(--border);white-space:nowrap;}
-td{padding:11px 16px;font-size:12.5px;border-bottom:1px solid #f3f5f9;color:#374161;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:#f8faff;}
-.amount{font-weight:600;font-family:'Inter',monospace;}
-.amount-danger{color:var(--danger);}
-.amount-warning{color:var(--warning);}
-.amount-success{color:var(--success);}
-.bucket-pill{display:inline-block;font-size:10px;font-weight:600;padding:2px 9px;border-radius:12px;white-space:nowrap;}
-.bucket-180{background:#fdecea;color:#c62828;}
-.bucket-91{background:#fff3e0;color:#e65100;}
-.bucket-61{background:#fff8e1;color:#f9a825;}
-.bucket-lt60{background:#e8f5e9;color:#2e7d32;}
-
-/* EDITABLE ROWS */
-.edit-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;transition:all 0.15s;}
-.edit-btn:hover{border-color:var(--primary);color:var(--primary);}
-.editable-cell{cursor:pointer;border-bottom:1px dashed transparent;}
-.editable-cell:hover{border-bottom:1px dashed var(--primary);color:var(--primary);}
-input.inline-edit{width:100%;border:none;border-bottom:2px solid var(--primary);background:transparent;font-size:12.5px;font-family:'Inter',sans-serif;outline:none;padding:1px 0;color:#374161;}
-
-/* CHART CARD */
-.chart-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:24px;}
-.chart-title{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:16px;}
-.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
-
-/* AGEING BARS */
-.ageing-bar-container{display:flex;align-items:center;gap:8px;}
-.ageing-bar{height:8px;border-radius:4px;min-width:4px;transition:width 0.3s;}
-
-/* PROJECT DETAIL */
-.project-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
-.back-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
-.back-btn:hover{border-color:var(--primary);color:var(--primary);}
-.project-title{font-size:16px;font-weight:600;}
-
-/* GOOGLE SHEETS BTN */
-.gs-btn{display:flex;align-items:center;gap:6px;background:#34a853;color:#fff;border:none;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;}
-.gs-btn:hover{background:#2e7d32;}
-
-/* SUMMARY RIBBON */
-.summary-ribbon{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px;}
-.ribbon-item{background:#fff;padding:14px 16px;text-align:center;}
-.ribbon-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;}
-.ribbon-value{font-size:16px;font-weight:700;color:#1a1a2e;}
-
-/* NOTIFICATION */
-.notification{position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:#fff;padding:12px 20px;border-radius:8px;font-size:12px;z-index:999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none;}
-.notification.show{opacity:1;transform:translateY(0);}
-
-/* PAGINATION */
-.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border);}
-.pagination-info{font-size:12px;color:var(--text-muted);}
-.pagination-btns{display:flex;gap:4px;}
-.page-btn{padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;font-size:12px;cursor:pointer;color:#374161;}
-.page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
-.page-btn:hover:not(.active){background:#f5f8ff;}
-
-/* RESPONSIVE */
-@media(max-width:1200px){.stats-grid{grid-template-columns:repeat(2,1fr);}.charts-row{grid-template-columns:1fr;}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vishal Electricals - Payment Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#f4f6f8}
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px}
+    .sidebar{transition:width .2s}
+    .nav-item.active{background:linear-gradient(90deg,rgba(37,99,235,.1) 0%,transparent 100%);border-left:3px solid #2563eb}
+    .site-item.active{background:#eff6ff;border-left:3px solid #2563eb}
+    .expanded-row{background:linear-gradient(180deg,#f0f9ff 0%,#e0f2fe 100%)}
+  </style>
 </head>
 <body>
-
-<div class="layout">
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-text">VE Finance</div>
-    <div class="logo-sub">Vishal Electricals</div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Overview</div>
-    <a class="sidebar-item active" onclick="showSection('dashboard')">
-      <span class="dot"></span> Dashboard
-    </a>
-    <a class="sidebar-item" onclick="showSection('summary')">
-      <span class="dot"></span> Summary <span class="badge">43</span>
-    </a>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Receivables</div>
-    <a class="sidebar-item" onclick="showSection('ageing')">
-      <span class="dot"></span> Ageing Analysis
-    </a>
-    <a class="sidebar-item" onclick="showSection('projects')">
-      <span class="dot"></span> Project-wise OS <span class="badge">43</span>
-    </a>
-    <a class="sidebar-item" onclick="showSection('emd')">
-      <span class="dot"></span> EMD Tracker
-    </a>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Revenue</div>
-    <a class="sidebar-item" onclick="showSection('revenue_ve')">
-      <span class="dot"></span> VE Revenue 26-27
-    </a>
-    <a class="sidebar-item" onclick="showSection('revenue_vtpl')">
-      <span class="dot"></span> VTPL Revenue 26-27
-    </a>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Finance</div>
-    <a class="sidebar-item" onclick="showSection('weekly')">
-      <span class="dot"></span> Weekly Review
-    </a>
-  </div>
-
-  <div style="margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);">
-    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">Google Sheets Backup</div>
-    <button class="gs-btn" onclick="showNotif('Enter your Google Sheets API key in settings to enable backup.')">
-      &#x1F4CA; Connect Sheets
-    </button>
-    <div style="margin-top:10px;">
-      <input id="sheets-api" placeholder="Paste Sheets API URL..." style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;outline:none;"/>
-    </div>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<main class="main">
-  <div class="topbar">
-    <div class="topbar-title" id="page-title">Dashboard Overview</div>
-    <div class="topbar-right">
-      <span class="topbar-date">As on: May 21, 2026</span>
-      <button class="btn" onclick="exportCSV()">&#8595; Export CSV</button>
-      <button class="btn btn-primary" onclick="showAddRow()">+ Add Record</button>
-    </div>
-  </div>
-
-  <div class="content">
-
-    <!-- ===== DASHBOARD ===== -->
-    <div id="section-dashboard" class="tab-section active">
-      <div class="stats-grid">
-        <div class="stat-card" style="--accent-color:#c62828;">
-          <div class="stat-label">Total Outstanding</div>
-          <div class="stat-value">₹5.09 Cr</div>
-          <div class="stat-sub">Across 43 projects</div>
-          <span class="stat-badge badge-danger">High Priority</span>
-        </div>
-        <div class="stat-card" style="--accent-color:#e65100;">
-          <div class="stat-label">LD Deductions</div>
-          <div class="stat-value">₹1.59 Cr</div>
-          <div class="stat-sub">Total LD held</div>
-          <span class="stat-badge badge-warning">Recoverable</span>
-        </div>
-        <div class="stat-card" style="--accent-color:#0288d1;">
-          <div class="stat-label">SD Deductions</div>
-          <div class="stat-value">₹1.06 Cr</div>
-          <div class="stat-sub">Security deposit held</div>
-          <span class="stat-badge badge-warning">Refundable</span>
-        </div>
-        <div class="stat-card" style="--accent-color:#2e7d32;">
-          <div class="stat-label">Withheld (Comm.)</div>
-          <div class="stat-value">₹0.76 Cr</div>
-          <div class="stat-sub">Commercial withheld</div>
-          <span class="stat-badge badge-success">In Process</span>
-        </div>
-      </div>
-
-      <div class="summary-ribbon">
-        <div class="ribbon-item"><div class="ribbon-label">180+ Days</div><div class="ribbon-value" style="color:#c62828;">₹3.65 Cr</div></div>
-        <div class="ribbon-item"><div class="ribbon-label">91-180 Days</div><div class="ribbon-value" style="color:#e65100;">₹1.15 Cr</div></div>
-        <div class="ribbon-item"><div class="ribbon-label">61-90 Days</div><div class="ribbon-value" style="color:#f9a825;">₹0.39 Cr</div></div>
-        <div class="ribbon-item"><div class="ribbon-label">Other Deductions</div><div class="ribbon-value" style="color:#2e7d32;">₹0.13 Cr</div></div>
-        <div class="ribbon-item"><div class="ribbon-label">Instant Release</div><div class="ribbon-value" style="color:#1565c0;">₹0.01 Cr</div></div>
-      </div>
-
-      <div class="charts-row">
-        <div class="chart-card">
-          <div class="chart-title">Outstanding by Ageing Bucket</div>
-          <div style="position:relative;height:260px;">
-            <canvas id="chartAgeing" role="img" aria-label="Bar chart of outstanding amounts by ageing bucket"></canvas>
-          </div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Deduction Type Breakdown</div>
-          <div style="position:relative;height:260px;">
-            <canvas id="chartDeduction" role="img" aria-label="Doughnut chart of deduction types"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="chart-card">
-        <div class="chart-title">Top 10 Projects by Outstanding Amount</div>
-        <div style="position:relative;height:320px;">
-          <canvas id="chartTop10" role="img" aria-label="Horizontal bar chart of top 10 outstanding projects"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== AGEING ANALYSIS ===== -->
-    <div id="section-ageing" class="tab-section">
-      <div class="table-card">
-        <div class="table-header">
-          <div class="table-title">Ageing Analysis – All Projects</div>
-          <div class="table-search">
-            <input class="search-input" placeholder="Search project..." oninput="filterTable('ageing-tbl',this.value)">
-            <button class="btn" onclick="filterBucket('ageing-tbl','')">All</button>
-            <button class="btn" onclick="filterBucket('ageing-tbl','180+')">180+ Days</button>
-            <button class="btn" onclick="filterBucket('ageing-tbl','91-')">91-180</button>
-            <button class="btn" onclick="filterBucket('ageing-tbl','61-')">61-90</button>
-          </div>
-        </div>
-        <div style="overflow-x:auto;">
-        <table id="ageing-tbl">
-          <thead><tr>
-            <th>S.No</th><th>Project / Site Name</th><th>Column</th><th>Amount (₹)</th>
-            <th>Oldest Invoice Date</th><th>Ageing Days</th><th>Avg Days</th><th>Bucket</th><th>Action</th>
-          </tr></thead>
-          <tbody id="ageing-tbody"></tbody>
-        </table>
-        </div>
-        <div class="pagination">
-          <div class="pagination-info" id="ageing-info"></div>
-          <div class="pagination-btns" id="ageing-pages"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== PROJECTS ===== -->
-    <div id="section-projects" class="tab-section">
-      <div class="table-card">
-        <div class="table-header">
-          <div class="table-title">Project-wise Outstanding Summary</div>
-          <div class="table-search">
-            <input class="search-input" placeholder="Search project..." oninput="filterTable('proj-tbl',this.value)">
-          </div>
-        </div>
-        <div style="overflow-x:auto;">
-        <table id="proj-tbl">
-          <thead><tr>
-            <th>#</th><th>Project / Site Name</th><th>SD Deduction (₹)</th><th>LD Deduction (₹)</th>
-            <th>Instant Release (₹)</th><th>Other Deduction (₹)</th><th>Withheld (₹)</th><th>Total Outstanding (₹)</th><th>Action</th>
-          </tr></thead>
-          <tbody id="proj-tbody"></tbody>
-        </table>
-        </div>
-        <div class="pagination">
-          <div class="pagination-info" id="proj-info"></div>
-          <div class="pagination-btns" id="proj-pages"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== SUMMARY ===== -->
-    <div id="section-summary" class="tab-section">
-      <div class="stats-grid">
-        <div class="stat-card" style="--accent-color:#c62828;">
-          <div class="stat-label">Grand Total Outstanding</div>
-          <div class="stat-value">₹5.09 Cr</div>
-          <div class="stat-sub">All projects combined</div>
-        </div>
-        <div class="stat-card" style="--accent-color:#0288d1;">
-          <div class="stat-label">LD (Refundable)</div>
-          <div class="stat-value">₹1.59 Cr</div>
-          <div class="stat-sub">Pending recovery</div>
-        </div>
-        <div class="stat-card" style="--accent-color:#e65100;">
-          <div class="stat-label">SD Deduction</div>
-          <div class="stat-value">₹1.06 Cr</div>
-          <div class="stat-sub">Security deposits</div>
-        </div>
-        <div class="stat-card" style="--accent-color:#2e7d32;">
-          <div class="stat-label">Withheld for Comm.</div>
-          <div class="stat-value">₹0.76 Cr</div>
-          <div class="stat-sub">Commercial hold</div>
-        </div>
-      </div>
-      <div class="table-card">
-        <div class="table-header">
-          <div class="table-title">Payment Breakup Summary – All Projects</div>
-          <div class="table-search"><input class="search-input" placeholder="Search..." oninput="filterTable('summ-tbl',this.value)"></div>
-        </div>
-        <div style="overflow-x:auto;">
-        <table id="summ-tbl">
-          <thead><tr>
-            <th>#</th><th>Project / Site Name</th><th>LD Deduction (₹)</th><th>SD Deduction (₹)</th>
-            <th>GST Hold (₹)</th><th>Instant Release (₹)</th><th>Other Deduction (₹)</th><th>Withheld (₹)</th><th>Total OS (₹)</th><th>Action</th>
-          </tr></thead>
-          <tbody id="summ-tbody"></tbody>
-        </table>
-        </div>
-        <div class="pagination">
-          <div class="pagination-info" id="summ-info"></div>
-          <div class="pagination-btns" id="summ-pages"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== REVENUE VE ===== -->
-    <div id="section-revenue_ve" class="tab-section">
-      <div class="table-card">
-        <div class="table-header">
-          <div class="table-title">VE Revenue 26-27 – Invoice Register</div>
-          <div class="table-search"><input class="search-input" placeholder="Search..." oninput="filterTable('ve-tbl',this.value)"></div>
-        </div>
-        <div style="overflow-x:auto;">
-        <table id="ve-tbl">
-          <thead><tr>
-            <th>#</th><th>Invoice Date</th><th>Invoice No.</th><th>Party Name</th>
-            <th>Taxable Value (₹)</th><th>IGST (₹)</th><th>CGST (₹)</th><th>SGST (₹)</th>
-            <th>Total Invoice (₹)</th><th>Month</th><th>Action</th>
-          </tr></thead>
-          <tbody id="ve-tbody"></tbody>
-        </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== REVENUE VTPL ===== -->
-    <div id="section-revenue_vtpl" class="tab-section">
-      <div class="table-card">
-        <div class="table-header">
-          <div class="table-title">VTPL Revenue 26-27 – Invoice Register</div>
-          <div class="table-search"><input class="search-input" placeholder="Search..." oninput="filterTable('vtpl-tbl',this.value)"></div>
-        </div>
-        <div style="overflow-x:auto;">
-        <table id="vtpl-tbl">
-          <thead><tr>
-            <th>#</th><th>Invoice Date</th><th>Invoice No.</th><th>Party Name</th>
-            <th>Taxable Value (₹)</th><th>IGST (₹)</th><th>CGST (₹)</th><th>SGST (₹)</th>
-            <th>Total Invoice (₹)</th><th>Month</th><th>Action</th>
-          </tr></thead>
-          <tbody id="vtpl-tbody"></tbody>
-        </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== EMD ===== -->
-    <div id="section-emd" class="tab-section">
-      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="stat-card" style="--accent-color:#c62828;">
-          <div class="stat-label">LIC Ghaziabad</div>
-          <div class="stat-value">EMD Due</div>
-          <div class="stat-sub">Status: Pending</div>
-        </div>
-        <div class="stat-card" style="--accent-color:#e65100;">
-          <div class="stat-label">IOCL Vizag</div>
-          <div class="stat-value">EMD Due</div>
-          <div class="stat-sub">Status: Pending</div>
-        </div>
-        <div class="stat-card" style="--accent-color:#0288d1;">
-          <div class="stat-label">IOCL Bathinda</div>
-          <div class="stat-value">EMD Due</div>
-          <div class="stat-sub">Status: Pending</div>
-        </div>
-      </div>
-      <div class="table-card">
-        <div class="table-header"><div class="table-title">EMD Tracker</div></div>
-        <table>
-          <thead><tr><th>#</th><th>Debtors Name</th><th>Status</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>LIC Ghaziabad</td><td><span class="bucket-pill bucket-180">Due</span></td><td>–</td></tr>
-            <tr><td>2</td><td>IOCL Vizag</td><td><span class="bucket-pill bucket-180">Due</span></td><td>–</td></tr>
-            <tr><td>3</td><td>IOCL Bathinda</td><td><span class="bucket-pill bucket-91">Pending</span></td><td>–</td></tr>
-            <tr><td>4</td><td>IOCL-Chandigarh VTPL</td><td><span class="bucket-pill bucket-91">Pending</span></td><td>–</td></tr>
-            <tr><td>5</td><td>IOCL Sangrur DO</td><td><span class="bucket-pill bucket-lt60">In Process</span></td><td>–</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ===== WEEKLY REVIEW ===== -->
-    <div id="section-weekly" class="tab-section">
-      <div class="table-card">
-        <div class="table-header"><div class="table-title">Finance Weekly Review – As on May 2026</div></div>
-        <table>
-          <thead><tr><th>#</th><th>Particulars</th><th>Week-1 Amt</th><th>Week-1 Days</th><th>Week-2 Amt</th><th>Week-2 Days</th><th>Week-3 Amt</th><th>Week-3 Days</th><th>Week-4 Amt</th><th>Week-4 Days</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>Debtor</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
-            <tr><td>2</td><td>Inventory</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
-            <tr><td>3</td><td>Cash Conversion Cycle</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
-            <tr><td>4</td><td>Revenue</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
-            <tr><td>5</td><td>Cash Block – Debtor</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
-            <tr><td>5a</td><td>— SD</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
-            <tr><td>5b</td><td>— LD</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
-            <tr><td>5c</td><td>— Inventory</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
-            <tr><td>6</td><td>Profit % Age (NP)</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div style="font-size:12px;color:var(--text-muted);padding:8px 4px;">Click any cell to edit. Data is saved locally in your browser.</div>
-    </div>
-
-  </div><!-- end content -->
-</main>
-</div>
-
-<div class="notification" id="notif"></div>
-
+<div id="app"></div>
 <script>
-// ======= DATA =======
-const ageingData = [
-  {sno:1,project:"Indian Oil Corporation Ltd - Mathura BDFP",col:"LD Deduction Amount",amount:1143938.95,date:"27-Jul-2024",days:661,avg:568,bucket:"180+ Days"},
-  {sno:2,project:"IOCL - PANIPAT DO",col:"LD Deduction Amount",amount:358778.71,date:"31-Mar-2025",days:414,avg:294,bucket:"180+ Days"},
-  {sno:3,project:"IOCL - SALEM",col:"Pending Bill Amount",amount:817313.8,date:"31-Mar-2025",days:414,avg:276,bucket:"180+ Days"},
-  {sno:3,project:"IOCL - SALEM",col:"SD Deduction Amount",amount:4159.4,date:"31-Mar-2025",days:414,avg:276,bucket:"180+ Days"},
-  {sno:4,project:"IOCL - COIMBATORE",col:"Withheld Amount",amount:593380.89,date:"31-Mar-2025",days:414,avg:353,bucket:"180+ Days"},
-  {sno:5,project:"IOCL - TRICHY",col:"Pending Bill Amount",amount:776915.9,date:"31-Mar-2025",days:414,avg:290,bucket:"180+ Days"},
-  {sno:6,project:"IOCL - MADURAI",col:"Pending Bill Amount",amount:226317.6,date:"31-Mar-2025",days:414,avg:300,bucket:"180+ Days"},
-  {sno:6,project:"IOCL - MADURAI",col:"Withheld Amount",amount:81055.95,date:"31-Mar-2025",days:414,avg:300,bucket:"180+ Days"},
-  {sno:7,project:"IOCL - CHENNAI",col:"SD Deduction Amount",amount:905314.3,date:"31-Mar-2025",days:414,avg:376,bucket:"180+ Days"},
-  {sno:7,project:"IOCL - CHENNAI",col:"LD Deduction Amount",amount:989416.45,date:"31-Mar-2025",days:414,avg:376,bucket:"180+ Days"},
-  {sno:7,project:"IOCL - CHENNAI",col:"Withheld Amount",amount:614480,date:"31-Mar-2025",days:414,avg:376,bucket:"180+ Days"},
-  {sno:8,project:"IOCL - HISSAR",col:"Pending Bill Amount",amount:2054704,date:"31-Mar-2025",days:414,avg:222,bucket:"180+ Days"},
-  {sno:8,project:"IOCL - HISSAR",col:"LD Deduction Amount",amount:1145966.13,date:"31-Mar-2025",days:414,avg:222,bucket:"180+ Days"},
-  {sno:9,project:"IOCL - Panipat Refinery",col:"Pending Bill Amount",amount:3907140,date:"26-May-2025",days:358,avg:226,bucket:"180+ Days"},
-  {sno:9,project:"IOCL - Panipat Refinery",col:"LD Deduction Amount",amount:1394719.05,date:"26-May-2025",days:358,avg:226,bucket:"180+ Days"},
-  {sno:10,project:"IOCL - BARAUNI",col:"LD Deduction Amount",amount:999625.16,date:"24-Sep-2024",days:602,avg:335,bucket:"180+ Days"},
-  {sno:11,project:"IOCL - KANPUR",col:"LD Deduction Amount",amount:921902.65,date:"29-Mar-2025",days:416,avg:287,bucket:"180+ Days"},
-  {sno:12,project:"IOCL - HOWRAH",col:"SD Deduction Amount",amount:139834.5,date:"29-Mar-2025",days:416,avg:309,bucket:"180+ Days"},
-  {sno:13,project:"IOCL - LONI",col:"LD Deduction Amount",amount:441100.3,date:"29-Jan-2025",days:475,avg:405,bucket:"180+ Days"},
-  {sno:14,project:"IOCL - JATNI",col:"LD Deduction Amount",amount:739952.21,date:"30-Jun-2025",days:323,avg:180,bucket:"180+ Days"},
-  {sno:15,project:"IOCL - PARADEEP AUTOMATION",col:"LD Deduction Amount",amount:292393,date:"24-Feb-2025",days:449,avg:358,bucket:"180+ Days"},
-  {sno:16,project:"IOCL - AHMEDNAGAR",col:"Pending Bill Amount",amount:4622248,date:"27-Oct-2023",days:935,avg:551,bucket:"180+ Days"},
-  {sno:16,project:"IOCL - AHMEDNAGAR",col:"SD Deduction Amount",amount:1087389,date:"27-Oct-2023",days:935,avg:551,bucket:"180+ Days"},
-  {sno:17,project:"IOCL - ALLAHABAD",col:"LD Deduction Amount",amount:685785.03,date:"05-Sep-2024",days:621,avg:521,bucket:"180+ Days"},
-  {sno:18,project:"IOCL - KHUNTI",col:"LD Deduction Amount",amount:824686,date:"05-Sep-2024",days:621,avg:501,bucket:"180+ Days"},
-  {sno:19,project:"IOCL - JHARSUGUDA",col:"Pending Bill Amount",amount:1564080,date:"05-Oct-2024",days:591,avg:382,bucket:"180+ Days"},
-  {sno:20,project:"IOCL - NASHIK",col:"SD Deduction Amount",amount:500213.1,date:"28-Jun-2025",days:325,avg:260,bucket:"180+ Days"},
-  {sno:21,project:"HPCL - LONI",col:"SD + LD Deduction",amount:512688.7,date:"28-Feb-2025",days:445,avg:406,bucket:"180+ Days"},
-  {sno:24,project:"NFC - HYDERABAD",col:"SD Deduction Amount",amount:949417.5,date:"05-Jun-2024",days:713,avg:578,bucket:"180+ Days"},
-  {sno:25,project:"IOCL - MUMBAI DO (VTPL)",col:"Pending + SD",amount:1428477,date:"01-Jul-2025",days:322,avg:261,bucket:"180+ Days"},
-  {sno:34,project:"IOCL - Secunderabad",col:"LD Deduction Amount",amount:146115.33,date:"20-Nov-2025",days:180,avg:115,bucket:"91-180 Days"},
-  {sno:35,project:"IOCL - Warangal",col:"LD Deduction Amount",amount:139825.57,date:"21-Nov-2025",days:179,avg:102,bucket:"91-180 Days"},
-  {sno:36,project:"IOCL - Tirupati",col:"Pending + LD",amount:669255.4,date:"21-Nov-2025",days:179,avg:111,bucket:"91-180 Days"},
-  {sno:37,project:"IOCL - NIZAMABAD",col:"LD Deduction Amount",amount:189657.72,date:"03-Dec-2025",days:167,avg:89,bucket:"91-180 Days"},
-  {sno:38,project:"IOCL - Vijaywada",col:"SD + LD",amount:322567.4,date:"23-Dec-2025",days:147,avg:88,bucket:"91-180 Days"},
-  {sno:39,project:"AAI - AMRITSAR",col:"SD Deduction Amount",amount:288622.5,date:"16-Jan-2026",days:123,avg:86,bucket:"91-180 Days"},
-  {sno:40,project:"IOCL - Paradeep HM",col:"SD + LD + Other",amount:2722855,date:"10-Feb-2026",days:98,avg:65,bucket:"91-180 Days"},
-  {sno:41,project:"PARADIP PORT AUTHORITY",col:"SD + LD + Withheld",amount:8164332,date:"10-Feb-2026",days:98,avg:74,bucket:"91-180 Days"},
-  {sno:42,project:"NTPC - DADRI",col:"Pending + SD + Withheld",amount:780958.8,date:"10-Feb-2026",days:98,avg:72,bucket:"91-180 Days"},
-  {sno:43,project:"GAIL - VIJAIPUR",col:"Withheld Amount",amount:388234.35,date:"16-Mar-2026",days:64,avg:64,bucket:"61-90 Days"},
+const STORAGE_KEY='ve_dashboard_v6';
+const SHEET_ID='1iHrPxhvsFnedO2Js7u3wmFbPAxLeC4F1WP71MBv5gcw';
+const SB=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=`;
+const SUMMARY_GID='105280238';
+const GID_MAP={1:"0",2:"2070489175",3:"776970165",4:"1201529354",5:"131840235",6:"1729965160",7:"923489850",8:"996674553",9:"2095150463",10:"989690966",11:"980845244",12:"1855046779",13:"1612881510",14:"606059273",15:"1110433204",16:"1199190624",17:"1725908395",18:"493192291",19:"387496523",20:"22890483",21:"671962254",22:"279843949",23:"",24:"477557482",25:"1545839474",26:"1485879867",27:"323328787",28:"1871920534",29:"1053026690",30:"1087865048",31:"178072507",32:"458687889",33:"1666678437",34:"1920245490",35:"1642019228",36:"977030954",37:"2004258151",38:"1234783628",39:"1893067828",40:"1979702996",41:"321034887",42:"1347791283",43:"751444077"};
+const defaultSites=[
+{id:1,sno:1,name:"Indian Oil Corporation Ltd - Mathura BDFP",sheet:"IOCL MATHURA BDFP",pm:"Vicky",pending:0,sd:0,ld:1143938.95,gst:0,instant:0,other:0,witheld:0,total:1143938.95,invoices:[]},
+{id:2,sno:2,name:"INDIAN OIL CORPORATION LTD - PANIPAT DO",sheet:"IOCL PANIPAT DO",pm:"Chandrashekhar",pending:0,sd:0,ld:358778.71,gst:0,instant:0,other:0,witheld:0,total:358778.71,invoices:[]},
+{id:3,sno:3,name:"INDIAN OIL CORPORATION LTD - SALEM",sheet:"IOCL-Salem DO",pm:"Ravi",pending:817313.81,sd:4159.40,ld:0,gst:0,instant:0,other:0,witheld:0,total:821473.21,invoices:[]},
+{id:4,sno:4,name:"INDIAN OIL CORPORATION LTD - COIMBATORE",sheet:"IOCL-Coimbatore DO",pm:"Ravi",pending:0,sd:0,ld:0,gst:0,instant:0,other:0,witheld:593380.89,total:593380.89,invoices:[]},
+{id:5,sno:5,name:"INDIAN OIL CORPORATION LTD - TRICHY",sheet:"IOCL-Trichy DO",pm:"Ravi",pending:776915.86,sd:0,ld:0,gst:0,instant:0,other:0,witheld:0,total:776915.86,invoices:[]},
+{id:6,sno:6,name:"INDIAN OIL CORPORATION LTD - MADURAI",sheet:"IOCL- Madurai DO",pm:"Ravi",pending:226305.61,sd:0,ld:0,gst:0,instant:0,other:0,witheld:81055.95,total:226305.62,invoices:[]},
+{id:7,sno:7,name:"INDIAN OIL CORPORATION LTD - CHENNAI",sheet:"IOCL CHENNAI",pm:"Ravi",pending:0,sd:905314.25,ld:989416.45,gst:0,instant:0,other:0,witheld:614480,total:2509210.70,invoices:[]},
+{id:8,sno:8,name:"INDIAN OIL CORPORATION LTD - HISSAR",sheet:"IOCL HISSAR DO",pm:"Ravi",pending:2054704.29,sd:0,ld:1145966.13,gst:0,instant:0,other:0,witheld:0,total:3200670.42,invoices:[]},
+{id:9,sno:9,name:"Indian Oil Corporation Ltd - Panipat Refinery",sheet:"IOCL PANIPAT REFINERY",pm:"Chandrashekhar",pending:3907133.72,sd:37208.44,ld:1394719.05,gst:0,instant:0,other:369114.64,witheld:0,total:5708175.84,invoices:[]},
+{id:10,sno:10,name:"Indian Oil Corporation Ltd - BARAUNI",sheet:"IOCL BARAUNI",pm:"Vicky",pending:273215.16,sd:0,ld:999625.16,gst:0,instant:0,other:0,witheld:0,total:1272840.32,invoices:[]},
+{id:11,sno:11,name:"INDIAN OIL CORPORATION LTD - KANPUR",sheet:"IOCL KANPUR",pm:"Chandrashekhar",pending:0,sd:0,ld:921902.65,gst:0,instant:0,other:0,witheld:0,total:921902.65,invoices:[]},
+{id:12,sno:12,name:"INDIAN OIL CORPORATION LTD - HOWRAH",sheet:"IOCL Howrah",pm:"Vicky",pending:0,sd:139834.52,ld:0,gst:0,instant:0,other:0,witheld:0,total:139834.52,invoices:[]},
+{id:13,sno:13,name:"INDIAN OIL CORPORATION LTD - LONI",sheet:"IOCL LONI",pm:"Chandrashekhar",pending:0,sd:0,ld:441100.30,gst:0,instant:0,other:0,witheld:0,total:441100.30,invoices:[]},
+{id:14,sno:14,name:"INDIAN OIL CORPORATION LTD - JATNI",sheet:"IOCL Jatni",pm:"Ravi",pending:0,sd:0,ld:739952.21,gst:0,instant:0,other:0,witheld:0,total:739952.21,invoices:[]},
+{id:15,sno:15,name:"INDIAN OIL CORPORATION LTD - PARADEEP AUTOMATION",sheet:"IOCL Paradeep",pm:"Ravi",pending:0,sd:0,ld:292393,gst:0,instant:0,other:0,witheld:0,total:292393,invoices:[]},
+{id:16,sno:16,name:"INDIAN OIL CORPORATION LTD - AHMEDNAGAR",sheet:"IOCL AHMEDNAGAR",pm:"Chandrashekhar",pending:4622247.53,sd:1087388.61,ld:0,gst:0,instant:0,other:0,witheld:0,total:5709636.14,invoices:[]},
+{id:17,sno:17,name:"INDIAN OIL CORPORATION LTD - ALLAHABAD",sheet:"IOCL Allahabad",pm:"Chandrashekhar",pending:0,sd:478849.64,ld:685785.03,gst:0,instant:0,other:0,witheld:0,total:1164634.67,invoices:[]},
+{id:18,sno:18,name:"INDIAN OIL CORPORATION LTD - KHUNTI",sheet:"IOCL Khunti",pm:"Vicky",pending:0,sd:91765,ld:824686,gst:0,instant:80566,other:0,witheld:0,total:997017,invoices:[]},
+{id:19,sno:19,name:"INDIAN OIL CORPORATION LTD - JHARSUGUDA",sheet:"IOCL Jharsuguda",pm:"Ravi",pending:1564080.45,sd:0,ld:928887.91,gst:0,instant:0,other:0,witheld:0,total:2492968.36,invoices:[]},
+{id:20,sno:20,name:"INDIAN OIL CORPORATION LIMITED - NASHIK",sheet:"IOCL NASHIK",pm:"Ravi",pending:0,sd:500213.15,ld:186372.13,gst:0,instant:0,other:0,witheld:0,total:686585.28,invoices:[]},
+{id:21,sno:21,name:"HINDUSTAN PETROLEUM CORPORATION LTD - LONI",sheet:"HPCL Loni",pm:"Ravi",pending:0,sd:215597.68,ld:297091,gst:0,instant:0,other:0,witheld:0,total:512688.68,invoices:[]},
+{id:22,sno:22,name:"NUCLEAR FUEL COMPLEX - KOTA TOWNSHIP",sheet:"NFC",pm:"Chandrashekhar",pending:0,sd:164005.78,ld:0,gst:0,instant:0,other:0,witheld:0,total:164005.78,invoices:[]},
+{id:23,sno:23,name:"NUCLEAR FUEL COMPLEX - KOTA",sheet:"NFC KOTA",pm:"Chandrashekhar",pending:0,sd:1073156.58,ld:0,gst:0,instant:0,other:0,witheld:0,total:1073156.58,invoices:[]},
+{id:24,sno:24,name:"NUCLEAR FUEL COMPLEX - HYDERABAD",sheet:"NFC-HYDERABAD",pm:"Vicky",pending:0,sd:949417.48,ld:0,gst:0,instant:0,other:0,witheld:0,total:949417.48,invoices:[]},
+{id:25,sno:25,name:"INDIAN OIL CORPORATION LTD - MUMBAI DO (VTPL)",sheet:"IOCL MUMBAI DO",pm:"Ravi",pending:0.79,sd:638343.69,ld:0,gst:0,instant:0,other:0,witheld:0,total:638344.48,invoices:[]},
+{id:26,sno:26,name:"Genpact India Pvt Ltd - DLF Gurgaon",sheet:"GENPACT(Gurgaon)",pm:"Ravi",pending:0,sd:0,ld:0,gst:0,instant:0,other:0,witheld:0,total:0,invoices:[]},
+{id:27,sno:27,name:"INDIAN OIL CORPORATION LTD - SARPARA",sheet:"IOCL SARPARA",pm:"Chandrashekhar",pending:6907.62,sd:24578.51,ld:329297.53,gst:0,instant:0,other:0,witheld:0,total:360783.66,invoices:[]},
+{id:28,sno:28,name:"Indian Oil Corporation Ltd - Moradabad Do (Vtpl)",sheet:"IOCL MORADABAD DO",pm:"Chandrashekhar",pending:0,sd:249925.38,ld:77648.16,gst:0,instant:0,other:0,witheld:50000,total:377573.54,invoices:[]},
+{id:29,sno:29,name:"Transrail Lighting Ltd",sheet:"Transrail Lighting Ltd.",pm:"Vicky",pending:384450,sd:0,ld:0,gst:0,instant:0,other:0,witheld:1299025,total:1683475,invoices:[]},
+{id:30,sno:30,name:"INDIAN OIL CORPORATION LTD - BANGALORE DO",sheet:"IOCL Bangalore",pm:"Ravi",pending:0,sd:0,ld:0,gst:0,instant:0,other:0,witheld:0,total:0,invoices:[]},
+{id:31,sno:31,name:"INDIAN OIL CORPORATION LTD - VIZAG",sheet:"IOCL VIZAG",pm:"Chandrashekhar",pending:267548.59,sd:0,ld:149126,gst:0,instant:0,other:0,witheld:0,total:416674.59,invoices:[]},
+{id:32,sno:32,name:"Indian Oil Corporation Ltd - Raipur Do (Vtpl)",sheet:"IOCL RAIPUR",pm:"Ravi",pending:0,sd:451274.03,ld:0,gst:0,instant:0,other:0,witheld:0,total:451274.03,invoices:[]},
+{id:33,sno:33,name:"INDIAN OIL CORPORATION LTD - BHATINDA",sheet:"IOCL BHATINDA",pm:"Chandrashekhar",pending:0,sd:0,ld:271950.26,gst:0,instant:0,other:0,witheld:0,total:271950.26,invoices:[]},
+{id:34,sno:34,name:"Indian Oil Corporation Ltd - Secunderabad",sheet:"IOCL SECUNDERABAD",pm:"Chandrashekhar",pending:0,sd:0,ld:146115.33,gst:0,instant:0,other:0,witheld:0,total:146115.33,invoices:[]},
+{id:35,sno:35,name:"Indian Oil Corporation Ltd - Warangal",sheet:"IOCL WARANGAL",pm:"Chandrashekhar",pending:0,sd:0,ld:139825.57,gst:0,instant:0,other:0,witheld:0,total:139825.57,invoices:[]},
+{id:36,sno:36,name:"Indian Oil Corporation Ltd - Tirupati",sheet:"IOCL Tirupati",pm:"Chandrashekhar",pending:371062.80,sd:0,ld:298192.64,gst:0,instant:0,other:0,witheld:0,total:669255.44,invoices:[]},
+{id:37,sno:37,name:"INDIAN OIL CORPORATION LIMITED - NIZAMABAD",sheet:"IOCL Nizamabad",pm:"Chandrashekhar",pending:0,sd:0,ld:189657.72,gst:0,instant:0,other:0,witheld:0,total:189657.72,invoices:[]},
+{id:38,sno:38,name:"Indian Oil Corporation Ltd - Vijaywada",sheet:"IOCL VIJAYWADA",pm:"Chandrashekhar",pending:0,sd:50524.11,ld:272033.43,gst:0,instant:0,other:0,witheld:0,total:322557.54,invoices:[]},
+{id:39,sno:39,name:"AIRPORTS AUTHORITY OF INDIA - AMRITSAR",sheet:"AAI Amritsar",pm:"Vicky",pending:0,sd:288622.50,ld:0,gst:0,instant:0,other:0,witheld:0,total:288622.50,invoices:[]},
+{id:40,sno:40,name:"Indian Oil Corporation Limited - Paradeep HM",sheet:"IOCL PARADEEP HM",pm:"Ravi",pending:0,sd:1374309.85,ld:458545.14,gst:0,instant:0,other:890000,witheld:0,total:2722854.99,invoices:[]},
+{id:41,sno:41,name:"PARADIP PORT AUTHORITY",sheet:"PPA PORT",pm:"Keshav",pending:0,sd:1521853,ld:2174077,gst:0,instant:0,other:0,witheld:4468402,total:8164332,invoices:[]},
+{id:42,sno:42,name:"NTPC LIMITED - DADRI",sheet:"NTPC Dadri",pm:"Vicky",pending:270223.78,sd:364811,ld:0,gst:0,instant:0,other:0,witheld:145924,total:780958.78,invoices:[]},
+{id:43,sno:43,name:"GAIL (INDIA) LIMITED - VIJAIPUR",sheet:"GAIL VIJYAPUR",pm:"Ravi",pending:0,sd:0,ld:0,gst:0,instant:0,other:0,witheld:388234.35,total:388234.35,invoices:[]},
 ];
-
-const projData = [
-  {id:1,name:"Indian Oil Corporation Ltd - Mathura BDFP",sd:0,ld:1143938.95,instant:0,other:0,withheld:0,total:1143939},
-  {id:2,name:"IOCL - PANIPAT DO",sd:0,ld:358778.71,instant:0,other:0,withheld:0,total:358779},
-  {id:3,name:"IOCL - SALEM",sd:4159.4,ld:0,instant:0,other:0,withheld:0,total:821473},
-  {id:4,name:"IOCL - COIMBATORE",sd:0,ld:0,instant:0,other:0,withheld:593380.89,total:593381},
-  {id:5,name:"IOCL - TRICHY",sd:0,ld:0,instant:0,other:0,withheld:0,total:776916},
-  {id:6,name:"IOCL - MADURAI",sd:0,ld:0,instant:0,other:0,withheld:81055.95,total:226306},
-  {id:7,name:"IOCL - CHENNAI",sd:905314.3,ld:989416.45,instant:0,other:0,withheld:614480,total:2509211},
-  {id:8,name:"IOCL - HISSAR",sd:0,ld:1145966.13,instant:0,other:0,withheld:0,total:3200670},
-  {id:9,name:"IOCL - Panipat Refinery",sd:37208.44,ld:1394719.05,instant:0,other:369114.64,withheld:0,total:5708176},
-  {id:10,name:"IOCL - BARAUNI",sd:0,ld:999625.16,instant:0,other:0,withheld:0,total:1272840},
-  {id:11,name:"IOCL - KANPUR",sd:0,ld:921902.65,instant:0,other:0,withheld:0,total:921903},
-  {id:12,name:"IOCL - HOWRAH",sd:139834.5,ld:0,instant:0,other:0,withheld:0,total:139835},
-  {id:13,name:"IOCL - LONI",sd:0,ld:441100.3,instant:0,other:0,withheld:0,total:441100},
-  {id:14,name:"IOCL - JATNI",sd:0,ld:739952.21,instant:0,other:0,withheld:0,total:739952},
-  {id:15,name:"IOCL - PARADEEP AUTOMATION",sd:0,ld:292393,instant:0,other:0,withheld:0,total:292393},
-  {id:16,name:"IOCL - AHMEDNAGAR",sd:1087389,ld:0,instant:0,other:0,withheld:0,total:5709636},
-  {id:17,name:"IOCL - ALLAHABAD",sd:478849.6,ld:685785.03,instant:0,other:0,withheld:0,total:1164635},
-  {id:18,name:"IOCL - KHUNTI",sd:91765,ld:824686,instant:80566,other:0,withheld:0,total:997017},
-  {id:19,name:"IOCL - JHARSUGUDA",sd:0,ld:928887.91,instant:0,other:0,withheld:0,total:2492968},
-  {id:20,name:"IOCL - NASHIK",sd:500213.1,ld:186372.13,instant:0,other:0,withheld:0,total:686585},
-  {id:21,name:"HPCL - LONI",sd:215597.7,ld:297091,instant:0,other:0,withheld:0,total:512689},
-  {id:22,name:"NFC - KOTA TOWNSHIP",sd:164005.8,ld:0,instant:0,other:0,withheld:0,total:164006},
-  {id:23,name:"NFC - HYDERABAD",sd:949417.5,ld:0,instant:0,other:0,withheld:0,total:949418},
-  {id:24,name:"IOCL - MUMBAI DO (VTPL)",sd:638343.7,ld:0,instant:0,other:0,withheld:0,total:638344},
-  {id:25,name:"Genpact India - DLF Gurgaon",sd:0,ld:0,instant:0,other:0,withheld:0,total:0},
-  {id:26,name:"IOCL - SARPARA",sd:24578.51,ld:329297.53,instant:0,other:0,withheld:0,total:360784},
-  {id:27,name:"IOCL - Moradabad DO (VTPL)",sd:249925.4,ld:77648.16,instant:0,other:0,withheld:50000,total:377574},
-  {id:28,name:"Transrail Lighting Ltd",sd:0,ld:0,instant:0,other:0,withheld:1299025,total:1683475},
-  {id:29,name:"IOCL - BANGALORE DO",sd:0,ld:0,instant:0,other:0,withheld:0,total:0},
-  {id:30,name:"IOCL - VIZAG",sd:0,ld:149126,instant:0,other:0,withheld:0,total:416675},
-  {id:31,name:"IOCL - Raipur DO (VTPL)",sd:451274,ld:0,instant:0,other:0,withheld:0,total:451274},
-  {id:32,name:"IOCL - BHATINDA",sd:0,ld:271950.26,instant:0,other:0,withheld:0,total:271950},
-  {id:33,name:"IOCL - Secunderabad",sd:0,ld:146115.33,instant:0,other:0,withheld:0,total:146115},
-  {id:34,name:"IOCL - Warangal",sd:0,ld:139825.57,instant:0,other:0,withheld:0,total:139826},
-  {id:35,name:"IOCL - Tirupati",sd:0,ld:298192.64,instant:0,other:0,withheld:0,total:669255},
-  {id:36,name:"IOCL - NIZAMABAD",sd:0,ld:189657.72,instant:0,other:0,withheld:0,total:189658},
-  {id:37,name:"IOCL - Vijaywada",sd:50524.11,ld:272033.43,instant:0,other:0,withheld:0,total:322558},
-  {id:38,name:"AAI - AMRITSAR",sd:288622.5,ld:0,instant:0,other:0,withheld:0,total:288623},
-  {id:39,name:"IOCL - Paradeep HM",sd:1374310,ld:458545.14,instant:0,other:890000,withheld:0,total:2722855},
-  {id:40,name:"PARADIP PORT AUTHORITY",sd:1521853,ld:2174077,instant:0,other:0,withheld:4468402,total:8164332},
-  {id:41,name:"NTPC - DADRI",sd:364811,ld:0,instant:0,other:0,withheld:145924,total:780959},
-  {id:42,name:"GAIL - VIJAIPUR",sd:0,ld:0,instant:0,other:0,withheld:388234.35,total:388234},
-];
-
-const veData = [
-  {date:"08-Apr-2026",inv:"VE/26-27/1",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
-  {date:"30-Apr-2026",inv:"VE/26-27/2",party:"Indian Oil Corporation Ltd",taxable:427860.77,igst:0,cgst:0,sgst:0,total:427860.77,month:"April"},
-  {date:"08-May-2026",inv:"VE/26-27/3",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
-];
-
-const vtplData = [
-  {date:"15-Apr-2026",inv:"VTPL/26-27/1",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
-  {date:"18-Apr-2026",inv:"VTPL/26-27/2",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
-  {date:"28-Apr-2026",inv:"VTPL/26-27/3",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
-  {date:"28-Apr-2026",inv:"VTPL/26-27/4",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
-  {date:"30-Apr-2026",inv:"VTPL/26-27/5",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
-  {date:"30-Apr-2026",inv:"VTPL/26-27/6",party:"Indian Oil Corporation Ltd",taxable:2288871.70,igst:0,cgst:0,sgst:0,total:2288871.70,month:"April"},
-  {date:"05-May-2026",inv:"VTPL/26-27/7",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
-  {date:"05-May-2026",inv:"VTPL/26-27/8",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
-  {date:"05-May-2026",inv:"VTPL/26-27/9",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
-  {date:"05-May-2026",inv:"VTPL/26-27/10",party:"Indian Oil Corporation Ltd",taxable:1034242.52,igst:0,cgst:0,sgst:0,total:1034242.52,month:"May"},
-  {date:"16-May-2026",inv:"VTPL/26-27/10a",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
-  {date:"16-May-2026",inv:"VTPL/26-27/10b",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
-];
-
-// ======= PAGINATION =======
-const pageSize = 15;
-const pageMeta = {};
-
-function fmt(v){return v?'₹'+v.toLocaleString('en-IN',{maximumFractionDigits:0}):'₹0';}
-
-function bucketClass(b){
-  if(b.includes('180'))return 'bucket-180';
-  if(b.includes('91'))return 'bucket-91';
-  if(b.includes('61'))return 'bucket-61';
-  return 'bucket-lt60';
+// State
+let data=JSON.parse(localStorage.getItem(STORAGE_KEY))||{sites:JSON.parse(JSON.stringify(defaultSites)),pantryId:'',googleApiKey:''};
+let page='dashboard',expandedId=null,search='',filterPM='';
+// Helpers
+const fmt=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtS=n=>{n=Number(n||0);if(n>=1e7)return'₹'+(n/1e7).toFixed(2)+'Cr';if(n>=1e5)return'₹'+(n/1e5).toFixed(2)+'L';return'₹'+n.toLocaleString('en-IN',{maximumFractionDigits:0})};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2);
+const save=()=>{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));if(data.pantryId)syncToPantry()};
+const gid=id=>GID_MAP[id]||'';
+const url=id=>gid(id)?SB+gid(id):'';
+const pms=()=>[...new Set(data.sites.map(s=>s.pm))];
+const sum=k=>data.sites.reduce((a,s)=>a+(s[k]||0),0);
+// Pantry Sync
+async function syncToPantry(){
+  if(!data.pantryId)return;
+  try{
+    await fetch(`https://getpantry.cloud/apiv1/pantry/${data.pantryId}/basket/vishal_electricals`,{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sites:data.sites,updated:new Date().toISOString()})
+    });
+  }catch(e){console.log('Pantry sync failed',e)}
 }
-
-function renderTable(id, data, renderRow, infoId, pagesId){
-  const tbody = document.getElementById(id+'-tbody'||id);
-  const info = document.getElementById(infoId);
-  const pages = document.getElementById(pagesId);
-  const pg = pageMeta[id]||1;
-  const start = (pg-1)*pageSize;
-  const slice = data.slice(start, start+pageSize);
-  tbody.innerHTML = slice.map(renderRow).join('');
-  if(info) info.textContent = `Showing ${start+1}-${Math.min(start+pageSize,data.length)} of ${data.length} records`;
-  if(pages){
-    const total = Math.ceil(data.length/pageSize);
-    pages.innerHTML = Array.from({length:total},(_,i)=>`<button class="page-btn${pg===i+1?' active':''}" onclick="goPage('${id}',${i+1})">${i+1}</button>`).join('');
-  }
+async function loadFromPantry(){
+  if(!data.pantryId)return alert('Enter Pantry ID first');
+  try{
+    const r=await fetch(`https://getpantry.cloud/apiv1/pantry/${data.pantryId}/basket/vishal_electricals`);
+    if(r.ok){const d=await r.json();if(d.sites){data.sites=d.sites;save();render();alert('Data loaded from Pantry!')}}
+  }catch(e){alert('Failed to load: '+e.message)}
 }
-
-function goPage(id, pg){pageMeta[id]=pg;initTables();}
-
-function filterTable(tblId, q){
-  pageMeta[tblId]=1;
-  const tbl = document.getElementById(tblId);
-  if(!tbl)return;
-  const rows = tbl.querySelectorAll('tbody tr');
-  rows.forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});
+// Render
+function render(){
+  const sites=data.sites.filter(s=>{
+    const mPM=!filterPM||s.pm===filterPM;
+    const mS=s.name.toLowerCase().includes(search.toLowerCase());
+    return mPM&&mS;
+  });
+  
+  document.getElementById('app').innerHTML=`
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="sidebar w-64 bg-white border-r flex flex-col fixed h-full z-40">
+<div class="h-14 flex items-center px-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">⚡</div>
+<div class="text-white"><div class="text-sm font-bold">Vishal Electricals</div><div class="text-[10px] opacity-80">Payment Dashboard</div></div>
+</div>
+</div>
+<nav class="flex-1 p-2 overflow-y-auto">
+<div class="space-y-1">
+${['dashboard','summary','settings'].map(p=>`
+<button onclick="page='${p}';expandedId=null;render()" class="nav-item ${page===p?'active':''} w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
+${p==='dashboard'?'📊':p==='summary'?'📋':'⚙️'} ${p[0].toUpperCase()+p.slice(1)}
+</button>`).join('')}
+</div>
+<div class="mt-4 pt-3 border-t">
+<div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase">Sites (${data.sites.length})</div>
+<input type="text" placeholder="Search..." value="${search}" oninput="search=this.value;render()" class="w-full px-3 py-1.5 text-xs bg-gray-50 border rounded mb-2">
+<div class="space-y-0.5 max-h-[calc(100vh-300px)] overflow-y-auto">
+${data.sites.slice(0,20).map(s=>`
+<button onclick="page='summary';expandedId=${s.id};render()" class="site-item ${expandedId===s.id?'active':''} w-full flex items-center gap-2 px-2 py-1.5 rounded text-left text-xs hover:bg-gray-50">
+<span class="w-5 h-5 rounded text-[10px] flex items-center justify-center font-bold ${expandedId===s.id?'bg-blue-600 text-white':'bg-gray-100'}">${s.sno}</span>
+<span class="truncate flex-1">${s.name.split(' - ').pop()}</span>
+</button>`).join('')}
+${data.sites.length>20?`<div class="text-xs text-gray-400 text-center py-2">+${data.sites.length-20} more in Summary</div>`:''}
+</div>
+</div>
+</nav>
+<div class="p-3 border-t">
+<a href="${SB}${SUMMARY_GID}" target="_blank" class="flex items-center justify-center gap-2 w-full px-3 py-2 bg-green-50 text-green-700 text-xs font-medium rounded-lg hover:bg-green-100">📊 Google Sheet</a>
+</div>
+</aside>
+<!-- Main -->
+<main class="flex-1 ml-64">
+<header class="sticky top-0 z-30 bg-white border-b h-12 flex items-center justify-between px-5">
+<h1 class="text-sm font-semibold text-gray-800">${page==='dashboard'?'Dashboard':page==='summary'?'Summary - All Sites':'Settings'}</h1>
+<div class="flex items-center gap-2">
+${data.pantryId?'<span class="text-xs text-green-600">🔄 Sync Active</span>':''}
+<span class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">VE</span>
+</div>
+</header>
+<div class="p-5">${page==='dashboard'?renderDash():page==='summary'?renderSummary(sites):renderSettings()}</div>
+</main>
+</div>`;
 }
-
-function filterBucket(tblId, bucket){
-  pageMeta[tblId]=1;
-  const tbl = document.getElementById(tblId);
-  if(!tbl)return;
-  const rows = tbl.querySelectorAll('tbody tr');
-  rows.forEach(r=>{r.style.display=(!bucket||r.textContent.includes(bucket))?'':'none';});
+function renderDash(){
+  const t={pending:sum('pending'),sd:sum('sd'),ld:sum('ld'),witheld:sum('witheld'),other:sum('other'),total:sum('total')};
+  const active=data.sites.filter(s=>s.total>0).length;
+  const top=[...data.sites].sort((a,b)=>b.total-a.total).slice(0,5);
+  const pmData=pms().map(p=>({n:p,c:data.sites.filter(s=>s.pm===p).length,t:data.sites.filter(s=>s.pm===p).reduce((a,s)=>a+s.total,0)})).sort((a,b)=>b.t-a.t);
+  
+  return`<div class="space-y-5">
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+${[{l:'Total Outstanding',v:t.total,c:'blue'},{l:'Pending Bills',v:t.pending,c:'amber'},{l:'SD Deduction',v:t.sd,c:'red'},{l:'LD Deduction',v:t.ld,c:'purple'},{l:'Witheld',v:t.witheld,c:'orange'},{l:'Active Sites',v:active,c:'green',f:1}].map(c=>`
+<div class="bg-white rounded-xl border p-4 hover:shadow-md transition cursor-pointer" onclick="page='summary';render()">
+<p class="text-xs text-gray-500 mb-1">${c.l}</p>
+<p class="text-lg font-bold text-${c.c}-600">${c.f?c.v:fmtS(c.v)}</p>
+</div>`).join('')}
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+<div class="bg-white rounded-xl border p-4">
+<h3 class="text-sm font-semibold mb-3">👥 Manager Breakdown</h3>
+${pmData.map(m=>`
+<div class="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer" onclick="filterPM='${m.n}';page='summary';render()">
+<div class="flex items-center gap-2">
+<span class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">${m.n[0]}</span>
+<div><div class="text-sm font-medium">${m.n}</div><div class="text-xs text-gray-400">${m.c} sites</div></div>
+</div>
+<span class="text-sm font-bold">${fmtS(m.t)}</span>
+</div>`).join('')}
+</div>
+<div class="bg-white rounded-xl border p-4">
+<h3 class="text-sm font-semibold mb-3">🔝 Top Outstanding</h3>
+${top.map((s,i)=>`
+<div class="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer" onclick="page='summary';expandedId=${s.id};render()">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded text-xs flex items-center justify-center font-bold ${i<3?'bg-red-100 text-red-700':'bg-gray-100'}">${i+1}</span>
+<span class="text-sm truncate max-w-[200px]">${s.name}</span>
+</div>
+<span class="text-sm font-bold">${fmtS(s.total)}</span>
+</div>`).join('')}
+</div>
+</div>
+</div>`;
 }
-
-function initTables(){
-  // AGEING
-  const atbody = document.getElementById('ageing-tbody');
-  const apg = pageMeta['ageing-tbl']||1;
-  const aslice = ageingData.slice((apg-1)*pageSize,(apg)*pageSize);
-  atbody.innerHTML = aslice.map((d,i)=>`
-    <tr>
-      <td>${d.sno}</td>
-      <td class="editable-cell" onclick="makeEditable(this)" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${d.project}">${d.project}</td>
-      <td>${d.col}</td>
-      <td class="amount ${d.amount>1000000?'amount-danger':d.amount>500000?'amount-warning':''}">${fmt(d.amount)}</td>
-      <td>${d.date}</td>
-      <td class="amount ${d.days>365?'amount-danger':d.days>180?'amount-warning':''}">${d.days}</td>
-      <td>${d.avg}</td>
-      <td><span class="bucket-pill ${bucketClass(d.bucket)}">${d.bucket}</span></td>
-      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
-    </tr>`).join('');
-  document.getElementById('ageing-info').textContent=`Showing ${(apg-1)*pageSize+1}-${Math.min(apg*pageSize,ageingData.length)} of ${ageingData.length} records`;
-  const at = Math.ceil(ageingData.length/pageSize);
-  document.getElementById('ageing-pages').innerHTML=Array.from({length:at},(_,i)=>`<button class="page-btn${apg===i+1?' active':''}" onclick="goPage('ageing-tbl',${i+1})">${i+1}</button>`).join('');
-
-  // PROJECTS
-  const ptbody = document.getElementById('proj-tbody');
-  const ppg = pageMeta['proj-tbl']||1;
-  const pslice = projData.slice((ppg-1)*pageSize,(ppg)*pageSize);
-  ptbody.innerHTML = pslice.map(d=>`
-    <tr>
-      <td>${d.id}</td>
-      <td class="editable-cell" onclick="makeEditable(this)" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${d.name}">${d.name}</td>
-      <td class="amount">${fmt(d.sd)}</td>
-      <td class="amount ${d.ld>500000?'amount-warning':''}">${fmt(d.ld)}</td>
-      <td class="amount">${fmt(d.instant)}</td>
-      <td class="amount">${fmt(d.other)}</td>
-      <td class="amount">${fmt(d.withheld)}</td>
-      <td class="amount ${d.total>2000000?'amount-danger':d.total>500000?'amount-warning':'amount-success'}">${fmt(d.total)}</td>
-      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
-    </tr>`).join('');
-  document.getElementById('proj-info').textContent=`Showing ${(ppg-1)*pageSize+1}-${Math.min(ppg*pageSize,projData.length)} of ${projData.length} records`;
-  const pt = Math.ceil(projData.length/pageSize);
-  document.getElementById('proj-pages').innerHTML=Array.from({length:pt},(_,i)=>`<button class="page-btn${ppg===i+1?' active':''}" onclick="goPage('proj-tbl',${i+1})">${i+1}</button>`).join('');
-
-  // SUMMARY
-  const stbody = document.getElementById('summ-tbody');
-  stbody.innerHTML = projData.map(d=>`
-    <tr>
-      <td>${d.id}</td>
-      <td class="editable-cell" onclick="makeEditable(this)" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${d.name}">${d.name}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.ld)}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.sd)}</td>
-      <td class="amount">₹0</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.instant)}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.other)}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.withheld)}</td>
-      <td class="amount ${d.total>2000000?'amount-danger':d.total>500000?'amount-warning':'amount-success'}">${fmt(d.total)}</td>
-      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
-    </tr>`).join('');
-
-  // VE REVENUE
-  document.getElementById('ve-tbody').innerHTML = veData.map((d,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td class="editable-cell" onclick="makeEditable(this)">${d.date}</td>
-      <td class="editable-cell" onclick="makeEditable(this)">${d.inv}</td>
-      <td>${d.party}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${d.taxable?fmt(d.taxable):'–'}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${d.igst?fmt(d.igst):'–'}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${d.cgst?fmt(d.cgst):'–'}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${d.sgst?fmt(d.sgst):'–'}</td>
-      <td class="amount ${d.total?'amount-success':''}">${d.total?fmt(d.total):'–'}</td>
-      <td><span style="background:#e3f0ff;color:#1565c0;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;">${d.month}</span></td>
-      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
-    </tr>`).join('');
-
-  // VTPL REVENUE
-  document.getElementById('vtpl-tbody').innerHTML = vtplData.map((d,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td class="editable-cell" onclick="makeEditable(this)">${d.date}</td>
-      <td class="editable-cell" onclick="makeEditable(this)">${d.inv}</td>
-      <td>${d.party}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${d.taxable?fmt(d.taxable):'–'}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${d.igst?fmt(d.igst):'–'}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${d.cgst?fmt(d.cgst):'–'}</td>
-      <td class="amount editable-cell" onclick="makeEditable(this)">${d.sgst?fmt(d.sgst):'–'}</td>
-      <td class="amount ${d.total?'amount-success':''}">${d.total?fmt(d.total):'–'}</td>
-      <td><span style="background:#e3f0ff;color:#1565c0;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;">${d.month}</span></td>
-      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
-    </tr>`).join('');
+function renderSummary(sites){
+  const t={pending:sites.reduce((a,s)=>a+s.pending,0),sd:sites.reduce((a,s)=>a+s.sd,0),ld:sites.reduce((a,s)=>a+s.ld,0),witheld:sites.reduce((a,s)=>a+s.witheld,0),total:sites.reduce((a,s)=>a+s.total,0)};
+  
+  return`<div class="space-y-4">
+<div class="flex flex-wrap gap-3 items-center">
+<select onchange="filterPM=this.value;render()" class="px-3 py-2 text-sm border rounded-lg bg-white">
+<option value="">All Managers</option>
+${pms().map(p=>`<option value="${p}" ${filterPM===p?'selected':''}>${p}</option>`).join('')}
+</select>
+<input type="text" placeholder="Search sites..." value="${search}" oninput="search=this.value;render()" class="px-3 py-2 text-sm border rounded-lg w-48">
+<button onclick="exportCSV()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">📥 Export</button>
+${filterPM?`<button onclick="filterPM='';render()" class="px-3 py-2 text-sm bg-gray-100 rounded-lg">✕ Clear Filter</button>`:''}
+</div>
+<div class="bg-white rounded-xl border overflow-hidden">
+<table class="w-full text-sm">
+<thead class="bg-gray-50 border-b">
+<tr>
+<th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-500">S.No</th>
+<th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-500">Project / Site</th>
+<th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-500">PM</th>
+<th class="px-3 py-2.5 text-right text-xs font-semibold text-gray-500">Pending</th>
+<th class="px-3 py-2.5 text-right text-xs font-semibold text-gray-500">SD</th>
+<th class="px-3 py-2.5 text-right text-xs font-semibold text-gray-500">LD</th>
+<th class="px-3 py-2.5 text-right text-xs font-semibold text-gray-500">Witheld</th>
+<th class="px-3 py-2.5 text-right text-xs font-semibold text-gray-500 font-bold">Total</th>
+<th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-500">Detail</th>
+</tr>
+</thead>
+<tbody>
+${sites.map(s=>`
+<tr class="border-b hover:bg-blue-50/50 ${expandedId===s.id?'bg-blue-50':''}">
+<td class="px-3 py-2 font-medium">${s.sno}</td>
+<td class="px-3 py-2 font-medium max-w-[220px]"><div class="truncate">${s.name}</div></td>
+<td class="px-3 py-2"><span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full">${s.pm}</span></td>
+<td class="px-3 py-2 text-right font-mono text-xs ${s.pending>0?'text-amber-600 font-semibold':'text-gray-400'}">${fmt(s.pending)}</td>
+<td class="px-3 py-2 text-right font-mono text-xs ${s.sd>0?'text-red-600':'text-gray-400'}">${fmt(s.sd)}</td>
+<td class="px-3 py-2 text-right font-mono text-xs ${s.ld>0?'text-purple-600':'text-gray-400'}">${fmt(s.ld)}</td>
+<td class="px-3 py-2 text-right font-mono text-xs ${s.witheld>0?'text-orange-600':'text-gray-400'}">${fmt(s.witheld)}</td>
+<td class="px-3 py-2 text-right font-mono text-xs font-bold">${fmt(s.total)}</td>
+<td class="px-3 py-2 text-center">
+<button onclick="expandedId=expandedId===${s.id}?null:${s.id};render()" class="px-2 py-1 ${expandedId===s.id?'bg-blue-600 text-white':'bg-blue-100 text-blue-700'} text-xs rounded hover:opacity-80">
+${expandedId===s.id?'▲ Hide':'▼ Detail'}
+</button>
+</td>
+</tr>
+${expandedId===s.id?renderDetail(s):''}
+`).join('')}
+</tbody>
+<tfoot class="bg-blue-50 border-t-2 border-blue-200">
+<tr>
+<td class="px-3 py-2.5 font-bold text-blue-900" colspan="3">TOTAL (${sites.length} sites)</td>
+<td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-blue-900">${fmt(t.pending)}</td>
+<td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-blue-900">${fmt(t.sd)}</td>
+<td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-blue-900">${fmt(t.ld)}</td>
+<td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-blue-900">${fmt(t.witheld)}</td>
+<td class="px-3 py-2.5 text-right font-mono text-xs font-bold text-blue-900">${fmt(t.total)}</td>
+<td></td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>`;
 }
-
-// ======= NAVIGATION =======
-const titles = {
-  dashboard:'Dashboard Overview',ageing:'Ageing Analysis',projects:'Project-wise Outstanding',
-  summary:'Payment Breakup Summary',revenue_ve:'VE Revenue 26-27',
-  revenue_vtpl:'VTPL Revenue 26-27',emd:'EMD Tracker',weekly:'Finance Weekly Review'
+function renderDetail(s){
+  return`<tr class="expanded-row">
+<td colspan="9" class="p-0">
+<div class="p-4 border-t-2 border-blue-300">
+<!-- Header -->
+<div class="flex items-center justify-between mb-4">
+<div>
+<h3 class="font-bold text-gray-900">${s.name}</h3>
+<p class="text-xs text-gray-500">PM: ${s.pm} • ${s.sheet} ${gid(s.id)?`• GID: ${gid(s.id)}`:''}</p>
+</div>
+<div class="flex gap-2">
+${url(s.id)?`<a href="${url(s.id)}" target="_blank" class="px-3 py-1.5 bg-green-100 text-green-700 text-xs rounded-lg hover:bg-green-200">📊 Sheet</a>`:''}
+<button onclick="editSite(${s.id})" class="px-3 py-1.5 bg-blue-100 text-blue-700 text-xs rounded-lg hover:bg-blue-200">✏️ Edit Amounts</button>
+</div>
+</div>
+<!-- Amount Cards -->
+<div class="grid grid-cols-4 lg:grid-cols-8 gap-2 mb-4">
+${[{l:'Pending',v:s.pending,c:'amber'},{l:'SD',v:s.sd,c:'red'},{l:'LD',v:s.ld,c:'purple'},{l:'GST Hold',v:s.gst,c:'teal'},{l:'Instant',v:s.instant,c:'green'},{l:'Other',v:s.other,c:'pink'},{l:'Witheld',v:s.witheld,c:'orange'},{l:'Total',v:s.total,c:'blue',h:1}].map(c=>`
+<div class="${c.h?'bg-blue-600 text-white':'bg-white border'} rounded-lg p-2 text-center">
+<div class="text-[10px] ${c.h?'text-blue-100':'text-gray-500'}">${c.l}</div>
+<div class="text-xs font-bold ${c.h?'':'text-'+c.c+'-600'}">${fmt(c.v)}</div>
+</div>`).join('')}
+</div>
+<!-- Invoices Section -->
+<div class="bg-white rounded-lg border overflow-hidden">
+<div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b">
+<h4 class="text-sm font-semibold">📄 Invoices (${s.invoices.length})</h4>
+<button onclick="addInvoice(${s.id})" class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">+ Add Invoice</button>
+</div>
+${s.invoices.length===0?`
+<div class="p-8 text-center text-gray-400">
+<div class="text-3xl mb-2">📄</div>
+<p class="text-sm">No invoices yet. Click "Add Invoice" to add.</p>
+</div>
+`:`
+<table class="w-full text-sm">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-3 py-2 text-left text-xs font-semibold text-gray-500">#</th>
+<th class="px-3 py-2 text-left text-xs font-semibold text-gray-500">Invoice No.</th>
+<th class="px-3 py-2 text-left text-xs font-semibold text-gray-500">Date</th>
+<th class="px-3 py-2 text-left text-xs font-semibold text-gray-500">Description</th>
+<th class="px-3 py-2 text-right text-xs font-semibold text-gray-500">Amount</th>
+<th class="px-3 py-2 text-center text-xs font-semibold text-gray-500">Status</th>
+<th class="px-3 py-2 text-center text-xs font-semibold text-gray-500">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y">
+${s.invoices.map((inv,i)=>`
+<tr class="hover:bg-gray-50">
+<td class="px-3 py-2 text-gray-500">${i+1}</td>
+<td class="px-3 py-2 font-medium">${inv.no}</td>
+<td class="px-3 py-2 text-gray-600">${inv.date}</td>
+<td class="px-3 py-2 text-gray-600 max-w-[150px] truncate">${inv.desc||'-'}</td>
+<td class="px-3 py-2 text-right font-mono font-semibold">${fmt(inv.amount)}</td>
+<td class="px-3 py-2 text-center">
+<span class="px-2 py-0.5 rounded-full text-xs font-medium ${inv.status==='Paid'?'bg-green-100 text-green-700':inv.status==='Partial'?'bg-blue-100 text-blue-700':'bg-amber-100 text-amber-700'}">${inv.status}</span>
+</td>
+<td class="px-3 py-2 text-center">
+<button onclick="editInvoice(${s.id},'${inv.id}')" class="p-1 hover:bg-blue-100 rounded text-blue-600">✏️</button>
+<button onclick="deleteInvoice(${s.id},'${inv.id}')" class="p-1 hover:bg-red-100 rounded text-red-600">🗑️</button>
+</td>
+</tr>
+`).join('')}
+</tbody>
+<tfoot class="bg-gray-50 border-t">
+<tr>
+<td colspan="4" class="px-3 py-2 font-semibold text-gray-700">Total Invoices</td>
+<td class="px-3 py-2 text-right font-mono font-bold">${fmt(s.invoices.reduce((a,i)=>a+i.amount,0))}</td>
+<td colspan="2"></td>
+</tr>
+</tfoot>
+</table>
+`}
+</div>
+</div>
+</td>
+</tr>`;
+}
+function renderSettings(){
+  return`<div class="max-w-2xl space-y-5">
+<!-- Sync Settings -->
+<div class="bg-white rounded-xl border p-5">
+<h3 class="font-semibold mb-4">🔄 Data Sync Settings</h3>
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Pantry ID (Cross-Device Sync)</label>
+<p class="text-xs text-gray-500 mb-2">Free cloud storage. Get ID from <a href="https://getpantry.cloud" target="_blank" class="text-blue-600 underline">getpantry.cloud</a></p>
+<div class="flex gap-2">
+<input type="text" value="${data.pantryId}" onchange="data.pantryId=this.value;save()" placeholder="Enter Pantry ID..." class="flex-1 px-3 py-2 text-sm border rounded-lg">
+<button onclick="loadFromPantry()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">Load</button>
+<button onclick="syncToPantry();alert('Synced!')" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">Save</button>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Google API Key (Sheet Sync)</label>
+<p class="text-xs text-gray-500 mb-2">For reading/writing to Google Sheets directly</p>
+<input type="text" value="${data.googleApiKey}" onchange="data.googleApiKey=this.value;save()" placeholder="Enter Google API Key..." class="w-full px-3 py-2 text-sm border rounded-lg">
+</div>
+</div>
+</div>
+<!-- Data Management -->
+<div class="bg-white rounded-xl border p-5">
+<h3 class="font-semibold mb-4">💾 Data Management</h3>
+<div class="grid grid-cols-3 gap-3">
+<button onclick="exportJSON()" class="px-4 py-3 bg-green-50 text-green-700 text-sm font-medium rounded-lg hover:bg-green-100 border border-green-200">📥 Export JSON</button>
+<button onclick="importJSON()" class="px-4 py-3 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-100 border border-blue-200">📤 Import JSON</button>
+<button onclick="resetAll()" class="px-4 py-3 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100 border border-red-200">🔄 Reset All</button>
+</div>
+</div>
+<!-- Quick Stats -->
+<div class="bg-gray-50 rounded-xl border p-5">
+<h3 class="font-semibold mb-3">📊 Quick Stats</h3>
+<div class="grid grid-cols-3 gap-4 text-center">
+<div><div class="text-2xl font-bold text-blue-600">${data.sites.length}</div><div class="text-xs text-gray-500">Total Sites</div></div>
+<div><div class="text-2xl font-bold text-green-600">${data.sites.reduce((a,s)=>a+s.invoices.length,0)}</div><div class="text-xs text-gray-500">Total Invoices</div></div>
+<div><div class="text-2xl font-bold text-purple-600">${fmtS(sum('total'))}</div><div class="text-xs text-gray-500">Total Outstanding</div></div>
+</div>
+</div>
+</div>`;
+}
+// Actions
+window.editSite=(id)=>{
+  const s=data.sites.find(x=>x.id===id);if(!s)return;
+  const p=prompt('Pending Bill:',s.pending);if(p!==null)s.pending=parseFloat(p)||0;
+  const sd=prompt('SD Deduction:',s.sd);if(sd!==null)s.sd=parseFloat(sd)||0;
+  const ld=prompt('LD Deduction:',s.ld);if(ld!==null)s.ld=parseFloat(ld)||0;
+  const w=prompt('Witheld:',s.witheld);if(w!==null)s.witheld=parseFloat(w)||0;
+  const t=prompt('Total Outstanding:',s.total);if(t!==null)s.total=parseFloat(t)||0;
+  save();render();
 };
-
-function showSection(id){
-  document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
-  document.getElementById('section-'+id).classList.add('active');
-  document.getElementById('page-title').textContent = titles[id]||id;
-  event&&event.target&&event.target.classList.add('active');
-}
-
-// ======= EDITABLE CELLS =======
-function makeEditable(td){
-  if(td.querySelector('input'))return;
-  const val = td.textContent;
-  td.innerHTML = `<input class="inline-edit" value="${val}" onblur="saveEdit(this,'${val}')" onkeydown="if(event.key==='Enter')this.blur();" autofocus/>`;
-  td.querySelector('input').select();
-}
-
-function saveEdit(inp, old){
-  const td = inp.parentElement;
-  const nv = inp.value.trim()||old;
-  td.textContent = nv;
-  td.classList.add('editable-cell');
-  td.setAttribute('onclick','makeEditable(this)');
-  showNotif('Saved! Sync to Google Sheets to backup.');
-  saveToLocal();
-}
-
-function makeRowEditable(btn){
-  const tr = btn.closest('tr');
-  const editableCells = tr.querySelectorAll('td:not(:first-child):not(:last-child)');
-  if(btn.textContent==='Edit'){
-    editableCells.forEach(td=>{
-      const v = td.textContent;
-      td.innerHTML=`<input class="inline-edit" value="${v}" style="width:90px;"/>`;
-    });
-    btn.textContent='Save';
-    btn.style.background='var(--primary)';btn.style.color='#fff';
-  } else {
-    editableCells.forEach(td=>{
-      const inp = td.querySelector('input');
-      if(inp) td.textContent = inp.value;
-    });
-    btn.textContent='Edit';btn.style.background='';btn.style.color='';
-    showNotif('Row saved! Sync to backup.');
-    saveToLocal();
+window.addInvoice=(sid)=>{
+  const s=data.sites.find(x=>x.id===sid);if(!s)return;
+  const no=prompt('Invoice Number:');if(!no)return;
+  const date=prompt('Date (DD/MM/YYYY):');
+  const amount=parseFloat(prompt('Amount:'))||0;
+  const desc=prompt('Description:');
+  const status=prompt('Status (Pending/Paid/Partial):','Pending');
+  s.invoices.push({id:uid(),no,date:date||'',amount,desc:desc||'',status:status||'Pending'});
+  save();render();
+};
+window.editInvoice=(sid,iid)=>{
+  const s=data.sites.find(x=>x.id===sid);
+  const inv=s?.invoices.find(i=>i.id===iid);if(!inv)return;
+  const no=prompt('Invoice No:',inv.no);if(no!==null)inv.no=no;
+  const date=prompt('Date:',inv.date);if(date!==null)inv.date=date;
+  const amount=prompt('Amount:',inv.amount);if(amount!==null)inv.amount=parseFloat(amount)||0;
+  const desc=prompt('Description:',inv.desc);if(desc!==null)inv.desc=desc;
+  const status=prompt('Status (Pending/Paid/Partial):',inv.status);if(status!==null)inv.status=status;
+  save();render();
+};
+window.deleteInvoice=(sid,iid)=>{
+  if(!confirm('Delete this invoice?'))return;
+  const s=data.sites.find(x=>x.id===sid);
+  if(s){s.invoices=s.invoices.filter(i=>i.id!==iid);save();render()}
+};
+window.exportCSV=()=>{
+  const h='S.No,Project,PM,Pending,SD,LD,Witheld,Total,Invoices';
+  const r=data.sites.map(s=>[s.sno,`"${s.name}"`,s.pm,s.pending,s.sd,s.ld,s.witheld,s.total,s.invoices.length].join(','));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([[h,...r].join('\n')],{type:'text/csv'}));
+  a.download='vishal_electricals.csv';a.click();
+};
+window.exportJSON=()=>{
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+  a.download='vishal_electricals_backup.json';a.click();
+};
+window.importJSON=()=>{
+  const i=document.createElement('input');i.type='file';i.accept='.json';
+  i.onchange=e=>{
+    const r=new FileReader();
+    r.onload=ev=>{try{data=JSON.parse(ev.target.result);save();render();alert('Imported!')}catch{alert('Invalid file')}};
+    r.readAsText(e.target.files[0]);
+  };i.click();
+};
+window.resetAll=()=>{
+  if(confirm('Reset ALL data to default? This cannot be undone.')){
+    data={sites:JSON.parse(JSON.stringify(defaultSites)),pantryId:data.pantryId,googleApiKey:data.googleApiKey};
+    save();render();
   }
-}
-
-// ======= LOCAL STORAGE =======
-function saveToLocal(){
-  try{localStorage.setItem('ve_proj_data', JSON.stringify(projData));}catch(e){}
-}
-
-// ======= ADD ROW =======
-function showAddRow(){
-  const section = document.querySelector('.tab-section.active').id;
-  showNotif('To add a new row: use the table Edit buttons or paste data from Excel.');
-}
-
-// ======= EXPORT =======
-function exportCSV(){
-  const rows = [['Project','SD','LD','Instant','Other','Withheld','Total'],...projData.map(d=>[d.name,d.sd,d.ld,d.instant,d.other,d.withheld,d.total])];
-  const csv = rows.map(r=>r.join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download='vishal_electricals_outstanding.csv';
-  a.click();
-  showNotif('CSV exported successfully!');
-}
-
-// ======= NOTIFICATION =======
-function showNotif(msg){
-  const n = document.getElementById('notif');
-  n.textContent = msg;n.classList.add('show');
-  setTimeout(()=>n.classList.remove('show'),3000);
-}
-
-// ======= CHARTS =======
-function initCharts(){
-  const ageingCounts = {'180+ Days':0,'91-180 Days':0,'61-90 Days':0};
-  ageingData.forEach(d=>{if(ageingCounts[d.bucket]!==undefined)ageingCounts[d.bucket]+=d.amount;});
-
-  new Chart(document.getElementById('chartAgeing'),{
-    type:'bar',
-    data:{
-      labels:Object.keys(ageingCounts).map(k=>k),
-      datasets:[{
-        label:'Amount (₹)',
-        data:Object.values(ageingCounts).map(v=>Math.round(v/100000)/10),
-        backgroundColor:['#c62828','#e65100','#f9a825'],
-        borderRadius:6,borderSkipped:false,
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+c.parsed.y.toFixed(1)+' Lakh'}}},
-      scales:{y:{ticks:{callback:v=>v+'L'},grid:{color:'#f3f5f9'}},x:{grid:{display:false}}}
-    }
-  });
-
-  const ldTotal = projData.reduce((s,d)=>s+d.ld,0);
-  const sdTotal = projData.reduce((s,d)=>s+d.sd,0);
-  const wTotal = projData.reduce((s,d)=>s+d.withheld,0);
-  const oTotal = projData.reduce((s,d)=>s+d.other,0);
-  new Chart(document.getElementById('chartDeduction'),{
-    type:'doughnut',
-    data:{
-      labels:['LD Deduction','SD Deduction','Withheld','Other Deduction'],
-      datasets:[{data:[ldTotal,sdTotal,wTotal,oTotal].map(v=>Math.round(v/1000)),backgroundColor:['#e65100','#1565c0','#2e7d32','#7b1fa2'],borderWidth:0,hoverOffset:8}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,cutout:'60%',
-      plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:12}},
-        tooltip:{callbacks:{label:c=>c.label+': ₹'+c.parsed.toLocaleString('en-IN')+'K'}}}
-    }
-  });
-
-  const top10 = [...projData].sort((a,b)=>b.total-a.total).slice(0,10);
-  new Chart(document.getElementById('chartTop10'),{
-    type:'bar',
-    data:{
-      labels:top10.map(d=>d.name.replace('INDIAN OIL CORPORATION LTD','IOCL').replace('Indian Oil Corporation Ltd','IOCL').substring(0,35)),
-      datasets:[{
-        label:'Outstanding (₹)',
-        data:top10.map(d=>Math.round(d.total/100000)/10),
-        backgroundColor:'#1565c0',borderRadius:4,
-      }]
-    },
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+c.parsed.x.toFixed(1)+' Lakh'}}},
-      scales:{x:{ticks:{callback:v=>v+'L'},grid:{color:'#f3f5f9'}},y:{grid:{display:false},ticks:{font:{size:11}}}}
-    }
-  });
-}
-
-// ======= INIT =======
-window.onload=function(){initTables();initCharts();};
+};
+// Init
+render();
 </script>
 </body>
 </html>
