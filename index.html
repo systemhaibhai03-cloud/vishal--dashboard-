@@ -1,1260 +1,870 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Vishal Electricals — ERP Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vishal Electricals - Payment Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:14px;}
 :root{
-  --sb-w:260px;--sb-sm:64px;
-  --primary:#4f46e5;--primary-l:#6366f1;
-  --bg:#f7f8fc;--card:#fff;--border:#eef0f4;
+  --primary:#1565c0;--primary-light:#e3f0ff;--primary-dark:#0d47a1;
+  --sidebar-bg:#fff;--sidebar-width:240px;
+  --accent:#0288d1;--success:#2e7d32;--warning:#e65100;--danger:#c62828;
+  --border:#e0e6f0;--card-bg:#fff;--text-muted:#6b7a99;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:#1e293b;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:9px}
-::-webkit-scrollbar-thumb:hover{background:#9ca3af}
+.layout{display:flex;min-height:100vh;}
 
-/* ─ sidebar ─ */
-.sb{position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);background:#fff;border-right:1px solid var(--border);z-index:50;display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1),transform .22s cubic-bezier(.4,0,.2,1)}
-.sb.col{width:var(--sb-sm)}
-.sb.col .sb-label,.sb.col .sb-head-text,.sb.col .sb-search,.sb.col .sb-footer-text,.sb.col .sb-section-title{display:none!important}
-@media(max-width:767px){.sb{transform:translateX(-100%);width:280px}.sb.mob{transform:translateX(0);box-shadow:0 0 60px rgba(0,0,0,.12)}}
-.sb-link{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:2px 8px;border-radius:10px;font-size:13px;font-weight:500;color:#64748b;cursor:pointer;transition:all .12s;white-space:nowrap;overflow:hidden;border:1px solid transparent;background:none;width:calc(100% - 16px);text-align:left}
-.sb-link:hover{background:#f1f5f9;color:#334155}
-.sb-link.on{background:#eef2ff;color:var(--primary);border-color:#e0e7ff;font-weight:600}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-width);background:var(--sidebar-bg);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;display:flex;flex-direction:column;}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);}
+.logo-text{font-size:16px;font-weight:700;color:var(--primary);letter-spacing:-0.3px;}
+.logo-sub{font-size:10px;color:var(--text-muted);font-weight:400;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;}
+.sidebar-section{padding:12px 0;}
+.sidebar-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);padding:6px 20px 4px;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;color:#374161;font-size:13px;font-weight:500;border-left:3px solid transparent;transition:all 0.15s;text-decoration:none;}
+.sidebar-item:hover{background:#f5f8ff;color:var(--primary);}
+.sidebar-item.active{background:var(--primary-light);color:var(--primary);border-left:3px solid var(--primary);}
+.sidebar-item .dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.sidebar-item.active .dot{background:var(--primary);}
+.sidebar-item .badge{margin-left:auto;background:#e3f0ff;color:var(--primary);font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;}
 
-/* ─ overlay ─ */
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.22);z-index:40;opacity:0;pointer-events:none;transition:opacity .22s}
-.ov.on{opacity:1;pointer-events:auto}
+/* MAIN */
+.main{margin-left:var(--sidebar-width);flex:1;min-width:0;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:15px;font-weight:600;color:#1a1a2e;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.topbar-date{font-size:12px;color:var(--text-muted);background:#f5f7fa;padding:5px 12px;border-radius:20px;border:1px solid var(--border);}
+.btn{padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:12px;font-weight:500;cursor:pointer;color:#374161;transition:all 0.15s;}
+.btn:hover{background:#f5f8ff;border-color:var(--primary);color:var(--primary);}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+.btn-primary:hover{background:var(--primary-dark);color:#fff;}
 
-/* ─ main ─ */
-.mn{margin-left:var(--sb-w);min-height:100vh;transition:margin-left .22s cubic-bezier(.4,0,.2,1)}
-.mn.col{margin-left:var(--sb-sm)}
-@media(max-width:767px){.mn{margin-left:0!important;padding-top:56px}}
+/* CONTENT */
+.content{padding:24px 28px;}
 
-/* ─ card ─ */
-.cd{background:#fff;border:1px solid var(--border);border-radius:14px;transition:box-shadow .2s,transform .2s}
-.cd:hover{box-shadow:0 4px 20px rgba(0,0,0,.05)}
-.cd-lift:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.07)}
+/* TABS */
+.tab-nav{display:flex;gap:2px;margin-bottom:24px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:4px;width:fit-content;}
+.tab-btn{padding:7px 18px;border-radius:6px;border:none;background:transparent;font-size:12px;font-weight:500;cursor:pointer;color:var(--text-muted);transition:all 0.15s;}
+.tab-btn.active{background:var(--primary);color:#fff;}
+.tab-btn:hover:not(.active){background:#f5f8ff;color:var(--primary);}
 
-/* ─ stat 3d ─ */
-.st3d{transition:transform .3s,box-shadow .3s}
-.st3d:hover{transform:perspective(800px) rotateY(-2deg) rotateX(2deg) translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.06)}
+/* SECTIONS */
+.tab-section{display:none;}
+.tab-section.active{display:block;}
 
-/* ─ table ─ */
-.tb{width:100%;border-collapse:separate;border-spacing:0}
-.tb thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#64748b;background:#f8fafc;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;white-space:nowrap}
-.tb tbody td{padding:9px 14px;font-size:13px;color:#475569;border-bottom:1px solid #f5f6f8;white-space:nowrap}
-.tb tbody tr:hover{background:#fafbfe}
-.tb tbody tr.ptr{cursor:pointer}
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent-color,var(--primary));}
+.stat-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;}
+.stat-value{font-size:22px;font-weight:700;color:#1a1a2e;line-height:1;}
+.stat-sub{font-size:11px;color:var(--text-muted);margin-top:6px;}
+.stat-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;margin-top:8px;}
+.badge-danger{background:#fdecea;color:var(--danger);}
+.badge-warning{background:#fff3e0;color:var(--warning);}
+.badge-success{background:#e8f5e9;color:var(--success);}
 
-/* ─ badge ─ */
-.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;line-height:1.6}
+/* TABLE */
+.table-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px;}
+.table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.table-title{font-size:13px;font-weight:600;color:#1a1a2e;}
+.table-search{display:flex;align-items:center;gap:8px;}
+.search-input{padding:6px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;width:200px;}
+.search-input:focus{border-color:var(--primary);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:#f8f9fb;}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:11px 16px;font-size:12.5px;border-bottom:1px solid #f3f5f9;color:#374161;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#f8faff;}
+.amount{font-weight:600;font-family:'Inter',monospace;}
+.amount-danger{color:var(--danger);}
+.amount-warning{color:var(--warning);}
+.amount-success{color:var(--success);}
+.bucket-pill{display:inline-block;font-size:10px;font-weight:600;padding:2px 9px;border-radius:12px;white-space:nowrap;}
+.bucket-180{background:#fdecea;color:#c62828;}
+.bucket-91{background:#fff3e0;color:#e65100;}
+.bucket-61{background:#fff8e1;color:#f9a825;}
+.bucket-lt60{background:#e8f5e9;color:#2e7d32;}
 
-/* ─ tab pill ─ */
-.tp{padding:7px 16px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;border:1px solid transparent;color:#64748b;background:none}
-.tp:hover{background:#f1f5f9;color:#334155}
-.tp.on{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(79,70,229,.22)}
+/* EDITABLE ROWS */
+.edit-btn{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;transition:all 0.15s;}
+.edit-btn:hover{border-color:var(--primary);color:var(--primary);}
+.editable-cell{cursor:pointer;border-bottom:1px dashed transparent;}
+.editable-cell:hover{border-bottom:1px dashed var(--primary);color:var(--primary);}
+input.inline-edit{width:100%;border:none;border-bottom:2px solid var(--primary);background:transparent;font-size:12.5px;font-family:'Inter',sans-serif;outline:none;padding:1px 0;color:#374161;}
 
-/* ─ skeleton ─ */
-.sk{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shi 1.3s infinite;border-radius:8px;display:block}
-@keyframes shi{0%{background-position:-200% 0}100%{background-position:200% 0}}
+/* CHART CARD */
+.chart-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:24px;}
+.chart-title{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:16px;}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
 
-/* ─ modal ─ */
-.md-bg{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);padding:16px}
-.md-box{background:#fff;border-radius:16px;max-width:880px;width:100%;max-height:88vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.12);animation:mdUp .22s ease}
-@keyframes mdUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* AGEING BARS */
+.ageing-bar-container{display:flex;align-items:center;gap:8px;}
+.ageing-bar{height:8px;border-radius:4px;min-width:4px;transition:width 0.3s;}
 
-/* ─ login ─ */
-.login-bg{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eef2ff 0%,#f8fafc 50%,#e0f2fe 100%)}
+/* PROJECT DETAIL */
+.project-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.back-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
+.back-btn:hover{border-color:var(--primary);color:var(--primary);}
+.project-title{font-size:16px;font-weight:600;}
 
-/* ─ form inputs ─ */
-.fi{width:100%;padding:9px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border .15s,box-shadow .15s;background:#fff;color:#1e293b}
-.fi:focus{border-color:var(--primary-l);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+/* GOOGLE SHEETS BTN */
+.gs-btn{display:flex;align-items:center;gap:6px;background:#34a853;color:#fff;border:none;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;}
+.gs-btn:hover{background:#2e7d32;}
 
-/* ─ btn ─ */
-.btn-primary{padding:9px 20px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;box-shadow:0 2px 8px rgba(79,70,229,.3)}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(79,70,229,.4)}
-.btn-ghost{padding:8px 14px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s}
-.btn-ghost:hover{background:#e2e8f0;color:#334155}
+/* SUMMARY RIBBON */
+.summary-ribbon{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px;}
+.ribbon-item{background:#fff;padding:14px 16px;text-align:center;}
+.ribbon-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:4px;}
+.ribbon-value{font-size:16px;font-weight:700;color:#1a1a2e;}
 
-/* ─ section ─ */
-.page{padding:24px;display:none;animation:mdUp .2s ease}
-.page.active{display:block}
-@media(max-width:768px){.page{padding:14px}}
+/* NOTIFICATION */
+.notification{position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:#fff;padding:12px 20px;border-radius:8px;font-size:12px;z-index:999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none;}
+.notification.show{opacity:1;transform:translateY(0);}
 
-/* ─ grid utilities ─ */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.g6{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
-@media(max-width:1200px){.g6{grid-template-columns:repeat(4,1fr)}.g4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:900px){.g6{grid-template-columns:repeat(3,1fr)}.g3{grid-template-columns:1fr 1fr}}
-@media(max-width:640px){.g6{grid-template-columns:1fr 1fr}.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr 1fr}}
-@media(max-width:420px){.g3{grid-template-columns:1fr}.g2{grid-template-columns:1fr}}
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border);}
+.pagination-info{font-size:12px;color:var(--text-muted);}
+.pagination-btns{display:flex;gap:4px;}
+.page-btn{padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;font-size:12px;cursor:pointer;color:#374161;}
+.page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.page-btn:hover:not(.active){background:#f5f8ff;}
 
-/* ─ progress ─ */
-.prog-bar{width:100%;height:6px;background:#f1f5f9;border-radius:9px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(to right,#4f46e5,#7c3aed);border-radius:9px;transition:width .6s ease}
-
-/* ─ toast ─ */
-.toast{position:fixed;bottom:24px;right:24px;z-index:200;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.1);animation:mdUp .3s ease;background:#1e293b;color:#fff}
-
-/* ─ edit cell ─ */
-.ec{cursor:pointer}
-.ec:hover{background:#eef2ff;border-radius:4px}
+/* RESPONSIVE */
+@media(max-width:1200px){.stats-grid{grid-template-columns:repeat(2,1fr);}.charts-row{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<!-- OVERLAY -->
-<div class="ov" id="overlay" onclick="closeSidebar()"></div>
-
+<div class="layout">
 <!-- SIDEBAR -->
-<aside class="sb" id="sidebar">
-  <div style="display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--border);flex-shrink:0">
-    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;flex-shrink:0;box-shadow:0 2px 8px rgba(79,70,229,.3)">VE</div>
-    <div class="sb-head-text" style="min-width:0;flex:1">
-      <p style="font-size:13px;font-weight:700;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Vishal Electricals</p>
-      <p style="font-size:10px;color:#94a3b8">ERP Dashboard</p>
-    </div>
-    <button onclick="toggleCollapse()" style="color:#94a3b8;border:none;background:none;cursor:pointer;padding:4px;border-radius:8px;display:none" id="collapseBtn" class="md-only">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path id="collapseIcon" d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <button onclick="closeSidebar()" style="color:#94a3b8;border:none;background:none;cursor:pointer;padding:4px" class="mob-only">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">VE Finance</div>
+    <div class="logo-sub">Vishal Electricals</div>
   </div>
 
-  <div style="flex:1;overflow-y:auto;padding:8px 0">
-    <p class="sb-section-title" style="padding:12px 20px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#cbd5e1;font-weight:700">Navigation</p>
-    <button class="sb-link on" id="nav-dashboard" onclick="navTo('dashboard')">
-      <span style="font-size:16px;flex-shrink:0">📊</span><span class="sb-label">Dashboard</span>
-    </button>
-    <button class="sb-link" id="nav-account" onclick="navTo('account')">
-      <span style="font-size:16px;flex-shrink:0">💰</span><span class="sb-label">Account</span>
-    </button>
-    <button class="sb-link" id="nav-project" onclick="navTo('project')">
-      <span style="font-size:16px;flex-shrink:0">📋</span><span class="sb-label">Projects</span>
-    </button>
-    <button class="sb-link" id="nav-crm" onclick="navTo('crm')">
-      <span style="font-size:16px;flex-shrink:0">🤝</span><span class="sb-label">CRM</span>
-    </button>
-    <button class="sb-link" id="nav-history" onclick="navTo('history')">
-      <span style="font-size:16px;flex-shrink:0">🕑</span><span class="sb-label">Change History</span>
-    </button>
-    <button class="sb-link" id="nav-settings" onclick="navTo('settings')">
-      <span style="font-size:16px;flex-shrink:0">⚙️</span><span class="sb-label">Settings</span>
-    </button>
-
-    <div class="sb-section-title" style="margin-top:8px">
-      <button class="sb-link" onclick="toggleSheets()" id="sheets-toggle">
-        <span style="font-size:16px;flex-shrink:0">📑</span>
-        <span class="sb-label" style="flex:1">Google Sheets</span>
-        <svg id="sheets-chevron" style="width:14px;height:14px;color:#cbd5e1;transition:transform .2s;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div id="sheets-panel" style="display:none;padding:0 8px">
-        <div style="padding:6px 8px">
-          <input id="sheet-search" oninput="filterSheets()" placeholder="Search sheets…" class="fi" style="font-size:12px;padding:7px 12px"/>
-        </div>
-        <div style="display:flex;gap:4px;padding:0 8px 6px;flex-wrap:wrap" id="cat-filters"></div>
-        <div id="sheets-list" style="max-height:240px;overflow-y:auto"></div>
-      </div>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Overview</div>
+    <a class="sidebar-item active" onclick="showSection('dashboard')">
+      <span class="dot"></span> Dashboard
+    </a>
+    <a class="sidebar-item" onclick="showSection('summary')">
+      <span class="dot"></span> Summary <span class="badge">43</span>
+    </a>
   </div>
 
-  <div style="border-top:1px solid var(--border);padding:12px;flex-shrink:0" id="sb-footer">
-    <div style="display:flex;align-items:center;gap:10px">
-      <div id="user-avatar" style="width:32px;height:32px;border-radius:8px;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">A</div>
-      <div class="sb-footer-text" style="min-width:0;flex:1">
-        <p id="user-name" style="font-size:12px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Admin</p>
-        <p id="user-dept" style="font-size:10px;color:#94a3b8">Admin</p>
-      </div>
-      <button class="sb-footer-text" onclick="logout()" style="padding:6px;border-radius:8px;border:none;background:none;cursor:pointer;color:#94a3b8;transition:all .12s" title="Logout">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-      </button>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Receivables</div>
+    <a class="sidebar-item" onclick="showSection('ageing')">
+      <span class="dot"></span> Ageing Analysis
+    </a>
+    <a class="sidebar-item" onclick="showSection('projects')">
+      <span class="dot"></span> Project-wise OS <span class="badge">43</span>
+    </a>
+    <a class="sidebar-item" onclick="showSection('emd')">
+      <span class="dot"></span> EMD Tracker
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Revenue</div>
+    <a class="sidebar-item" onclick="showSection('revenue_ve')">
+      <span class="dot"></span> VE Revenue 26-27
+    </a>
+    <a class="sidebar-item" onclick="showSection('revenue_vtpl')">
+      <span class="dot"></span> VTPL Revenue 26-27
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Finance</div>
+    <a class="sidebar-item" onclick="showSection('weekly')">
+      <span class="dot"></span> Weekly Review
+    </a>
+  </div>
+
+  <div style="margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);">
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">Google Sheets Backup</div>
+    <button class="gs-btn" onclick="showNotif('Enter your Google Sheets API key in settings to enable backup.')">
+      &#x1F4CA; Connect Sheets
+    </button>
+    <div style="margin-top:10px;">
+      <input id="sheets-api" placeholder="Paste Sheets API URL..." style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;outline:none;"/>
     </div>
   </div>
 </aside>
 
-<!-- MOBILE HEADER -->
-<header id="mob-header" style="display:none;position:fixed;top:0;left:0;right:0;z-index:30;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 16px;align-items:center;justify-content:space-between">
-  <div style="display:flex;align-items:center;gap:10px">
-    <button onclick="openSidebar()" style="width:36px;height:36px;border-radius:10px;background:#f1f5f9;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#64748b">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:10px">VE</div>
-      <div>
-        <p id="mob-title" style="font-size:13px;font-weight:700;color:#1e293b">Dashboard</p>
-        <p style="font-size:10px;color:#94a3b8">Vishal Electricals</p>
-      </div>
-    </div>
-  </div>
-  <div id="mob-avatar" style="width:28px;height:28px;border-radius:8px;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">A</div>
-</header>
-
 <!-- MAIN -->
-<main class="mn" id="main">
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Dashboard Overview</div>
+    <div class="topbar-right">
+      <span class="topbar-date">As on: May 21, 2026</span>
+      <button class="btn" onclick="exportCSV()">&#8595; Export CSV</button>
+      <button class="btn btn-primary" onclick="showAddRow()">+ Add Record</button>
+    </div>
+  </div>
 
-  <!-- LOGIN PAGE -->
-  <div id="login-page" class="login-bg" style="display:none;min-height:100vh">
-    <div style="width:100%;max-width:420px;padding:16px">
-      <div class="cd" style="padding:32px;box-shadow:0 20px 60px rgba(79,70,229,.1)">
-        <div style="text-align:center;margin-bottom:28px">
-          <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#4f46e5,#7c3aed);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:900;box-shadow:0 8px 24px rgba(79,70,229,.35)">VE</div>
-          <h1 style="font-size:22px;font-weight:800;color:#1e293b">Vishal Electricals</h1>
-          <p style="font-size:13px;color:#94a3b8;margin-top:4px">ERP Dashboard — Sign In</p>
+  <div class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div id="section-dashboard" class="tab-section active">
+      <div class="stats-grid">
+        <div class="stat-card" style="--accent-color:#c62828;">
+          <div class="stat-label">Total Outstanding</div>
+          <div class="stat-value">₹5.09 Cr</div>
+          <div class="stat-sub">Across 43 projects</div>
+          <span class="stat-badge badge-danger">High Priority</span>
         </div>
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div>
-            <label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Email</label>
-            <input id="login-email" type="email" placeholder="admin@ve.com" class="fi"/>
+        <div class="stat-card" style="--accent-color:#e65100;">
+          <div class="stat-label">LD Deductions</div>
+          <div class="stat-value">₹1.59 Cr</div>
+          <div class="stat-sub">Total LD held</div>
+          <span class="stat-badge badge-warning">Recoverable</span>
+        </div>
+        <div class="stat-card" style="--accent-color:#0288d1;">
+          <div class="stat-label">SD Deductions</div>
+          <div class="stat-value">₹1.06 Cr</div>
+          <div class="stat-sub">Security deposit held</div>
+          <span class="stat-badge badge-warning">Refundable</span>
+        </div>
+        <div class="stat-card" style="--accent-color:#2e7d32;">
+          <div class="stat-label">Withheld (Comm.)</div>
+          <div class="stat-value">₹0.76 Cr</div>
+          <div class="stat-sub">Commercial withheld</div>
+          <span class="stat-badge badge-success">In Process</span>
+        </div>
+      </div>
+
+      <div class="summary-ribbon">
+        <div class="ribbon-item"><div class="ribbon-label">180+ Days</div><div class="ribbon-value" style="color:#c62828;">₹3.65 Cr</div></div>
+        <div class="ribbon-item"><div class="ribbon-label">91-180 Days</div><div class="ribbon-value" style="color:#e65100;">₹1.15 Cr</div></div>
+        <div class="ribbon-item"><div class="ribbon-label">61-90 Days</div><div class="ribbon-value" style="color:#f9a825;">₹0.39 Cr</div></div>
+        <div class="ribbon-item"><div class="ribbon-label">Other Deductions</div><div class="ribbon-value" style="color:#2e7d32;">₹0.13 Cr</div></div>
+        <div class="ribbon-item"><div class="ribbon-label">Instant Release</div><div class="ribbon-value" style="color:#1565c0;">₹0.01 Cr</div></div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Outstanding by Ageing Bucket</div>
+          <div style="position:relative;height:260px;">
+            <canvas id="chartAgeing" role="img" aria-label="Bar chart of outstanding amounts by ageing bucket"></canvas>
           </div>
-          <div>
-            <label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Password</label>
-            <div style="position:relative">
-              <input id="login-pw" type="password" placeholder="••••••" class="fi" style="padding-right:40px"/>
-              <button onclick="togglePw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;font-size:14px" id="pw-eye">👁️</button>
-            </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Deduction Type Breakdown</div>
+          <div style="position:relative;height:260px;">
+            <canvas id="chartDeduction" role="img" aria-label="Doughnut chart of deduction types"></canvas>
           </div>
-          <div id="login-err" style="display:none;background:#fef2f2;color:#dc2626;font-size:12px;font-weight:500;padding:10px 14px;border-radius:10px;border:1px solid #fecaca"></div>
-          <button class="btn-primary" onclick="doLogin()" style="width:100%;padding:12px">Sign In</button>
-        </div>
-        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
-          <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:10px">Demo Accounts</p>
-          <div id="demo-accounts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- DASHBOARD PAGE -->
-  <div id="page-dashboard" class="page active" style="padding:24px">
-    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:20px">
-      <div>
-        <h1 style="font-size:26px;font-weight:800;color:#1e293b">Dashboard</h1>
-        <p style="font-size:13px;color:#94a3b8;margin-top:2px">Overview of all operations • <span id="sheet-count">46</span> project sheets</p>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#22c55e;font-weight:600">
-        <span style="width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite"></span> Live Data
-      </div>
-    </div>
-    <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}</style>
-
-    <!-- KPI Cards -->
-    <div class="g6" style="margin-bottom:20px" id="kpi-cards">
-      <div class="cd st3d" style="padding:16px;border:1px solid #dbeafe;background:#eff6ff"><p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Total Invoiced</p><p style="font-size:20px;font-weight:800;color:#2563eb;margin-top:4px;font-family:'DM Mono',monospace" id="kpi-invoice"><span class="sk" style="width:80px;height:22px"></span></p><span style="font-size:18px">📄</span></div>
-      <div class="cd st3d" style="padding:16px;border:1px solid #dcfce7;background:#f0fdf4"><p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Total Received</p><p style="font-size:20px;font-weight:800;color:#16a34a;margin-top:4px;font-family:'DM Mono',monospace" id="kpi-received"><span class="sk" style="width:80px;height:22px"></span></p><span style="font-size:18px">✅</span></div>
-      <div class="cd st3d" style="padding:16px;border:1px solid #fef9c3;background:#fefce8"><p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Pending</p><p style="font-size:20px;font-weight:800;color:#d97706;margin-top:4px;font-family:'DM Mono',monospace" id="kpi-pending"><span class="sk" style="width:80px;height:22px"></span></p><span style="font-size:18px">⏳</span></div>
-      <div class="cd st3d" style="padding:16px;border:1px solid #ede9fe;background:#f5f3ff"><p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Collection Rate</p><p style="font-size:20px;font-weight:800;color:#7c3aed;margin-top:4px;font-family:'DM Mono',monospace" id="kpi-rate"><span class="sk" style="width:60px;height:22px"></span></p><span style="font-size:18px">📈</span></div>
-      <div class="cd st3d" style="padding:16px;border:1px solid #d1fae5;background:#ecfdf5"><p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Won Deals</p><p style="font-size:20px;font-weight:800;color:#059669;margin-top:4px;font-family:'DM Mono',monospace" id="kpi-won">—</p><span style="font-size:18px">🏆</span></div>
-      <div class="cd st3d" style="padding:16px;border:1px solid #e0f2fe;background:#f0f9ff"><p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Active Projects</p><p style="font-size:20px;font-weight:800;color:#0284c7;margin-top:4px;font-family:'DM Mono',monospace" id="kpi-active">—</p><span style="font-size:18px">🚧</span></div>
-    </div>
-
-    <!-- Activity + Pipeline -->
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px">
-      <div class="cd" style="padding:20px">
-        <h3 style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:12px">Recent Activity</h3>
-        <div id="activity-list" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:4px"></div>
-      </div>
-      <div class="cd" style="padding:20px">
-        <h3 style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:12px">Lead Pipeline</h3>
-        <div id="pipeline-summary" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div class="chart-card">
+        <div class="chart-title">Top 10 Projects by Outstanding Amount</div>
+        <div style="position:relative;height:320px;">
+          <canvas id="chartTop10" role="img" aria-label="Horizontal bar chart of top 10 outstanding projects"></canvas>
+        </div>
       </div>
     </div>
 
-    <!-- Category Filters + Sheet Cards -->
-    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px" id="dash-cats"></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px" id="sheet-cards"></div>
-  </div>
-
-  <!-- ACCOUNT PAGE -->
-  <div id="page-account" class="page" style="padding:24px">
-    <h1 style="font-size:24px;font-weight:800;color:#1e293b;margin-bottom:4px">Account</h1>
-    <p style="font-size:13px;color:#94a3b8;margin-bottom:20px">Billing & financial sheets</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px" id="account-cards"></div>
-  </div>
-
-  <!-- PROJECTS PAGE -->
-  <div id="page-project" class="page" style="padding:24px">
-    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:20px">
-      <div>
-        <h1 style="font-size:24px;font-weight:800;color:#1e293b">Projects</h1>
-        <p style="font-size:13px;color:#94a3b8;margin-top:2px" id="proj-subtitle">6 projects</p>
+    <!-- ===== AGEING ANALYSIS ===== -->
+    <div id="section-ageing" class="tab-section">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Ageing Analysis – All Projects</div>
+          <div class="table-search">
+            <input class="search-input" placeholder="Search project..." oninput="filterTable('ageing-tbl',this.value)">
+            <button class="btn" onclick="filterBucket('ageing-tbl','')">All</button>
+            <button class="btn" onclick="filterBucket('ageing-tbl','180+')">180+ Days</button>
+            <button class="btn" onclick="filterBucket('ageing-tbl','91-')">91-180</button>
+            <button class="btn" onclick="filterBucket('ageing-tbl','61-')">61-90</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+        <table id="ageing-tbl">
+          <thead><tr>
+            <th>S.No</th><th>Project / Site Name</th><th>Column</th><th>Amount (₹)</th>
+            <th>Oldest Invoice Date</th><th>Ageing Days</th><th>Avg Days</th><th>Bucket</th><th>Action</th>
+          </tr></thead>
+          <tbody id="ageing-tbody"></tbody>
+        </table>
+        </div>
+        <div class="pagination">
+          <div class="pagination-info" id="ageing-info"></div>
+          <div class="pagination-btns" id="ageing-pages"></div>
+        </div>
       </div>
-      <button class="btn-primary" onclick="addProject()">+ Add Project</button>
     </div>
-    <div class="g4" style="margin-bottom:16px" id="proj-kpis"></div>
-    <div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:16px" id="proj-filters"></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px" id="proj-cards"></div>
-  </div>
 
-  <!-- CRM PAGE -->
-  <div id="page-crm" class="page" style="padding:24px">
-    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:20px">
-      <div>
-        <h1 style="font-size:24px;font-weight:800;color:#1e293b">CRM Dashboard</h1>
-        <p style="font-size:13px;color:#94a3b8;margin-top:2px" id="crm-subtitle">6 leads</p>
+    <!-- ===== PROJECTS ===== -->
+    <div id="section-projects" class="tab-section">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Project-wise Outstanding Summary</div>
+          <div class="table-search">
+            <input class="search-input" placeholder="Search project..." oninput="filterTable('proj-tbl',this.value)">
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+        <table id="proj-tbl">
+          <thead><tr>
+            <th>#</th><th>Project / Site Name</th><th>SD Deduction (₹)</th><th>LD Deduction (₹)</th>
+            <th>Instant Release (₹)</th><th>Other Deduction (₹)</th><th>Withheld (₹)</th><th>Total Outstanding (₹)</th><th>Action</th>
+          </tr></thead>
+          <tbody id="proj-tbody"></tbody>
+        </table>
+        </div>
+        <div class="pagination">
+          <div class="pagination-info" id="proj-info"></div>
+          <div class="pagination-btns" id="proj-pages"></div>
+        </div>
       </div>
-      <button class="btn-primary" onclick="addLead()">+ Add Lead</button>
     </div>
-    <div class="g4" style="margin-bottom:16px" id="crm-kpis"></div>
-    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px" id="crm-filters"></div>
-    <div id="crm-pipeline" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px"></div>
-  </div>
 
-  <!-- HISTORY PAGE -->
-  <div id="page-history" class="page" style="padding:24px">
-    <h1 style="font-size:24px;font-weight:800;color:#1e293b;margin-bottom:4px">Change History</h1>
-    <p style="font-size:13px;color:#94a3b8;margin-bottom:20px">Audit log of all actions</p>
-    <div class="cd" style="overflow:hidden">
-      <div style="overflow-x:auto">
-        <table class="tb">
-          <thead><tr><th>Action</th><th>Detail</th><th>User</th><th>Department</th><th>Time</th></tr></thead>
-          <tbody id="history-tbody"></tbody>
+    <!-- ===== SUMMARY ===== -->
+    <div id="section-summary" class="tab-section">
+      <div class="stats-grid">
+        <div class="stat-card" style="--accent-color:#c62828;">
+          <div class="stat-label">Grand Total Outstanding</div>
+          <div class="stat-value">₹5.09 Cr</div>
+          <div class="stat-sub">All projects combined</div>
+        </div>
+        <div class="stat-card" style="--accent-color:#0288d1;">
+          <div class="stat-label">LD (Refundable)</div>
+          <div class="stat-value">₹1.59 Cr</div>
+          <div class="stat-sub">Pending recovery</div>
+        </div>
+        <div class="stat-card" style="--accent-color:#e65100;">
+          <div class="stat-label">SD Deduction</div>
+          <div class="stat-value">₹1.06 Cr</div>
+          <div class="stat-sub">Security deposits</div>
+        </div>
+        <div class="stat-card" style="--accent-color:#2e7d32;">
+          <div class="stat-label">Withheld for Comm.</div>
+          <div class="stat-value">₹0.76 Cr</div>
+          <div class="stat-sub">Commercial hold</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Payment Breakup Summary – All Projects</div>
+          <div class="table-search"><input class="search-input" placeholder="Search..." oninput="filterTable('summ-tbl',this.value)"></div>
+        </div>
+        <div style="overflow-x:auto;">
+        <table id="summ-tbl">
+          <thead><tr>
+            <th>#</th><th>Project / Site Name</th><th>LD Deduction (₹)</th><th>SD Deduction (₹)</th>
+            <th>GST Hold (₹)</th><th>Instant Release (₹)</th><th>Other Deduction (₹)</th><th>Withheld (₹)</th><th>Total OS (₹)</th><th>Action</th>
+          </tr></thead>
+          <tbody id="summ-tbody"></tbody>
+        </table>
+        </div>
+        <div class="pagination">
+          <div class="pagination-info" id="summ-info"></div>
+          <div class="pagination-btns" id="summ-pages"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== REVENUE VE ===== -->
+    <div id="section-revenue_ve" class="tab-section">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">VE Revenue 26-27 – Invoice Register</div>
+          <div class="table-search"><input class="search-input" placeholder="Search..." oninput="filterTable('ve-tbl',this.value)"></div>
+        </div>
+        <div style="overflow-x:auto;">
+        <table id="ve-tbl">
+          <thead><tr>
+            <th>#</th><th>Invoice Date</th><th>Invoice No.</th><th>Party Name</th>
+            <th>Taxable Value (₹)</th><th>IGST (₹)</th><th>CGST (₹)</th><th>SGST (₹)</th>
+            <th>Total Invoice (₹)</th><th>Month</th><th>Action</th>
+          </tr></thead>
+          <tbody id="ve-tbody"></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== REVENUE VTPL ===== -->
+    <div id="section-revenue_vtpl" class="tab-section">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">VTPL Revenue 26-27 – Invoice Register</div>
+          <div class="table-search"><input class="search-input" placeholder="Search..." oninput="filterTable('vtpl-tbl',this.value)"></div>
+        </div>
+        <div style="overflow-x:auto;">
+        <table id="vtpl-tbl">
+          <thead><tr>
+            <th>#</th><th>Invoice Date</th><th>Invoice No.</th><th>Party Name</th>
+            <th>Taxable Value (₹)</th><th>IGST (₹)</th><th>CGST (₹)</th><th>SGST (₹)</th>
+            <th>Total Invoice (₹)</th><th>Month</th><th>Action</th>
+          </tr></thead>
+          <tbody id="vtpl-tbody"></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EMD ===== -->
+    <div id="section-emd" class="tab-section">
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card" style="--accent-color:#c62828;">
+          <div class="stat-label">LIC Ghaziabad</div>
+          <div class="stat-value">EMD Due</div>
+          <div class="stat-sub">Status: Pending</div>
+        </div>
+        <div class="stat-card" style="--accent-color:#e65100;">
+          <div class="stat-label">IOCL Vizag</div>
+          <div class="stat-value">EMD Due</div>
+          <div class="stat-sub">Status: Pending</div>
+        </div>
+        <div class="stat-card" style="--accent-color:#0288d1;">
+          <div class="stat-label">IOCL Bathinda</div>
+          <div class="stat-value">EMD Due</div>
+          <div class="stat-sub">Status: Pending</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">EMD Tracker</div></div>
+        <table>
+          <thead><tr><th>#</th><th>Debtors Name</th><th>Status</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>LIC Ghaziabad</td><td><span class="bucket-pill bucket-180">Due</span></td><td>–</td></tr>
+            <tr><td>2</td><td>IOCL Vizag</td><td><span class="bucket-pill bucket-180">Due</span></td><td>–</td></tr>
+            <tr><td>3</td><td>IOCL Bathinda</td><td><span class="bucket-pill bucket-91">Pending</span></td><td>–</td></tr>
+            <tr><td>4</td><td>IOCL-Chandigarh VTPL</td><td><span class="bucket-pill bucket-91">Pending</span></td><td>–</td></tr>
+            <tr><td>5</td><td>IOCL Sangrur DO</td><td><span class="bucket-pill bucket-lt60">In Process</span></td><td>–</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
-  </div>
 
-  <!-- SETTINGS PAGE -->
-  <div id="page-settings" class="page" style="padding:24px">
-    <h1 style="font-size:24px;font-weight:800;color:#1e293b;margin-bottom:4px">Settings</h1>
-    <p style="font-size:13px;color:#94a3b8;margin-bottom:24px">Manage users and departments</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <div class="cd" style="padding:20px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <h3 style="font-size:14px;font-weight:700;color:#1e293b">Users</h3>
-          <button class="btn-primary" style="padding:6px 14px;font-size:12px" onclick="addUser()">+ Add</button>
-        </div>
-        <div id="users-list" style="display:flex;flex-direction:column;gap:8px"></div>
-      </div>
-      <div class="cd" style="padding:20px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <h3 style="font-size:14px;font-weight:700;color:#1e293b">Departments</h3>
-          <button class="btn-primary" style="padding:6px 14px;font-size:12px" onclick="addDept()">+ Add</button>
-        </div>
-        <div id="depts-list" style="display:flex;flex-direction:column;gap:8px"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHEET VIEW PAGE -->
-  <div id="page-sheet" class="page" style="padding:24px">
-    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div id="sheet-icon" style="width:44px;height:44px;border-radius:14px;background:#eef2ff;border:1px solid #e0e7ff;display:flex;align-items:center;justify-content:center;font-size:20px">📄</div>
-        <div>
-          <h1 id="sheet-title" style="font-size:20px;font-weight:800;color:#1e293b">Sheet</h1>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
-            <span id="sheet-gid-label" style="font-size:10px;color:#94a3b8;font-family:'DM Mono',monospace"></span>
-            <span style="color:#e2e8f0">•</span>
-            <span id="sheet-rows-label" style="font-size:10px;color:#94a3b8">Loading…</span>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-        <div style="position:relative">
-          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:#94a3b8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input id="sheet-search-inp" oninput="filterSheet()" placeholder="Search…" class="fi" style="padding-left:32px;width:160px;font-size:12px"/>
-        </div>
-        <button onclick="toggleEdit()" id="edit-btn" class="btn-ghost">✏️ Edit</button>
-        <button onclick="reloadSheet()" class="btn-ghost" id="refresh-btn">↻ Refresh</button>
-        <a id="gs-link" href="#" target="_blank" class="btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;background:#f0fdf4;color:#16a34a;border-color:#bbf7d0">
-          <svg style="width:12px;height:12px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>Google Sheet
-        </a>
-      </div>
-    </div>
-    <div class="g4" id="sheet-kpis" style="margin-bottom:16px;display:none"></div>
-    <div id="edit-warning" style="display:none;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;background:#fffbeb;border:1px solid #fef08a;margin-bottom:12px">
-      <span style="color:#d97706">⚠️</span>
-      <p style="font-size:12px;color:#92400e"><strong>Edit Mode</strong> — Double-click cells to edit. Changes are local only.</p>
-    </div>
-    <div id="sheet-loading" class="cd" style="padding:24px">
-      <div class="sk" style="height:40px;margin-bottom:8px"></div>
-      <div class="sk" style="height:40px;margin-bottom:8px"></div>
-      <div class="sk" style="height:40px;margin-bottom:8px"></div>
-      <div class="sk" style="height:40px;margin-bottom:8px"></div>
-      <div class="sk" style="height:40px"></div>
-    </div>
-    <div id="sheet-error" style="display:none" class="cd">
-      <div style="padding:40px;text-align:center">
-        <p style="font-size:32px;margin-bottom:12px">⚠️</p>
-        <h3 style="font-size:16px;font-weight:700;color:#ef4444;margin-bottom:4px">Error Loading Data</h3>
-        <p id="sheet-err-msg" style="font-size:13px;color:#94a3b8;margin-bottom:16px"></p>
-        <button onclick="reloadSheet()" class="btn-primary">↻ Retry</button>
-      </div>
-    </div>
-    <div id="sheet-table-wrap" class="cd" style="display:none;overflow:hidden">
-      <div style="overflow-x:auto;max-height:65vh">
-        <table class="tb" id="sheet-table">
-          <thead id="sheet-thead"></thead>
-          <tbody id="sheet-tbody"></tbody>
+    <!-- ===== WEEKLY REVIEW ===== -->
+    <div id="section-weekly" class="tab-section">
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Finance Weekly Review – As on May 2026</div></div>
+        <table>
+          <thead><tr><th>#</th><th>Particulars</th><th>Week-1 Amt</th><th>Week-1 Days</th><th>Week-2 Amt</th><th>Week-2 Days</th><th>Week-3 Amt</th><th>Week-3 Days</th><th>Week-4 Amt</th><th>Week-4 Days</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Debtor</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
+            <tr><td>2</td><td>Inventory</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
+            <tr><td>3</td><td>Cash Conversion Cycle</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
+            <tr><td>4</td><td>Revenue</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
+            <tr><td>5</td><td>Cash Block – Debtor</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
+            <tr><td>5a</td><td>— SD</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
+            <tr><td>5b</td><td>— LD</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
+            <tr><td>5c</td><td>— Inventory</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
+            <tr><td>6</td><td>Profit % Age (NP)</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td><td class="editable-cell amount" onclick="makeEditable(this)">–</td><td class="editable-cell" onclick="makeEditable(this)">–</td></tr>
+          </tbody>
         </table>
       </div>
+      <div style="font-size:12px;color:var(--text-muted);padding:8px 4px;">Click any cell to edit. Data is saved locally in your browser.</div>
     </div>
-  </div>
 
+  </div><!-- end content -->
 </main>
-
-<!-- MODAL CONTAINER -->
-<div id="modal-overlay" class="md-bg" style="display:none" onclick="closeModal(event)">
-  <div class="md-box" id="modal-box" onclick="event.stopPropagation()">
-    <div id="modal-content"></div>
-  </div>
 </div>
 
+<div class="notification" id="notif"></div>
+
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
-// CONFIG
-// ─────────────────────────────────────────────────────────────────────────────
-const SPREADSHEET_ID = '1iHrPxhvsFnedO2Js7u3wmFbPAxLeC4F1WP71MBv5gcw';
-
-const SHEETS = [
-  {gid:'105280238',name:'Vishal Electricals - Main',shortName:'VE Main',category:'overview',icon:'🏢'},
-  {gid:'174412694',name:'MIS Dashboard',shortName:'MIS',category:'overview',icon:'📊'},
-  {gid:'118852844',name:'Sales Register 26-27',shortName:'Sales Reg',category:'sales',icon:'📋'},
-  {gid:'548407335',name:'EMD / SD Details',shortName:'EMD/SD',category:'overview',icon:'💰'},
-  {gid:'751444077',name:'GAIL Vijaipur',shortName:'GAIL',category:'billing',icon:'🏭'},
-  {gid:'1347791283',name:'NTPC Dadri',shortName:'NTPC',category:'billing',icon:'⚡'},
-  {gid:'321034887',name:'Paradip Port Authority',shortName:'Paradip Port',category:'billing',icon:'🚢'},
-  {gid:'1979702996',name:'IOCL Paradeep HM',shortName:'IOCL Paradeep',category:'iocl',icon:'🛢️'},
-  {gid:'1893067828',name:'AAI Amritsar',shortName:'AAI Amritsar',category:'billing',icon:'✈️'},
-  {gid:'1234783628',name:'IOCL Vijayawada',shortName:'IOCL Vijayawada',category:'iocl',icon:'🛢️'},
-  {gid:'977030954',name:'IOCL Tirupati',shortName:'IOCL Tirupati',category:'iocl',icon:'🛢️'},
-  {gid:'1642019228',name:'IOCL Warangal',shortName:'IOCL Warangal',category:'iocl',icon:'🛢️'},
-  {gid:'1920245490',name:'IOCL Secunderabad',shortName:'IOCL Secunderabad',category:'iocl',icon:'🛢️'},
-  {gid:'2004258151',name:'IOCL Nizamabad',shortName:'IOCL Nizamabad',category:'iocl',icon:'🛢️'},
-  {gid:'1666678437',name:'IOCL Bathinda',shortName:'IOCL Bathinda',category:'iocl',icon:'🛢️'},
-  {gid:'458687889',name:'IOCL Raipur DO',shortName:'IOCL Raipur',category:'iocl',icon:'🛢️'},
-  {gid:'178072507',name:'IOCL Vizag',shortName:'IOCL Vizag',category:'iocl',icon:'🛢️'},
-  {gid:'1087865048',name:'IOCL Bangalore DO',shortName:'IOCL Bangalore',category:'iocl',icon:'🛢️'},
-  {gid:'1871920534',name:'IOCL Moradabad DO',shortName:'IOCL Moradabad',category:'iocl',icon:'🛢️'},
-  {gid:'1053026690',name:'Transrail Lighting Ltd',shortName:'Transrail',category:'other',icon:'💡'},
-  {gid:'1485879867',name:'Genpact India - DLF Gurgaon',shortName:'Genpact',category:'other',icon:'🏗️'},
-  {gid:'1545839474',name:'IOCL Mumbai DO',shortName:'IOCL Mumbai',category:'iocl',icon:'🛢️'},
-  {gid:'477557482',name:'NFC Hyderabad',shortName:'NFC Hyderabad',category:'other',icon:'☢️'},
-  {gid:'279843949',name:'NFC Kota Township',shortName:'NFC Kota',category:'other',icon:'☢️'},
-  {gid:'671962254',name:'HPCL Loni',shortName:'HPCL Loni',category:'billing',icon:'⛽'},
-  {gid:'387496523',name:'IOCL Jharsuguda',shortName:'IOCL Jharsuguda',category:'iocl',icon:'🛢️'},
-  {gid:'323328787',name:'IOCL Sarpara',shortName:'IOCL Sarpara',category:'iocl',icon:'🛢️'},
-  {gid:'1725908395',name:'IOCL Allahabad',shortName:'IOCL Allahabad',category:'iocl',icon:'🛢️'},
-  {gid:'493192291',name:'IOCL Khunti',shortName:'IOCL Khunti',category:'iocl',icon:'🛢️'},
-  {gid:'1199190624',name:'IOCL Ahmednagar',shortName:'IOCL Ahmednagar',category:'iocl',icon:'🛢️'},
-  {gid:'1110433204',name:'IOCL Paradeep Automation',shortName:'IOCL Paradeep Auto',category:'iocl',icon:'🛢️'},
-  {gid:'606059273',name:'IOCL Jatni',shortName:'IOCL Jatni',category:'iocl',icon:'🛢️'},
-  {gid:'1612881510',name:'IOCL Loni',shortName:'IOCL Loni',category:'iocl',icon:'🛢️'},
-  {gid:'1855046779',name:'IOCL Howrah',shortName:'IOCL Howrah',category:'iocl',icon:'🛢️'},
-  {gid:'980845244',name:'IOCL Kanpur',shortName:'IOCL Kanpur',category:'iocl',icon:'🛢️'},
-  {gid:'989690966',name:'IOCL Barauni',shortName:'IOCL Barauni',category:'iocl',icon:'🛢️'},
-  {gid:'0',name:'IOCL Mathura BDFP',shortName:'IOCL Mathura',category:'iocl',icon:'🛢️'},
-  {gid:'2070489175',name:'IOCL Panipat DO',shortName:'IOCL Panipat DO',category:'iocl',icon:'🛢️'},
-  {gid:'776970165',name:'IOCL Salem',shortName:'IOCL Salem',category:'iocl',icon:'🛢️'},
-  {gid:'1201529354',name:'IOCL Coimbatore',shortName:'IOCL Coimbatore',category:'iocl',icon:'🛢️'},
-  {gid:'1729965160',name:'IOCL Madurai',shortName:'IOCL Madurai',category:'iocl',icon:'🛢️'},
-  {gid:'131840235',name:'IOCL Trichy',shortName:'IOCL Trichy',category:'iocl',icon:'🛢️'},
-  {gid:'923489850',name:'IOCL Chennai',shortName:'IOCL Chennai',category:'iocl',icon:'🛢️'},
-  {gid:'996674553',name:'IOCL Hissar',shortName:'IOCL Hissar',category:'iocl',icon:'🛢️'},
-  {gid:'2095150463',name:'IOCL Panipat Refinery',shortName:'IOCL Panipat Ref',category:'iocl',icon:'🛢️'},
-  {gid:'22890483',name:'IOCL Nashik',shortName:'IOCL Nashik',category:'iocl',icon:'🛢️'},
+// ======= DATA =======
+const ageingData = [
+  {sno:1,project:"Indian Oil Corporation Ltd - Mathura BDFP",col:"LD Deduction Amount",amount:1143938.95,date:"27-Jul-2024",days:661,avg:568,bucket:"180+ Days"},
+  {sno:2,project:"IOCL - PANIPAT DO",col:"LD Deduction Amount",amount:358778.71,date:"31-Mar-2025",days:414,avg:294,bucket:"180+ Days"},
+  {sno:3,project:"IOCL - SALEM",col:"Pending Bill Amount",amount:817313.8,date:"31-Mar-2025",days:414,avg:276,bucket:"180+ Days"},
+  {sno:3,project:"IOCL - SALEM",col:"SD Deduction Amount",amount:4159.4,date:"31-Mar-2025",days:414,avg:276,bucket:"180+ Days"},
+  {sno:4,project:"IOCL - COIMBATORE",col:"Withheld Amount",amount:593380.89,date:"31-Mar-2025",days:414,avg:353,bucket:"180+ Days"},
+  {sno:5,project:"IOCL - TRICHY",col:"Pending Bill Amount",amount:776915.9,date:"31-Mar-2025",days:414,avg:290,bucket:"180+ Days"},
+  {sno:6,project:"IOCL - MADURAI",col:"Pending Bill Amount",amount:226317.6,date:"31-Mar-2025",days:414,avg:300,bucket:"180+ Days"},
+  {sno:6,project:"IOCL - MADURAI",col:"Withheld Amount",amount:81055.95,date:"31-Mar-2025",days:414,avg:300,bucket:"180+ Days"},
+  {sno:7,project:"IOCL - CHENNAI",col:"SD Deduction Amount",amount:905314.3,date:"31-Mar-2025",days:414,avg:376,bucket:"180+ Days"},
+  {sno:7,project:"IOCL - CHENNAI",col:"LD Deduction Amount",amount:989416.45,date:"31-Mar-2025",days:414,avg:376,bucket:"180+ Days"},
+  {sno:7,project:"IOCL - CHENNAI",col:"Withheld Amount",amount:614480,date:"31-Mar-2025",days:414,avg:376,bucket:"180+ Days"},
+  {sno:8,project:"IOCL - HISSAR",col:"Pending Bill Amount",amount:2054704,date:"31-Mar-2025",days:414,avg:222,bucket:"180+ Days"},
+  {sno:8,project:"IOCL - HISSAR",col:"LD Deduction Amount",amount:1145966.13,date:"31-Mar-2025",days:414,avg:222,bucket:"180+ Days"},
+  {sno:9,project:"IOCL - Panipat Refinery",col:"Pending Bill Amount",amount:3907140,date:"26-May-2025",days:358,avg:226,bucket:"180+ Days"},
+  {sno:9,project:"IOCL - Panipat Refinery",col:"LD Deduction Amount",amount:1394719.05,date:"26-May-2025",days:358,avg:226,bucket:"180+ Days"},
+  {sno:10,project:"IOCL - BARAUNI",col:"LD Deduction Amount",amount:999625.16,date:"24-Sep-2024",days:602,avg:335,bucket:"180+ Days"},
+  {sno:11,project:"IOCL - KANPUR",col:"LD Deduction Amount",amount:921902.65,date:"29-Mar-2025",days:416,avg:287,bucket:"180+ Days"},
+  {sno:12,project:"IOCL - HOWRAH",col:"SD Deduction Amount",amount:139834.5,date:"29-Mar-2025",days:416,avg:309,bucket:"180+ Days"},
+  {sno:13,project:"IOCL - LONI",col:"LD Deduction Amount",amount:441100.3,date:"29-Jan-2025",days:475,avg:405,bucket:"180+ Days"},
+  {sno:14,project:"IOCL - JATNI",col:"LD Deduction Amount",amount:739952.21,date:"30-Jun-2025",days:323,avg:180,bucket:"180+ Days"},
+  {sno:15,project:"IOCL - PARADEEP AUTOMATION",col:"LD Deduction Amount",amount:292393,date:"24-Feb-2025",days:449,avg:358,bucket:"180+ Days"},
+  {sno:16,project:"IOCL - AHMEDNAGAR",col:"Pending Bill Amount",amount:4622248,date:"27-Oct-2023",days:935,avg:551,bucket:"180+ Days"},
+  {sno:16,project:"IOCL - AHMEDNAGAR",col:"SD Deduction Amount",amount:1087389,date:"27-Oct-2023",days:935,avg:551,bucket:"180+ Days"},
+  {sno:17,project:"IOCL - ALLAHABAD",col:"LD Deduction Amount",amount:685785.03,date:"05-Sep-2024",days:621,avg:521,bucket:"180+ Days"},
+  {sno:18,project:"IOCL - KHUNTI",col:"LD Deduction Amount",amount:824686,date:"05-Sep-2024",days:621,avg:501,bucket:"180+ Days"},
+  {sno:19,project:"IOCL - JHARSUGUDA",col:"Pending Bill Amount",amount:1564080,date:"05-Oct-2024",days:591,avg:382,bucket:"180+ Days"},
+  {sno:20,project:"IOCL - NASHIK",col:"SD Deduction Amount",amount:500213.1,date:"28-Jun-2025",days:325,avg:260,bucket:"180+ Days"},
+  {sno:21,project:"HPCL - LONI",col:"SD + LD Deduction",amount:512688.7,date:"28-Feb-2025",days:445,avg:406,bucket:"180+ Days"},
+  {sno:24,project:"NFC - HYDERABAD",col:"SD Deduction Amount",amount:949417.5,date:"05-Jun-2024",days:713,avg:578,bucket:"180+ Days"},
+  {sno:25,project:"IOCL - MUMBAI DO (VTPL)",col:"Pending + SD",amount:1428477,date:"01-Jul-2025",days:322,avg:261,bucket:"180+ Days"},
+  {sno:34,project:"IOCL - Secunderabad",col:"LD Deduction Amount",amount:146115.33,date:"20-Nov-2025",days:180,avg:115,bucket:"91-180 Days"},
+  {sno:35,project:"IOCL - Warangal",col:"LD Deduction Amount",amount:139825.57,date:"21-Nov-2025",days:179,avg:102,bucket:"91-180 Days"},
+  {sno:36,project:"IOCL - Tirupati",col:"Pending + LD",amount:669255.4,date:"21-Nov-2025",days:179,avg:111,bucket:"91-180 Days"},
+  {sno:37,project:"IOCL - NIZAMABAD",col:"LD Deduction Amount",amount:189657.72,date:"03-Dec-2025",days:167,avg:89,bucket:"91-180 Days"},
+  {sno:38,project:"IOCL - Vijaywada",col:"SD + LD",amount:322567.4,date:"23-Dec-2025",days:147,avg:88,bucket:"91-180 Days"},
+  {sno:39,project:"AAI - AMRITSAR",col:"SD Deduction Amount",amount:288622.5,date:"16-Jan-2026",days:123,avg:86,bucket:"91-180 Days"},
+  {sno:40,project:"IOCL - Paradeep HM",col:"SD + LD + Other",amount:2722855,date:"10-Feb-2026",days:98,avg:65,bucket:"91-180 Days"},
+  {sno:41,project:"PARADIP PORT AUTHORITY",col:"SD + LD + Withheld",amount:8164332,date:"10-Feb-2026",days:98,avg:74,bucket:"91-180 Days"},
+  {sno:42,project:"NTPC - DADRI",col:"Pending + SD + Withheld",amount:780958.8,date:"10-Feb-2026",days:98,avg:72,bucket:"91-180 Days"},
+  {sno:43,project:"GAIL - VIJAIPUR",col:"Withheld Amount",amount:388234.35,date:"16-Mar-2026",days:64,avg:64,bucket:"61-90 Days"},
 ];
 
-const CATEGORIES = [
-  {key:'all',label:'All Sheets',icon:'📁'},
-  {key:'overview',label:'Overview',icon:'📊'},
-  {key:'sales',label:'Sales',icon:'📋'},
-  {key:'billing',label:'Billing',icon:'💰'},
-  {key:'iocl',label:'IOCL Sites',icon:'🛢️'},
-  {key:'other',label:'Other Clients',icon:'🏗️'},
+const projData = [
+  {id:1,name:"Indian Oil Corporation Ltd - Mathura BDFP",sd:0,ld:1143938.95,instant:0,other:0,withheld:0,total:1143939},
+  {id:2,name:"IOCL - PANIPAT DO",sd:0,ld:358778.71,instant:0,other:0,withheld:0,total:358779},
+  {id:3,name:"IOCL - SALEM",sd:4159.4,ld:0,instant:0,other:0,withheld:0,total:821473},
+  {id:4,name:"IOCL - COIMBATORE",sd:0,ld:0,instant:0,other:0,withheld:593380.89,total:593381},
+  {id:5,name:"IOCL - TRICHY",sd:0,ld:0,instant:0,other:0,withheld:0,total:776916},
+  {id:6,name:"IOCL - MADURAI",sd:0,ld:0,instant:0,other:0,withheld:81055.95,total:226306},
+  {id:7,name:"IOCL - CHENNAI",sd:905314.3,ld:989416.45,instant:0,other:0,withheld:614480,total:2509211},
+  {id:8,name:"IOCL - HISSAR",sd:0,ld:1145966.13,instant:0,other:0,withheld:0,total:3200670},
+  {id:9,name:"IOCL - Panipat Refinery",sd:37208.44,ld:1394719.05,instant:0,other:369114.64,withheld:0,total:5708176},
+  {id:10,name:"IOCL - BARAUNI",sd:0,ld:999625.16,instant:0,other:0,withheld:0,total:1272840},
+  {id:11,name:"IOCL - KANPUR",sd:0,ld:921902.65,instant:0,other:0,withheld:0,total:921903},
+  {id:12,name:"IOCL - HOWRAH",sd:139834.5,ld:0,instant:0,other:0,withheld:0,total:139835},
+  {id:13,name:"IOCL - LONI",sd:0,ld:441100.3,instant:0,other:0,withheld:0,total:441100},
+  {id:14,name:"IOCL - JATNI",sd:0,ld:739952.21,instant:0,other:0,withheld:0,total:739952},
+  {id:15,name:"IOCL - PARADEEP AUTOMATION",sd:0,ld:292393,instant:0,other:0,withheld:0,total:292393},
+  {id:16,name:"IOCL - AHMEDNAGAR",sd:1087389,ld:0,instant:0,other:0,withheld:0,total:5709636},
+  {id:17,name:"IOCL - ALLAHABAD",sd:478849.6,ld:685785.03,instant:0,other:0,withheld:0,total:1164635},
+  {id:18,name:"IOCL - KHUNTI",sd:91765,ld:824686,instant:80566,other:0,withheld:0,total:997017},
+  {id:19,name:"IOCL - JHARSUGUDA",sd:0,ld:928887.91,instant:0,other:0,withheld:0,total:2492968},
+  {id:20,name:"IOCL - NASHIK",sd:500213.1,ld:186372.13,instant:0,other:0,withheld:0,total:686585},
+  {id:21,name:"HPCL - LONI",sd:215597.7,ld:297091,instant:0,other:0,withheld:0,total:512689},
+  {id:22,name:"NFC - KOTA TOWNSHIP",sd:164005.8,ld:0,instant:0,other:0,withheld:0,total:164006},
+  {id:23,name:"NFC - HYDERABAD",sd:949417.5,ld:0,instant:0,other:0,withheld:0,total:949418},
+  {id:24,name:"IOCL - MUMBAI DO (VTPL)",sd:638343.7,ld:0,instant:0,other:0,withheld:0,total:638344},
+  {id:25,name:"Genpact India - DLF Gurgaon",sd:0,ld:0,instant:0,other:0,withheld:0,total:0},
+  {id:26,name:"IOCL - SARPARA",sd:24578.51,ld:329297.53,instant:0,other:0,withheld:0,total:360784},
+  {id:27,name:"IOCL - Moradabad DO (VTPL)",sd:249925.4,ld:77648.16,instant:0,other:0,withheld:50000,total:377574},
+  {id:28,name:"Transrail Lighting Ltd",sd:0,ld:0,instant:0,other:0,withheld:1299025,total:1683475},
+  {id:29,name:"IOCL - BANGALORE DO",sd:0,ld:0,instant:0,other:0,withheld:0,total:0},
+  {id:30,name:"IOCL - VIZAG",sd:0,ld:149126,instant:0,other:0,withheld:0,total:416675},
+  {id:31,name:"IOCL - Raipur DO (VTPL)",sd:451274,ld:0,instant:0,other:0,withheld:0,total:451274},
+  {id:32,name:"IOCL - BHATINDA",sd:0,ld:271950.26,instant:0,other:0,withheld:0,total:271950},
+  {id:33,name:"IOCL - Secunderabad",sd:0,ld:146115.33,instant:0,other:0,withheld:0,total:146115},
+  {id:34,name:"IOCL - Warangal",sd:0,ld:139825.57,instant:0,other:0,withheld:0,total:139826},
+  {id:35,name:"IOCL - Tirupati",sd:0,ld:298192.64,instant:0,other:0,withheld:0,total:669255},
+  {id:36,name:"IOCL - NIZAMABAD",sd:0,ld:189657.72,instant:0,other:0,withheld:0,total:189658},
+  {id:37,name:"IOCL - Vijaywada",sd:50524.11,ld:272033.43,instant:0,other:0,withheld:0,total:322558},
+  {id:38,name:"AAI - AMRITSAR",sd:288622.5,ld:0,instant:0,other:0,withheld:0,total:288623},
+  {id:39,name:"IOCL - Paradeep HM",sd:1374310,ld:458545.14,instant:0,other:890000,withheld:0,total:2722855},
+  {id:40,name:"PARADIP PORT AUTHORITY",sd:1521853,ld:2174077,instant:0,other:0,withheld:4468402,total:8164332},
+  {id:41,name:"NTPC - DADRI",sd:364811,ld:0,instant:0,other:0,withheld:145924,total:780959},
+  {id:42,name:"GAIL - VIJAIPUR",sd:0,ld:0,instant:0,other:0,withheld:388234.35,total:388234},
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STORE (localStorage)
-// ─────────────────────────────────────────────────────────────────────────────
-const LS = {
-  get(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } },
-  set(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+const veData = [
+  {date:"08-Apr-2026",inv:"VE/26-27/1",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
+  {date:"30-Apr-2026",inv:"VE/26-27/2",party:"Indian Oil Corporation Ltd",taxable:427860.77,igst:0,cgst:0,sgst:0,total:427860.77,month:"April"},
+  {date:"08-May-2026",inv:"VE/26-27/3",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
+];
+
+const vtplData = [
+  {date:"15-Apr-2026",inv:"VTPL/26-27/1",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
+  {date:"18-Apr-2026",inv:"VTPL/26-27/2",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
+  {date:"28-Apr-2026",inv:"VTPL/26-27/3",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
+  {date:"28-Apr-2026",inv:"VTPL/26-27/4",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
+  {date:"30-Apr-2026",inv:"VTPL/26-27/5",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"April"},
+  {date:"30-Apr-2026",inv:"VTPL/26-27/6",party:"Indian Oil Corporation Ltd",taxable:2288871.70,igst:0,cgst:0,sgst:0,total:2288871.70,month:"April"},
+  {date:"05-May-2026",inv:"VTPL/26-27/7",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
+  {date:"05-May-2026",inv:"VTPL/26-27/8",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
+  {date:"05-May-2026",inv:"VTPL/26-27/9",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
+  {date:"05-May-2026",inv:"VTPL/26-27/10",party:"Indian Oil Corporation Ltd",taxable:1034242.52,igst:0,cgst:0,sgst:0,total:1034242.52,month:"May"},
+  {date:"16-May-2026",inv:"VTPL/26-27/10a",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
+  {date:"16-May-2026",inv:"VTPL/26-27/10b",party:"Indian Oil Corporation Ltd",taxable:0,igst:0,cgst:0,sgst:0,total:0,month:"May"},
+];
+
+// ======= PAGINATION =======
+const pageSize = 15;
+const pageMeta = {};
+
+function fmt(v){return v?'₹'+v.toLocaleString('en-IN',{maximumFractionDigits:0}):'₹0';}
+
+function bucketClass(b){
+  if(b.includes('180'))return 'bucket-180';
+  if(b.includes('91'))return 'bucket-91';
+  if(b.includes('61'))return 'bucket-61';
+  return 'bucket-lt60';
+}
+
+function renderTable(id, data, renderRow, infoId, pagesId){
+  const tbody = document.getElementById(id+'-tbody'||id);
+  const info = document.getElementById(infoId);
+  const pages = document.getElementById(pagesId);
+  const pg = pageMeta[id]||1;
+  const start = (pg-1)*pageSize;
+  const slice = data.slice(start, start+pageSize);
+  tbody.innerHTML = slice.map(renderRow).join('');
+  if(info) info.textContent = `Showing ${start+1}-${Math.min(start+pageSize,data.length)} of ${data.length} records`;
+  if(pages){
+    const total = Math.ceil(data.length/pageSize);
+    pages.innerHTML = Array.from({length:total},(_,i)=>`<button class="page-btn${pg===i+1?' active':''}" onclick="goPage('${id}',${i+1})">${i+1}</button>`).join('');
+  }
+}
+
+function goPage(id, pg){pageMeta[id]=pg;initTables();}
+
+function filterTable(tblId, q){
+  pageMeta[tblId]=1;
+  const tbl = document.getElementById(tblId);
+  if(!tbl)return;
+  const rows = tbl.querySelectorAll('tbody tr');
+  rows.forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});
+}
+
+function filterBucket(tblId, bucket){
+  pageMeta[tblId]=1;
+  const tbl = document.getElementById(tblId);
+  if(!tbl)return;
+  const rows = tbl.querySelectorAll('tbody tr');
+  rows.forEach(r=>{r.style.display=(!bucket||r.textContent.includes(bucket))?'':'none';});
+}
+
+function initTables(){
+  // AGEING
+  const atbody = document.getElementById('ageing-tbody');
+  const apg = pageMeta['ageing-tbl']||1;
+  const aslice = ageingData.slice((apg-1)*pageSize,(apg)*pageSize);
+  atbody.innerHTML = aslice.map((d,i)=>`
+    <tr>
+      <td>${d.sno}</td>
+      <td class="editable-cell" onclick="makeEditable(this)" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${d.project}">${d.project}</td>
+      <td>${d.col}</td>
+      <td class="amount ${d.amount>1000000?'amount-danger':d.amount>500000?'amount-warning':''}">${fmt(d.amount)}</td>
+      <td>${d.date}</td>
+      <td class="amount ${d.days>365?'amount-danger':d.days>180?'amount-warning':''}">${d.days}</td>
+      <td>${d.avg}</td>
+      <td><span class="bucket-pill ${bucketClass(d.bucket)}">${d.bucket}</span></td>
+      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
+    </tr>`).join('');
+  document.getElementById('ageing-info').textContent=`Showing ${(apg-1)*pageSize+1}-${Math.min(apg*pageSize,ageingData.length)} of ${ageingData.length} records`;
+  const at = Math.ceil(ageingData.length/pageSize);
+  document.getElementById('ageing-pages').innerHTML=Array.from({length:at},(_,i)=>`<button class="page-btn${apg===i+1?' active':''}" onclick="goPage('ageing-tbl',${i+1})">${i+1}</button>`).join('');
+
+  // PROJECTS
+  const ptbody = document.getElementById('proj-tbody');
+  const ppg = pageMeta['proj-tbl']||1;
+  const pslice = projData.slice((ppg-1)*pageSize,(ppg)*pageSize);
+  ptbody.innerHTML = pslice.map(d=>`
+    <tr>
+      <td>${d.id}</td>
+      <td class="editable-cell" onclick="makeEditable(this)" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${d.name}">${d.name}</td>
+      <td class="amount">${fmt(d.sd)}</td>
+      <td class="amount ${d.ld>500000?'amount-warning':''}">${fmt(d.ld)}</td>
+      <td class="amount">${fmt(d.instant)}</td>
+      <td class="amount">${fmt(d.other)}</td>
+      <td class="amount">${fmt(d.withheld)}</td>
+      <td class="amount ${d.total>2000000?'amount-danger':d.total>500000?'amount-warning':'amount-success'}">${fmt(d.total)}</td>
+      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
+    </tr>`).join('');
+  document.getElementById('proj-info').textContent=`Showing ${(ppg-1)*pageSize+1}-${Math.min(ppg*pageSize,projData.length)} of ${projData.length} records`;
+  const pt = Math.ceil(projData.length/pageSize);
+  document.getElementById('proj-pages').innerHTML=Array.from({length:pt},(_,i)=>`<button class="page-btn${ppg===i+1?' active':''}" onclick="goPage('proj-tbl',${i+1})">${i+1}</button>`).join('');
+
+  // SUMMARY
+  const stbody = document.getElementById('summ-tbody');
+  stbody.innerHTML = projData.map(d=>`
+    <tr>
+      <td>${d.id}</td>
+      <td class="editable-cell" onclick="makeEditable(this)" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${d.name}">${d.name}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.ld)}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.sd)}</td>
+      <td class="amount">₹0</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.instant)}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.other)}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${fmt(d.withheld)}</td>
+      <td class="amount ${d.total>2000000?'amount-danger':d.total>500000?'amount-warning':'amount-success'}">${fmt(d.total)}</td>
+      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
+    </tr>`).join('');
+
+  // VE REVENUE
+  document.getElementById('ve-tbody').innerHTML = veData.map((d,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td class="editable-cell" onclick="makeEditable(this)">${d.date}</td>
+      <td class="editable-cell" onclick="makeEditable(this)">${d.inv}</td>
+      <td>${d.party}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${d.taxable?fmt(d.taxable):'–'}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${d.igst?fmt(d.igst):'–'}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${d.cgst?fmt(d.cgst):'–'}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${d.sgst?fmt(d.sgst):'–'}</td>
+      <td class="amount ${d.total?'amount-success':''}">${d.total?fmt(d.total):'–'}</td>
+      <td><span style="background:#e3f0ff;color:#1565c0;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;">${d.month}</span></td>
+      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
+    </tr>`).join('');
+
+  // VTPL REVENUE
+  document.getElementById('vtpl-tbody').innerHTML = vtplData.map((d,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td class="editable-cell" onclick="makeEditable(this)">${d.date}</td>
+      <td class="editable-cell" onclick="makeEditable(this)">${d.inv}</td>
+      <td>${d.party}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${d.taxable?fmt(d.taxable):'–'}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${d.igst?fmt(d.igst):'–'}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${d.cgst?fmt(d.cgst):'–'}</td>
+      <td class="amount editable-cell" onclick="makeEditable(this)">${d.sgst?fmt(d.sgst):'–'}</td>
+      <td class="amount ${d.total?'amount-success':''}">${d.total?fmt(d.total):'–'}</td>
+      <td><span style="background:#e3f0ff;color:#1565c0;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;">${d.month}</span></td>
+      <td><button class="edit-btn" onclick="makeRowEditable(this)">Edit</button></td>
+    </tr>`).join('');
+}
+
+// ======= NAVIGATION =======
+const titles = {
+  dashboard:'Dashboard Overview',ageing:'Ageing Analysis',projects:'Project-wise Outstanding',
+  summary:'Payment Breakup Summary',revenue_ve:'VE Revenue 26-27',
+  revenue_vtpl:'VTPL Revenue 26-27',emd:'EMD Tracker',weekly:'Finance Weekly Review'
 };
 
-const D_USERS = [
-  {id:'u1',name:'Admin',email:'admin@ve.com',password:'admin123',role:'admin',department:'Admin',avatar:'A',createdAt:new Date().toISOString()},
-  {id:'u2',name:'Accounts Manager',email:'account@ve.com',password:'acc123',role:'account',department:'Account',avatar:'AC',createdAt:new Date().toISOString()},
-  {id:'u3',name:'Project Manager',email:'project@ve.com',password:'proj123',role:'project',department:'Project',avatar:'PM',createdAt:new Date().toISOString()},
-  {id:'u4',name:'CRM Manager',email:'crm@ve.com',password:'crm123',role:'crm',department:'CRM',avatar:'CR',createdAt:new Date().toISOString()},
-];
-const D_LEADS = [
-  {id:'l1',company:'IOCL Mathura',contact:'Rajesh Kumar',phone:'+91 98765 43210',email:'rajesh@iocl.com',source:'Tender',status:'won',value:12039940,notes:'BDFP project - ongoing',assignedTo:'CRM Manager',createdAt:'2024-06-15',updatedAt:'2025-01-10'},
-  {id:'l2',company:'NTPC Dadri',contact:'Anil Sharma',phone:'+91 87654 32109',email:'anil@ntpc.com',source:'Referral',status:'proposal',value:1992135,notes:'Electrical maintenance contract',assignedTo:'CRM Manager',createdAt:'2025-01-20',updatedAt:'2025-05-15'},
-  {id:'l3',company:'GAIL Vijaipur',contact:'Suresh Patel',phone:'+91 76543 21098',email:'suresh@gail.com',source:'Tender',status:'negotiation',value:1308904,notes:'Plant wiring project',assignedTo:'CRM Manager',createdAt:'2025-03-01',updatedAt:'2025-06-01'},
-  {id:'l4',company:'AAI Amritsar',contact:'Harpreet Singh',phone:'+91 65432 10987',email:'harpreet@aai.com',source:'Gov Portal',status:'qualified',value:3405751,notes:'Airport electrical infrastructure',assignedTo:'CRM Manager',createdAt:'2025-04-10',updatedAt:'2025-06-20'},
-  {id:'l5',company:'Paradip Port Authority',contact:'Mohan Das',phone:'+91 54321 09876',email:'mohan@ppa.com',source:'Tender',status:'won',value:18685032,notes:'Port electrification project',assignedTo:'CRM Manager',createdAt:'2025-02-01',updatedAt:'2025-06-25'},
-  {id:'l6',company:'HPCL Loni',contact:'Vikram Joshi',phone:'+91 43210 98765',email:'vikram@hpcl.com',source:'Direct',status:'new',value:2500000,notes:'New supply chain enquiry',assignedTo:'CRM Manager',createdAt:'2026-01-05',updatedAt:'2026-01-05'},
-];
-const D_PROJECTS = [
-  {id:'p1',name:'IOCL Mathura BDFP',client:'Indian Oil Corporation Ltd',location:'Mathura, UP',status:'in_progress',value:12039940,startDate:'2024-06-01',endDate:'2025-12-31',manager:'Project Manager',progress:65,linkedSheetGid:'0'},
-  {id:'p2',name:'NTPC Dadri Maintenance',client:'NTPC Limited',location:'Dadri, UP',status:'in_progress',value:1992135,startDate:'2025-01-01',endDate:'2025-09-30',manager:'Project Manager',progress:40,linkedSheetGid:'1347791283'},
-  {id:'p3',name:'GAIL Vijaipur Wiring',client:'GAIL India Limited',location:'Vijaipur, MP',status:'in_progress',value:1308904,startDate:'2025-03-01',endDate:'2025-12-31',manager:'Project Manager',progress:25,linkedSheetGid:'751444077'},
-  {id:'p4',name:'AAI Amritsar Infra',client:'Airports Authority of India',location:'Amritsar, Punjab',status:'planning',value:3405751,startDate:'2025-07-01',endDate:'2026-06-30',manager:'Project Manager',progress:10,linkedSheetGid:'1893067828'},
-  {id:'p5',name:'Paradip Port Electrification',client:'Paradip Port Authority',location:'Paradip, Odisha',status:'in_progress',value:18685032,startDate:'2025-02-01',endDate:'2026-03-31',manager:'Project Manager',progress:55,linkedSheetGid:'321034887'},
-  {id:'p6',name:'IOCL Paradeep HM',client:'Indian Oil Corporation Ltd',location:'Paradeep, Odisha',status:'in_progress',value:7685217,startDate:'2025-04-01',endDate:'2026-01-31',manager:'Project Manager',progress:35,linkedSheetGid:'1979702996'},
-];
-
-const getUsers   = () => LS.get('ve_users', D_USERS);
-const setUsers   = u  => LS.set('ve_users', u);
-const getLeads   = () => LS.get('ve_leads', D_LEADS);
-const setLeads   = l  => LS.set('ve_leads', l);
-const getProjects= () => LS.get('ve_projects', D_PROJECTS);
-const setProjects= p  => LS.set('ve_projects', p);
-const getHistory = () => LS.get('ve_history', []);
-const getCurUser = () => LS.get('ve_cur', null);
-const setCurUser = u  => LS.set('ve_cur', u);
-const uid        = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
-
-function addHistory(r) {
-  const h = getHistory();
-  h.unshift({...r, id:'h'+uid(), timestamp:new Date().toISOString()});
-  if(h.length>500) h.length=500;
-  LS.set('ve_history', h);
-}
-function auth(e, p) {
-  return getUsers().find(u => u.email===e && u.password===p) || null;
+function showSection(id){
+  document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  document.getElementById('page-title').textContent = titles[id]||id;
+  event&&event.target&&event.target.classList.add('active');
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
-function fmt(n) {
-  if(n>=1e7) return `₹${(n/1e7).toFixed(2)} Cr`;
-  if(n>=1e5) return `₹${(n/1e5).toFixed(2)} L`;
-  if(n>=1e3) return `₹${(n/1e3).toFixed(1)} K`;
-  return `₹${n.toFixed(0)}`;
-}
-function getSheetCsvUrl(gid) {
-  return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`;
-}
-function getSheetEditUrl(gid) {
-  return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${gid}#gid=${gid}`;
-}
-async function fetchSheetData(gid) {
-  const url = getSheetCsvUrl(gid);
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Failed: ${response.statusText}`);
-  const csvText = await response.text();
-  const result = Papa.parse(csvText, {header:false, skipEmptyLines:false});
-  const raw = result.data;
-  if(raw.length===0) return {headers:[],rows:[],rawData:[]};
-  return {headers:raw[0].map(h=>h.trim()), rows:raw.slice(1), rawData:raw};
-}
-function extractTotals(data) {
-  let ti=0, tr=0;
-  data.rows.forEach(row => {
-    if(row[0]?.toLowerCase().includes('total')||row[3]?.toLowerCase().includes('total')) {
-      if(row[6]){const v=parseFloat(row[6].replace(/,/g,''));if(!isNaN(v)&&v>100) ti=v;}
-      if(row[9]){const v=parseFloat(row[9].replace(/,/g,''));if(!isNaN(v)&&v>100) tr=v;}
-    }
-  });
-  return {ti, tr};
-}
-function toast(msg) {
-  const el = document.createElement('div');
-  el.className = 'toast'; el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
+// ======= EDITABLE CELLS =======
+function makeEditable(td){
+  if(td.querySelector('input'))return;
+  const val = td.textContent;
+  td.innerHTML = `<input class="inline-edit" value="${val}" onblur="saveEdit(this,'${val}')" onkeydown="if(event.key==='Enter')this.blur();" autofocus/>`;
+  td.querySelector('input').select();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LAYOUT STATE
-// ─────────────────────────────────────────────────────────────────────────────
-let curUser = null;
-let curTab = 'dashboard';
-let curSheet = null;
-let sidebarOpen = false;
-let collapsed = false;
-let dashCat = 'all';
-let projFilter = 'all';
-let crmFilter = 'all';
-let editMode = false;
-let sheetData = null;
-let sheetDataFull = null;
+function saveEdit(inp, old){
+  const td = inp.parentElement;
+  const nv = inp.value.trim()||old;
+  td.textContent = nv;
+  td.classList.add('editable-cell');
+  td.setAttribute('onclick','makeEditable(this)');
+  showNotif('Saved! Sync to Google Sheets to backup.');
+  saveToLocal();
+}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SIDEBAR
-// ─────────────────────────────────────────────────────────────────────────────
-function openSidebar() {
-  document.getElementById('sidebar').classList.add('mob');
-  document.getElementById('overlay').classList.add('on');
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('mob');
-  document.getElementById('overlay').classList.remove('on');
-}
-function toggleCollapse() {
-  collapsed = !collapsed;
-  const sb = document.getElementById('sidebar');
-  const mn = document.getElementById('main');
-  if(collapsed) { sb.classList.add('col'); mn.classList.add('col'); }
-  else { sb.classList.remove('col'); mn.classList.remove('col'); }
-  const path = document.getElementById('collapseIcon');
-  path.setAttribute('d', collapsed ? 'M9 18l6-6-6-6' : 'M15 18l-6-6 6-6');
-}
-function toggleSheets() {
-  const p = document.getElementById('sheets-panel');
-  const c = document.getElementById('sheets-chevron');
-  const vis = p.style.display==='none';
-  p.style.display = vis ? 'block' : 'none';
-  c.style.transform = vis ? 'rotate(180deg)' : '';
-  if(vis) renderSheetsNav();
-}
-function renderSheetsNav() {
-  const q = document.getElementById('sheet-search')?.value?.toLowerCase()||'';
-  const catFilters = document.getElementById('cat-filters');
-  if(catFilters && !catFilters.children.length) {
-    catFilters.innerHTML = CATEGORIES.map(c =>
-      `<button onclick="setSbCat('${c.key}')" id="sbcat-${c.key}" style="padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:none;transition:all .12s;background:${c.key==='all'?'#eef2ff':'#f1f5f9'};color:${c.key==='all'?'#4f46e5':'#64748b'}">${c.label}</button>`
-    ).join('');
-  }
-  const list = document.getElementById('sheets-list');
-  const sbCat = window._sbCat||'all';
-  const filtered = SHEETS.filter(s => {
-    const mc = sbCat==='all'||s.category===sbCat;
-    const ms = s.name.toLowerCase().includes(q)||s.shortName.toLowerCase().includes(q);
-    return mc&&ms;
-  });
-  list.innerHTML = filtered.map(s =>
-    `<button class="sb-link ${curSheet===s.gid?'on':''}" onclick="goSheet('${s.gid}')" style="font-size:12px;padding:7px 14px">
-      <span style="font-size:14px;flex-shrink:0">${s.icon}</span>
-      <span style="overflow:hidden;text-overflow:ellipsis">${s.shortName}</span>
-    </button>`
-  ).join('');
-}
-window._sbCat = 'all';
-function setSbCat(k) {
-  window._sbCat = k;
-  document.querySelectorAll('[id^="sbcat-"]').forEach(b => {
-    const active = b.id==='sbcat-'+k;
-    b.style.background = active?'#eef2ff':'#f1f5f9';
-    b.style.color = active?'#4f46e5':'#64748b';
-  });
-  renderSheetsNav();
-}
-function filterSheets() { renderSheetsNav(); }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// NAV
-// ─────────────────────────────────────────────────────────────────────────────
-function navTo(tab) {
-  curSheet = null; curTab = tab;
-  document.querySelectorAll('.sb-link[id^="nav-"]').forEach(b => b.classList.remove('on'));
-  const nb = document.getElementById('nav-'+tab);
-  if(nb) nb.classList.add('on');
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-'+tab)?.classList.add('active');
-  document.getElementById('mob-title').textContent = tab.charAt(0).toUpperCase()+tab.slice(1);
-  if(window.innerWidth<768) closeSidebar();
-  if(tab==='history') renderHistory();
-  if(tab==='settings') renderSettings();
-  if(tab==='crm') renderCRM();
-  if(tab==='project') renderProjects();
-  if(tab==='account') renderAccount();
-}
-function goSheet(gid) {
-  curSheet = gid; curTab = 'sheet';
-  document.querySelectorAll('.sb-link[id^="nav-"]').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-sheet').classList.add('active');
-  editMode = false;
-  const sheet = SHEETS.find(s=>s.gid===gid);
-  document.getElementById('sheet-title').textContent = sheet?.name||'Sheet';
-  document.getElementById('sheet-icon').textContent = sheet?.icon||'📄';
-  document.getElementById('sheet-gid-label').textContent = 'GID: '+gid;
-  document.getElementById('gs-link').href = getSheetEditUrl(gid);
-  document.getElementById('sheet-rows-label').textContent = 'Loading…';
-  document.getElementById('mob-title').textContent = sheet?.shortName||'Sheet';
-  document.getElementById('edit-btn').textContent = '✏️ Edit';
-  document.getElementById('edit-warning').style.display = 'none';
-  document.getElementById('sheet-kpis').style.display = 'none';
-  document.getElementById('sheet-loading').style.display = 'block';
-  document.getElementById('sheet-error').style.display = 'none';
-  document.getElementById('sheet-table-wrap').style.display = 'none';
-  document.getElementById('sheet-search-inp').value = '';
-  renderSheetsNav();
-  loadSheet(gid);
-  if(window.innerWidth<768) closeSidebar();
-  if(curUser) addHistory({userId:curUser.id,userName:curUser.name,department:curUser.department,action:'view_sheet',detail:`Viewed ${sheet?.shortName||gid}`,sheetGid:gid});
-}
-function reloadSheet() { if(curSheet) goSheet(curSheet); }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LOGIN
-// ─────────────────────────────────────────────────────────────────────────────
-function showLogin() {
-  document.getElementById('login-page').style.display = 'flex';
-  document.getElementById('sidebar').style.display = 'none';
-  document.getElementById('mob-header').style.display = 'none';
-  document.getElementById('main').style.marginLeft = '0';
-  document.getElementById('main').style.paddingTop = '0';
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const accounts = document.getElementById('demo-accounts');
-  accounts.innerHTML = getUsers().map(u =>
-    `<button onclick="document.getElementById('login-email').value='${u.email}';document.getElementById('login-pw').value='${u.password}'" style="text-align:left;padding:10px 12px;border-radius:10px;background:#f8fafc;border:1px solid var(--border);cursor:pointer;transition:all .12s" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#e0e7ff'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='var(--border)'">
-      <p style="font-size:12px;font-weight:600;color:#1e293b">${u.department}</p>
-      <p style="font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email}</p>
-    </button>`
-  ).join('');
-}
-function showApp() {
-  document.getElementById('login-page').style.display = 'none';
-  document.getElementById('sidebar').style.display = 'flex';
-  const isMob = window.innerWidth<768;
-  document.getElementById('mob-header').style.display = isMob?'flex':'none';
-  document.getElementById('collapseBtn').style.display = isMob?'none':'block';
-  document.getElementById('main').style.marginLeft = '';
-  document.getElementById('main').style.paddingTop = '';
-  updateUserUI();
-  navTo('dashboard');
-  initDashboard();
-  document.getElementById('sheet-count').textContent = SHEETS.length;
-}
-function updateUserUI() {
-  if(!curUser) return;
-  document.getElementById('user-name').textContent = curUser.name;
-  document.getElementById('user-dept').textContent = curUser.department;
-  document.getElementById('user-avatar').textContent = curUser.avatar;
-  document.getElementById('mob-avatar').textContent = curUser.avatar;
-}
-function doLogin() {
-  const e = document.getElementById('login-email').value;
-  const p = document.getElementById('login-pw').value;
-  const u = auth(e, p);
-  if(u) {
-    curUser = u; setCurUser(u);
-    addHistory({userId:u.id,userName:u.name,department:u.department,action:'login',detail:`${u.name} logged in`});
-    showApp();
+function makeRowEditable(btn){
+  const tr = btn.closest('tr');
+  const editableCells = tr.querySelectorAll('td:not(:first-child):not(:last-child)');
+  if(btn.textContent==='Edit'){
+    editableCells.forEach(td=>{
+      const v = td.textContent;
+      td.innerHTML=`<input class="inline-edit" value="${v}" style="width:90px;"/>`;
+    });
+    btn.textContent='Save';
+    btn.style.background='var(--primary)';btn.style.color='#fff';
   } else {
-    const err = document.getElementById('login-err');
-    err.style.display='block'; err.textContent='Invalid email or password';
+    editableCells.forEach(td=>{
+      const inp = td.querySelector('input');
+      if(inp) td.textContent = inp.value;
+    });
+    btn.textContent='Edit';btn.style.background='';btn.style.color='';
+    showNotif('Row saved! Sync to backup.');
+    saveToLocal();
   }
 }
-document.getElementById('login-email').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
-document.getElementById('login-pw').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
-function logout() {
-  if(curUser) addHistory({userId:curUser.id,userName:curUser.name,department:curUser.department,action:'logout',detail:`${curUser.name} logged out`});
-  curUser=null; setCurUser(null); showLogin();
-}
-function togglePw() {
-  const inp = document.getElementById('login-pw');
-  const eye = document.getElementById('pw-eye');
-  inp.type = inp.type==='password'?'text':'password';
-  eye.textContent = inp.type==='password'?'👁️':'🙈';
+
+// ======= LOCAL STORAGE =======
+function saveToLocal(){
+  try{localStorage.setItem('ve_proj_data', JSON.stringify(projData));}catch(e){}
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DASHBOARD
-// ─────────────────────────────────────────────────────────────────────────────
-function initDashboard() {
-  renderDashCats();
-  renderSheetCards();
-  renderActivityList();
-  renderPipelineSummary();
-  updateDashKPIs();
-  loadDashboardData();
+// ======= ADD ROW =======
+function showAddRow(){
+  const section = document.querySelector('.tab-section.active').id;
+  showNotif('To add a new row: use the table Edit buttons or paste data from Excel.');
 }
-function renderDashCats() {
-  const el = document.getElementById('dash-cats');
-  el.innerHTML = CATEGORIES.map(c =>
-    `<button class="tp ${dashCat===c.key?'on':''}" onclick="setDashCat('${c.key}')">${c.icon} ${c.label}</button>`
-  ).join('');
+
+// ======= EXPORT =======
+function exportCSV(){
+  const rows = [['Project','SD','LD','Instant','Other','Withheld','Total'],...projData.map(d=>[d.name,d.sd,d.ld,d.instant,d.other,d.withheld,d.total])];
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='vishal_electricals_outstanding.csv';
+  a.click();
+  showNotif('CSV exported successfully!');
 }
-function setDashCat(k) {
-  dashCat=k; renderDashCats(); renderSheetCards();
+
+// ======= NOTIFICATION =======
+function showNotif(msg){
+  const n = document.getElementById('notif');
+  n.textContent = msg;n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),3000);
 }
-function renderSheetCards(summaries) {
-  const el = document.getElementById('sheet-cards');
-  const sums = summaries || window._dashSums || [];
-  const filtered = dashCat==='all' ? SHEETS : SHEETS.filter(s=>s.category===dashCat);
-  el.innerHTML = filtered.map(s => {
-    const sum = sums.find(x=>x.gid===s.gid);
-    const hasData = sum && sum.loaded && sum.ti>0;
-    const rate = hasData ? Math.min((sum.tr/sum.ti)*100,100) : 0;
-    return `<div class="cd cd-lift" style="padding:16px;cursor:pointer" onclick="goSheet('${s.gid}')">
-      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px">
-        <span style="font-size:18px">${s.icon}</span>
-        <div style="min-width:0;flex:1">
-          <h4 style="font-size:13px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.shortName}</h4>
-          <p style="font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.name}</p>
-        </div>
-      </div>
-      ${hasData ? `
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#94a3b8">Invoiced</span><span style="color:#2563eb;font-weight:700;font-family:'DM Mono',monospace">${fmt(sum.ti)}</span></div>
-          <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#94a3b8">Received</span><span style="color:#16a34a;font-weight:700;font-family:'DM Mono',monospace">${fmt(sum.tr)}</span></div>
-          <div class="prog-bar" style="margin-top:4px"><div class="prog-fill" style="width:${rate}%"></div></div>
-        </div>` : `<p style="font-size:11px;color:#cbd5e1">Click to view →</p>`}
-      <div style="margin-top:10px;padding-top:8px;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
-        <span class="badge" style="font-size:9px;${s.category==='iocl'?'background:#fff7ed;color:#ea580c':s.category==='billing'?'background:#eff6ff;color:#2563eb':'background:#f8fafc;color:#64748b'}">${s.category.toUpperCase()}</span>
-        <svg style="width:14px;height:14px;color:#cbd5e1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
-      </div>
-    </div>`;
-  }).join('');
-}
-async function loadDashboardData() {
-  const billing = SHEETS.filter(s=>['billing','iocl','other'].includes(s.category)).slice(0,16);
-  const results = [];
-  const settled = await Promise.allSettled(billing.map(async s => {
-    try {
-      const d = await fetchSheetData(s.gid);
-      const {ti,tr} = extractTotals(d);
-      return {gid:s.gid, ti, tr, loaded:true};
-    } catch {
-      return {gid:s.gid, ti:0, tr:0, loaded:false};
+
+// ======= CHARTS =======
+function initCharts(){
+  const ageingCounts = {'180+ Days':0,'91-180 Days':0,'61-90 Days':0};
+  ageingData.forEach(d=>{if(ageingCounts[d.bucket]!==undefined)ageingCounts[d.bucket]+=d.amount;});
+
+  new Chart(document.getElementById('chartAgeing'),{
+    type:'bar',
+    data:{
+      labels:Object.keys(ageingCounts).map(k=>k),
+      datasets:[{
+        label:'Amount (₹)',
+        data:Object.values(ageingCounts).map(v=>Math.round(v/100000)/10),
+        backgroundColor:['#c62828','#e65100','#f9a825'],
+        borderRadius:6,borderSkipped:false,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+c.parsed.y.toFixed(1)+' Lakh'}}},
+      scales:{y:{ticks:{callback:v=>v+'L'},grid:{color:'#f3f5f9'}},x:{grid:{display:false}}}
     }
-  }));
-  settled.forEach(r => { if(r.status==='fulfilled'&&r.value) results.push(r.value); });
-  window._dashSums = results;
-  renderSheetCards(results);
-  // Update KPIs
-  const ti = results.reduce((a,b)=>a+b.ti,0);
-  const tr = results.reduce((a,b)=>a+b.tr,0);
-  const rate = ti>0?(tr/ti)*100:0;
-  document.getElementById('kpi-invoice').textContent = fmt(ti);
-  document.getElementById('kpi-received').textContent = fmt(tr);
-  document.getElementById('kpi-pending').textContent = fmt(ti-tr);
-  document.getElementById('kpi-rate').textContent = rate.toFixed(1)+'%';
-}
-function updateDashKPIs() {
-  const leads = getLeads();
-  const projs = getProjects();
-  const wv = leads.filter(l=>l.status==='won').reduce((a,b)=>a+b.value,0);
-  const ap = projs.filter(p=>p.status==='in_progress').length;
-  document.getElementById('kpi-won').textContent = fmt(wv);
-  document.getElementById('kpi-active').textContent = ap;
-}
-function renderActivityList() {
-  const hist = getHistory();
-  const el = document.getElementById('activity-list');
-  if(!hist.length) { el.innerHTML='<p style="font-size:12px;color:#cbd5e1;text-align:center;padding:20px 0">No activity yet</p>'; return; }
-  const icons = {login:'🔑',logout:'🚪',edit_cell:'✏️',view_sheet:'👁️',add_lead:'🤝',edit_lead:'✏️',add_project:'📋',edit_project:'📋',add_department:'🏢',add_user:'👤'};
-  const bgs = {login:'background:#f0fdf4;color:#16a34a',edit_cell:'background:#fffbeb;color:#d97706'};
-  el.innerHTML = hist.slice(0,8).map(h => `
-    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f8fafc">
-      <span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;${bgs[h.action]||'background:#eff6ff;color:#2563eb'}">${icons[h.action]||'📋'}</span>
-      <div style="min-width:0;flex:1">
-        <p style="font-size:12px;font-weight:500;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.detail}</p>
-        <p style="font-size:10px;color:#94a3b8">${h.userName} • ${h.department}</p>
-      </div>
-      <span style="font-size:10px;color:#cbd5e1;flex-shrink:0">${new Date(h.timestamp).toLocaleDateString()}</span>
-    </div>`
-  ).join('');
-}
-function renderPipelineSummary() {
-  const leads = getLeads();
-  const statuses = ['new','contacted','qualified','proposal','negotiation','won','lost'];
-  const colors = {new:'background:#eff6ff;color:#2563eb',contacted:'background:#f0f9ff;color:#0284c7',qualified:'background:#eef2ff;color:#4f46e5',proposal:'background:#f5f3ff;color:#7c3aed',negotiation:'background:#fffbeb;color:#d97706',won:'background:#f0fdf4;color:#16a34a',lost:'background:#fef2f2;color:#dc2626'};
-  document.getElementById('pipeline-summary').innerHTML = statuses.map(st => {
-    const cnt = leads.filter(l=>l.status===st).length;
-    return `<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:4px 0">
-      <span class="badge" style="${colors[st]}">${st.charAt(0).toUpperCase()+st.slice(1)}</span>
-      <span style="font-weight:700;color:#475569">${cnt}</span>
-    </div>`;
-  }).join('');
-}
+  });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ACCOUNT PAGE
-// ─────────────────────────────────────────────────────────────────────────────
-function renderAccount() {
-  const el = document.getElementById('account-cards');
-  const acSheets = SHEETS.filter(s=>['billing','iocl'].includes(s.category));
-  el.innerHTML = acSheets.map(s => `
-    <div class="cd cd-lift" style="padding:16px;cursor:pointer" onclick="goSheet('${s.gid}')">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <span style="font-size:20px">${s.icon}</span>
-        <div style="min-width:0">
-          <h4 style="font-size:13px;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.shortName}</h4>
-          <p style="font-size:10px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</p>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <span class="badge" style="${s.category==='iocl'?'background:#fff7ed;color:#ea580c':'background:#eff6ff;color:#2563eb'}">${s.category.toUpperCase()}</span>
-        <svg style="width:14px;height:14px;color:#cbd5e1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
-      </div>
-    </div>`
-  ).join('');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PROJECTS PAGE
-// ─────────────────────────────────────────────────────────────────────────────
-const PS = ['planning','in_progress','on_hold','completed','cancelled'];
-const PL = {planning:'Planning',in_progress:'In Progress',on_hold:'On Hold',completed:'Completed',cancelled:'Cancelled'};
-const PC = {planning:'background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe',in_progress:'background:#fffbeb;color:#d97706;border:1px solid #fde68a',on_hold:'background:#f8fafc;color:#64748b;border:1px solid #e2e8f0',completed:'background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0',cancelled:'background:#fef2f2;color:#dc2626;border:1px solid #fecaca'};
-
-function renderProjects() {
-  const projs = getProjects();
-  const tv = projs.reduce((a,b)=>a+b.value,0);
-  document.getElementById('proj-subtitle').textContent = `${projs.length} projects • Total value ${fmt(tv)}`;
-  const kpis = [
-    {l:'Total',v:String(projs.length),c:'color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe'},
-    {l:'Active',v:String(projs.filter(p=>p.status==='in_progress').length),c:'color:#d97706;background:#fffbeb;border:1px solid #fde68a'},
-    {l:'Completed',v:String(projs.filter(p=>p.status==='completed').length),c:'color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0'},
-    {l:'Value',v:fmt(tv),c:'color:#7c3aed;background:#f5f3ff;border:1px solid #ede9fe'},
-  ];
-  document.getElementById('proj-kpis').innerHTML = kpis.map(k =>
-    `<div class="cd st3d" style="padding:14px;${k.c}"><p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8">${k.l}</p><p style="font-size:18px;font-weight:800;margin-top:4px;${k.c.split(';')[0]}">${k.v}</p></div>`
-  ).join('');
-  const filters = document.getElementById('proj-filters');
-  filters.innerHTML = ['all',...PS].map(s =>
-    `<button class="tp ${projFilter===s?'on':''}" onclick="setProjFilter('${s}')">${s==='all'?'All':PL[s]}</button>`
-  ).join('');
-  renderProjCards();
-}
-function setProjFilter(f) { projFilter=f; renderProjects(); }
-function renderProjCards() {
-  const projs = getProjects();
-  const fl = projFilter==='all'?projs:projs.filter(p=>p.status===projFilter);
-  document.getElementById('proj-cards').innerHTML = fl.map(p => `
-    <div class="cd cd-lift" style="padding:20px;cursor:pointer" onclick="editProject('${p.id}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:8px">
-        <div style="min-width:0">
-          <h3 style="font-size:13px;font-weight:700;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</h3>
-          <p style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.client}</p>
-        </div>
-        <span class="badge" style="font-size:10px;flex-shrink:0;${PC[p.status]}">${PL[p.status]}</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:5px;font-size:11px">
-        <div style="display:flex;justify-content:space-between"><span style="color:#94a3b8">Location</span><span style="color:#475569;font-weight:500">${p.location}</span></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:#94a3b8">Value</span><span style="color:#4f46e5;font-weight:700;font-family:'DM Mono',monospace">${fmt(p.value)}</span></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:#94a3b8">Timeline</span><span style="color:#64748b">${p.startDate} → ${p.endDate||'TBD'}</span></div>
-      </div>
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9">
-        <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px"><span style="color:#94a3b8;font-weight:700">Progress</span><span style="color:#4f46e5;font-weight:700">${p.progress}%</span></div>
-        <div class="prog-bar"><div class="prog-fill" style="width:${p.progress}%;${p.progress>=100?'background:#22c55e':''}"></div></div>
-      </div>
-      ${p.linkedSheetGid?`<button onclick="event.stopPropagation();goSheet('${p.linkedSheetGid}')" style="margin-top:10px;font-size:11px;color:#4f46e5;font-weight:500;background:none;border:none;cursor:pointer;padding:0">📑 View Billing Sheet →</button>`:''}
-    </div>`
-  ).join('');
-}
-function addProject() {
-  const u = curUser;
-  const p = {id:uid(),name:'',client:'',location:'',status:'planning',value:0,startDate:new Date().toISOString().slice(0,10),endDate:'',manager:u?.name||'',progress:0};
-  openProjectModal(p, true);
-}
-function editProject(id) {
-  const p = getProjects().find(x=>x.id===id);
-  if(p) openProjectModal(p, false);
-}
-function openProjectModal(p, isNew) {
-  document.getElementById('modal-content').innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <h2 style="font-size:17px;font-weight:700;color:#1e293b">${isNew?'Add Project':'Edit Project'}</h2>
-      <button onclick="closeModal()" style="width:32px;height:32px;border-radius:8px;background:#f1f5f9;border:none;cursor:pointer;font-size:14px;color:#64748b">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      ${[{k:'name',l:'Project Name'},{k:'client',l:'Client'},{k:'location',l:'Location'},{k:'manager',l:'Manager'}].map(x=>`
-        <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">${x.l}</label>
-        <input class="fi" value="${p[x.k]||''}" oninput="window._projForm.${x.k}=this.value"/></div>`).join('')}
-      <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Value (₹)</label><input class="fi" type="number" value="${p.value}" oninput="window._projForm.value=parseFloat(this.value)||0"/></div>
-      <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Status</label>
-        <select class="fi" style="background:#fff" onchange="window._projForm.status=this.value">${PS.map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${PL[s]}</option>`).join('')}</select></div>
-      <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Start Date</label><input class="fi" type="date" value="${p.startDate||''}" oninput="window._projForm.startDate=this.value"/></div>
-      <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">End Date</label><input class="fi" type="date" value="${p.endDate||''}" oninput="window._projForm.endDate=this.value"/></div>
-      <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Progress (%)</label><input class="fi" type="number" min="0" max="100" value="${p.progress}" oninput="window._projForm.progress=parseInt(this.value)||0"/></div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
-      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveProject(${isNew})">${isNew?'Create Project':'Save Changes'}</button>
-    </div>`;
-  window._projForm = {...p};
-  document.getElementById('modal-overlay').style.display = 'flex';
-}
-function saveProject(isNew) {
-  const f = window._projForm;
-  let projs = getProjects();
-  if(isNew) { projs.unshift(f); if(curUser) addHistory({userId:curUser.id,userName:curUser.name,department:curUser.department,action:'add_project',detail:`Added project: ${f.name}`}); }
-  else { projs = projs.map(p=>p.id===f.id?f:p); if(curUser) addHistory({userId:curUser.id,userName:curUser.name,department:curUser.department,action:'edit_project',detail:`Updated project: ${f.name}`}); }
-  setProjects(projs); closeModal(); renderProjects(); toast('Project saved!');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CRM PAGE
-// ─────────────────────────────────────────────────────────────────────────────
-const STS = ['new','contacted','qualified','proposal','negotiation','won','lost'];
-const SC = {new:'background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe',contacted:'background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd',qualified:'background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe',proposal:'background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe',negotiation:'background:#fffbeb;color:#d97706;border:1px solid #fde68a',won:'background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0',lost:'background:#fef2f2;color:#dc2626;border:1px solid #fecaca'};
-
-function renderCRM() {
-  const leads = getLeads();
-  const tv = leads.reduce((a,b)=>a+b.value,0);
-  const wv = leads.filter(l=>l.status==='won').reduce((a,b)=>a+b.value,0);
-  document.getElementById('crm-subtitle').textContent = `${leads.length} leads • Pipeline ${fmt(tv)}`;
-  const wr = leads.length>0?((leads.filter(l=>l.status==='won').length/leads.length)*100).toFixed(0)+'%':'0%';
-  document.getElementById('crm-kpis').innerHTML = [
-    {l:'Total Leads',v:String(leads.length),c:'color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe'},
-    {l:'Won Value',v:fmt(wv),c:'color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0'},
-    {l:'In Pipeline',v:fmt(tv-wv),c:'color:#d97706;background:#fffbeb;border:1px solid #fde68a'},
-    {l:'Win Rate',v:wr,c:'color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe'},
-  ].map(k=>`<div class="cd st3d" style="padding:14px;${k.c}"><p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8">${k.l}</p><p style="font-size:18px;font-weight:800;margin-top:4px;${k.c.split(';')[0]}">${k.v}</p></div>`).join('');
-  const fl = document.getElementById('crm-filters');
-  fl.innerHTML = ['all',...STS].map(s=>
-    `<button class="tp ${crmFilter===s?'on':''}" onclick="setCrmFilter('${s}')">${s==='all'?'All':s.charAt(0).toUpperCase()+s.slice(1)}</button>`
-  ).join('');
-  renderCRMPipeline();
-}
-function setCrmFilter(f) { crmFilter=f; renderCRM(); }
-function renderCRMPipeline() {
-  const leads = getLeads();
-  const fl = crmFilter==='all'?leads:leads.filter(l=>l.status===crmFilter);
-  const bySt = {};
-  STS.forEach(s => bySt[s]=fl.filter(l=>l.status===s));
-  const shownSts = crmFilter==='all'?STS:[crmFilter];
-  document.getElementById('crm-pipeline').innerHTML = shownSts.map(st=>`
-    <div>
-      <div class="badge" style="width:100%;justify-content:center;margin-bottom:8px;font-size:11px;${SC[st]}">${st.charAt(0).toUpperCase()+st.slice(1)} (${bySt[st].length})</div>
-      ${(bySt[st]||[]).map(l=>`
-        <div class="cd" style="padding:10px;cursor:pointer;margin-bottom:6px" onclick="editLead('${l.id}')">
-          <p style="font-size:12px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.company}</p>
-          <p style="font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.contact}</p>
-          <p style="font-size:11px;font-weight:700;color:#4f46e5;margin-top:4px;font-family:'DM Mono',monospace">${fmt(l.value)}</p>
-        </div>`).join('')}
-    </div>`
-  ).join('');
-}
-function addLead() {
-  const u = curUser;
-  const l = {id:uid(),company:'',contact:'',phone:'',email:'',source:'',status:'new',value:0,notes:'',assignedTo:u?.name||'',createdAt:new Date().toISOString().slice(0,10),updatedAt:new Date().toISOString().slice(0,10)};
-  openLeadModal(l, true);
-}
-function editLead(id) {
-  const l = getLeads().find(x=>x.id===id);
-  if(l) openLeadModal(l, false);
-}
-function openLeadModal(l, isNew) {
-  document.getElementById('modal-content').innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <h2 style="font-size:17px;font-weight:700;color:#1e293b">${isNew?'Add Lead':'Edit Lead'}</h2>
-      <button onclick="closeModal()" style="width:32px;height:32px;border-radius:8px;background:#f1f5f9;border:none;cursor:pointer;font-size:14px;color:#64748b">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      ${[{k:'company',l:'Company'},{k:'contact',l:'Contact Person'},{k:'phone',l:'Phone'},{k:'email',l:'Email'},{k:'source',l:'Source'},{k:'assignedTo',l:'Assigned To'}].map(x=>`
-        <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">${x.l}</label>
-        <input class="fi" value="${l[x.k]||''}" oninput="window._leadForm.${x.k}=this.value"/></div>`).join('')}
-      <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Value (₹)</label><input class="fi" type="number" value="${l.value}" oninput="window._leadForm.value=parseFloat(this.value)||0"/></div>
-      <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Status</label>
-        <select class="fi" style="background:#fff" onchange="window._leadForm.status=this.value">${STS.map(s=>`<option value="${s}" ${l.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}</select></div>
-      <div style="grid-column:1/-1"><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Notes</label>
-        <textarea class="fi" rows="2" style="resize:none" oninput="window._leadForm.notes=this.value">${l.notes||''}</textarea></div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
-      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveLead(${isNew})">${isNew?'Create Lead':'Save Changes'}</button>
-    </div>`;
-  window._leadForm = {...l};
-  document.getElementById('modal-overlay').style.display = 'flex';
-}
-function saveLead(isNew) {
-  const f = {...window._leadForm, updatedAt:new Date().toISOString().slice(0,10)};
-  let leads = getLeads();
-  if(isNew) { leads.unshift(f); if(curUser) addHistory({userId:curUser.id,userName:curUser.name,department:curUser.department,action:'add_lead',detail:`Added lead: ${f.company}`}); }
-  else { leads = leads.map(l=>l.id===f.id?f:l); if(curUser) addHistory({userId:curUser.id,userName:curUser.name,department:curUser.department,action:'edit_lead',detail:`Updated lead: ${f.company}`}); }
-  setLeads(leads); closeModal(); renderCRM(); toast('Lead saved!');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HISTORY PAGE
-// ─────────────────────────────────────────────────────────────────────────────
-function renderHistory() {
-  const hist = getHistory();
-  const icons = {login:'🔑',logout:'🚪',edit_cell:'✏️',view_sheet:'👁️',add_lead:'🤝',edit_lead:'✏️',add_project:'📋',edit_project:'📋',add_department:'🏢',add_user:'👤'};
-  document.getElementById('history-tbody').innerHTML = hist.length
-    ? hist.map(h=>`<tr><td>${icons[h.action]||'📋'} ${h.action.replace(/_/g,' ')}</td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.detail}</td><td>${h.userName}</td><td>${h.department}</td><td style="color:#94a3b8;font-size:11px">${new Date(h.timestamp).toLocaleString()}</td></tr>`).join('')
-    : '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:40px">No history yet</td></tr>';
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SETTINGS PAGE
-// ─────────────────────────────────────────────────────────────────────────────
-function renderSettings() {
-  const users = getUsers();
-  document.getElementById('users-list').innerHTML = users.map(u=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1px solid var(--border)">
-      <div style="width:32px;height:32px;border-radius:8px;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${u.avatar}</div>
-      <div style="flex:1;min-width:0">
-        <p style="font-size:12px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.name}</p>
-        <p style="font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email} • ${u.department}</p>
-      </div>
-      <span class="badge" style="font-size:10px;background:#eef2ff;color:#4f46e5;flex-shrink:0">${u.role}</span>
-    </div>`).join('');
-  const depts = LS.get('ve_depts',[{id:'d1',name:'Account',icon:'💰',color:'#10b981'},{id:'d2',name:'Project',icon:'📋',color:'#3b82f6'},{id:'d3',name:'CRM',icon:'🤝',color:'#f59e0b'}]);
-  document.getElementById('depts-list').innerHTML = depts.map(d=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1px solid var(--border)">
-      <span style="font-size:20px">${d.icon}</span>
-      <div style="flex:1"><p style="font-size:12px;font-weight:600;color:#1e293b">${d.name}</p></div>
-    </div>`).join('');
-}
-function addUser() {
-  document.getElementById('modal-content').innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <h2 style="font-size:17px;font-weight:700;color:#1e293b">Add User</h2>
-      <button onclick="closeModal()" style="width:32px;height:32px;border-radius:8px;background:#f1f5f9;border:none;cursor:pointer;font-size:14px;color:#64748b">✕</button>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      ${[{k:'name',l:'Name'},{k:'email',l:'Email'},{k:'password',l:'Password'},{k:'department',l:'Department'}].map(x=>`
-        <div><label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">${x.l}</label>
-        <input class="fi" id="nu-${x.k}"/></div>`).join('')}
-      <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:12px;border-top:1px solid var(--border)">
-        <button class="btn-ghost" onclick="closeModal()">Cancel</button>
-        <button class="btn-primary" onclick="saveUser()">Create User</button>
-      </div>
-    </div>`;
-  document.getElementById('modal-overlay').style.display='flex';
-}
-function saveUser() {
-  const n=document.getElementById('nu-name').value;
-  const e=document.getElementById('nu-email').value;
-  const p=document.getElementById('nu-password').value;
-  const d=document.getElementById('nu-department').value;
-  if(!n||!e||!p) { toast('Please fill all fields'); return; }
-  const users=getUsers();
-  users.push({id:uid(),name:n,email:e,password:p,role:'custom',department:d||'Custom',avatar:n.slice(0,2).toUpperCase(),createdAt:new Date().toISOString()});
-  setUsers(users);
-  if(curUser) addHistory({userId:curUser.id,userName:curUser.name,department:curUser.department,action:'add_user',detail:`Added user: ${n}`});
-  closeModal(); renderSettings(); toast('User created!');
-}
-function addDept() { toast('Department management available in full version'); }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SHEET VIEW
-// ─────────────────────────────────────────────────────────────────────────────
-async function loadSheet(gid) {
-  try {
-    const data = await fetchSheetData(gid);
-    sheetDataFull = data;
-    sheetData = data;
-    renderSheetTable(data);
-    document.getElementById('sheet-rows-label').textContent = `${data.rows.filter(r=>r.some(c=>c.trim())).length} records`;
-    document.getElementById('sheet-loading').style.display='none';
-    document.getElementById('sheet-table-wrap').style.display='block';
-    // Stats
-    const {ti,tr} = extractTotals(data);
-    if(ti>0) {
-      const kpis = document.getElementById('sheet-kpis');
-      kpis.style.display='grid';
-      kpis.innerHTML = [
-        {l:'Total Invoiced',v:fmt(ti),c:'color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe'},
-        {l:'Total Received',v:fmt(tr),c:'color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0'},
-        {l:'Pending',v:fmt(ti-tr),c:'color:#d97706;background:#fffbeb;border:1px solid #fde68a'},
-        {l:'Collection %',v:(ti>0?(tr/ti)*100:0).toFixed(1)+'%',c:'color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe'},
-      ].map(k=>`<div class="cd" style="padding:12px;${k.c}"><p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8">${k.l}</p><p style="font-size:17px;font-weight:800;margin-top:2px;${k.c.split(';')[0]};font-family:'DM Mono',monospace">${k.v}</p></div>`).join('');
+  const ldTotal = projData.reduce((s,d)=>s+d.ld,0);
+  const sdTotal = projData.reduce((s,d)=>s+d.sd,0);
+  const wTotal = projData.reduce((s,d)=>s+d.withheld,0);
+  const oTotal = projData.reduce((s,d)=>s+d.other,0);
+  new Chart(document.getElementById('chartDeduction'),{
+    type:'doughnut',
+    data:{
+      labels:['LD Deduction','SD Deduction','Withheld','Other Deduction'],
+      datasets:[{data:[ldTotal,sdTotal,wTotal,oTotal].map(v=>Math.round(v/1000)),backgroundColor:['#e65100','#1565c0','#2e7d32','#7b1fa2'],borderWidth:0,hoverOffset:8}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'60%',
+      plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{label:c=>c.label+': ₹'+c.parsed.toLocaleString('en-IN')+'K'}}}
     }
-  } catch(err) {
-    document.getElementById('sheet-loading').style.display='none';
-    document.getElementById('sheet-err-msg').textContent=err.message;
-    document.getElementById('sheet-error').style.display='block';
-  }
-}
-function renderSheetTable(data) {
-  const thead = document.getElementById('sheet-thead');
-  const tbody = document.getElementById('sheet-tbody');
-  thead.innerHTML = '<tr>'+data.headers.map(h=>`<th>${h||'—'}</th>`).join('')+'</tr>';
-  const rows = data.rows.filter(r=>r.some(c=>c.trim()));
-  tbody.innerHTML = rows.map((row,ri)=>
-    `<tr class="ptr" onclick="openRowDetail(${ri})">${row.map((cell,ci)=>
-      `<td class="${editMode?'ec':''}" ${editMode?`ondblclick="startEdit(this,${ri},${ci})"`:''} style="font-size:12px">${cell||''}</td>`
-    ).join('')}</tr>`
-  ).join('');
-}
-function filterSheet() {
-  const q = document.getElementById('sheet-search-inp').value.toLowerCase();
-  if(!sheetDataFull) return;
-  if(!q) { sheetData=sheetDataFull; renderSheetTable(sheetDataFull); return; }
-  const filtered = {...sheetDataFull, rows:sheetDataFull.rows.filter(r=>r.some(c=>c.toLowerCase().includes(q)))};
-  sheetData=filtered; renderSheetTable(filtered);
-}
-function toggleEdit() {
-  editMode=!editMode;
-  document.getElementById('edit-btn').textContent=editMode?'✏️ Editing':'✏️ Edit';
-  document.getElementById('edit-btn').style.background=editMode?'#fffbeb':'';
-  document.getElementById('edit-btn').style.color=editMode?'#d97706':'';
-  document.getElementById('edit-warning').style.display=editMode?'flex':'none';
-  if(sheetData) renderSheetTable(sheetData);
-}
-function startEdit(cell, ri, ci) {
-  const val = cell.textContent;
-  cell.innerHTML=`<input class="fi" value="${val.replace(/"/g,'&quot;')}" style="min-width:80px;padding:4px 8px" onblur="commitEdit(this,${ri},${ci})" onkeydown="if(event.key==='Enter')this.blur()"/>`;
-  cell.querySelector('input').focus();
-}
-function commitEdit(inp, ri, ci) {
-  const val = inp.value;
-  if(sheetDataFull) {
-    const rows=[...sheetDataFull.rows];
-    const row=[...rows[ri]]; row[ci]=val; rows[ri]=row;
-    sheetDataFull={...sheetDataFull,rows};
-    sheetData=sheetDataFull;
-    if(curUser) addHistory({userId:curUser.id,userName:curUser.name,department:curUser.department,action:'edit_cell',detail:`Edited cell [${ri+1},${ci+1}] in ${document.getElementById('sheet-title').textContent}`,sheetGid:curSheet});
-  }
-  inp.closest('td').textContent=val;
-}
-function openRowDetail(ri) {
-  if(!sheetData) return;
-  const rows = sheetData.rows.filter(r=>r.some(c=>c.trim()));
-  const row = rows[ri];
-  if(!row) return;
-  document.getElementById('modal-content').innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <h2 style="font-size:17px;font-weight:700;color:#1e293b">Row Detail #${ri+1}</h2>
-      <button onclick="closeModal()" style="width:32px;height:32px;border-radius:8px;background:#f1f5f9;border:none;cursor:pointer;font-size:14px;color:#64748b">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      ${sheetData.headers.map((h,i)=>row[i]?`
-        <div style="padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border)">
-          <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${h||'Col '+(i+1)}</p>
-          <p style="font-size:13px;color:#1e293b;font-weight:500;word-break:break-word">${row[i]}</p>
-        </div>`:''
-      ).filter(Boolean).join('')}
-    </div>`;
-  document.getElementById('modal-overlay').style.display='flex';
+  });
+
+  const top10 = [...projData].sort((a,b)=>b.total-a.total).slice(0,10);
+  new Chart(document.getElementById('chartTop10'),{
+    type:'bar',
+    data:{
+      labels:top10.map(d=>d.name.replace('INDIAN OIL CORPORATION LTD','IOCL').replace('Indian Oil Corporation Ltd','IOCL').substring(0,35)),
+      datasets:[{
+        label:'Outstanding (₹)',
+        data:top10.map(d=>Math.round(d.total/100000)/10),
+        backgroundColor:'#1565c0',borderRadius:4,
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+c.parsed.x.toFixed(1)+' Lakh'}}},
+      scales:{x:{ticks:{callback:v=>v+'L'},grid:{color:'#f3f5f9'}},y:{grid:{display:false},ticks:{font:{size:11}}}}
+    }
+  });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MODAL
-// ─────────────────────────────────────────────────────────────────────────────
-function closeModal(e) {
-  if(!e||e.target===document.getElementById('modal-overlay')) {
-    document.getElementById('modal-overlay').style.display='none';
-  }
-}
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
-
-// ─────────────────────────────────────────────────────────────────────────────
-// RESPONSIVE
-// ─────────────────────────────────────────────────────────────────────────────
-function checkMobile() {
-  const mob = window.innerWidth<768;
-  document.getElementById('mob-header').style.display = mob && curUser ? 'flex' : 'none';
-  document.getElementById('collapseBtn').style.display = mob ? 'none' : 'block';
-  if(mob) { collapsed=false; document.getElementById('sidebar').classList.remove('col'); document.getElementById('main').classList.remove('col'); }
-}
-window.addEventListener('resize', checkMobile);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BOOT
-// ─────────────────────────────────────────────────────────────────────────────
-function boot() {
-  checkMobile();
-  curUser = getCurUser();
-  if(curUser) { showApp(); }
-  else { showLogin(); document.getElementById('sidebar').style.display='none'; }
-  // Login on Enter
-  document.getElementById('login-email').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('login-pw').focus(); });
-}
-boot();
+// ======= INIT =======
+window.onload=function(){initTables();initCharts();};
 </script>
 </body>
 </html>
