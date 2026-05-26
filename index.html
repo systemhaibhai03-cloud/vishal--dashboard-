@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vishal Technopower – Management Portal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#f5f0e8;--white:#fff;--amber-50:#fffbeb;--amber-100:#fef3c7;--amber-200:#fde68a;
+    --amber-600:#d97706;--amber-700:#b45309;--amber-800:#92400e;--amber-900:#78350f;
+    --red-50:#fef2f2;--red-100:#fee2e2;--red-200:#fecaca;--red-500:#ef4444;--red-600:#dc2626;--red-700:#b91c1c;
+    --green-50:#f0fdf4;--green-100:#dcfce7;--green-600:#16a34a;--green-700:#15803d;
+    --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-600:#2563eb;--blue-700:#1d4ed8;--blue-800:#1e40af;
+    --purple-50:#faf5ff;--purple-100:#f3e8ff;--purple-700:#7e22ce;--purple-800:#6b21a8;
+    --indigo-50:#eef2ff;--indigo-100:#e0e7ff;--indigo-600:#4f46e5;--indigo-800:#3730a3;
+    --teal-50:#f0fdfa;--teal-100:#ccfbf1;--teal-800:#115e59;
+    --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;
+    --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+    --shadow-lg:0 10px 25px rgba(0,0,0,.12),0 4px 6px rgba(0,0,0,.06);
+    --radius:14px;--radius-sm:10px;--radius-full:9999px;
+    --sidebar-w:256px;--sidebar-w-collapsed:64px;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--gray-800);height:100vh;overflow:hidden;display:flex;}
+  button{cursor:pointer;font-family:inherit;border:none;background:none;}
+  input{font-family:inherit;}
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:#d97706;border-radius:99px;}
+
+  /* ---- SIDEBAR ---- */
+  #sidebar{
+    width:var(--sidebar-w);background:var(--white);border-right:1px solid var(--amber-200);
+    display:flex;flex-direction:column;transition:width .3s ease;overflow:hidden;
+    box-shadow:var(--shadow-lg);z-index:20;flex-shrink:0;
+  }
+  #sidebar.collapsed{width:var(--sidebar-w-collapsed);}
+  .sb-header{
+    display:flex;align-items:center;justify-content:space-between;padding:16px;
+    border-bottom:1px solid var(--amber-200);background:linear-gradient(135deg,var(--amber-50),var(--white));
+    min-height:64px;
+  }
+  .sb-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .sb-logo-icon{width:36px;height:36px;background:var(--amber-600);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0;}
+  .sb-logo-text h2{font-size:13px;font-weight:700;color:var(--amber-900);}
+  .sb-logo-text p{font-size:10px;color:var(--amber-600);letter-spacing:.05em;}
+  .sb-toggle{padding:6px;border-radius:8px;color:var(--amber-600);transition:background .2s;}
+  .sb-toggle:hover{background:var(--amber-100);}
+  nav{flex:1;overflow-y:auto;padding:12px 8px;display:flex;flex-direction:column;gap:2px;}
+  .nav-btn{
+    width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);
+    font-size:13.5px;font-weight:500;color:var(--gray-600);transition:all .2s;white-space:nowrap;
+  }
+  .nav-btn:hover{background:var(--amber-50);color:var(--amber-700);}
+  .nav-btn.active{background:var(--amber-100);color:var(--amber-800);box-shadow:var(--shadow);}
+  .nav-btn svg{flex-shrink:0;}
+  .nav-label{overflow:hidden;transition:opacity .2s;}
+  #sidebar.collapsed .nav-label{opacity:0;width:0;}
+  .sb-alert{margin:8px 4px;padding:10px 12px;border-radius:var(--radius-sm);font-size:11px;}
+  .sb-alert.green{background:var(--green-50);border:1px solid var(--green-100);color:#15803d;}
+  .sb-alert.red{background:var(--red-50);border:1px solid var(--red-100);color:var(--red-700);}
+  .sb-alert-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+  .sb-alert.green .sb-alert-dot{background:#16a34a;}
+  .sb-alert.red .sb-alert-dot{background:var(--red-500);animation:pulse 1.5s infinite;}
+  #sidebar.collapsed .sb-alert{display:none;}
+  .sb-footer{padding:12px;border-top:1px solid var(--amber-200);background:rgba(255,251,235,.5);}
+  .sb-footer p{font-size:10px;color:var(--amber-600);text-align:center;}
+  #sidebar.collapsed .sb-footer p{display:none;}
+
+  /* ---- MAIN ---- */
+  #main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  #header{
+    position:sticky;top:0;z-index:10;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--amber-200);padding:12px 24px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;
+  }
+  .hdr-title h1{font-size:17px;font-weight:700;color:var(--gray-800);}
+  .hdr-title p{font-size:11px;color:var(--gray-500);}
+  .hdr-actions{display:flex;align-items:center;gap:10px;}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--radius-full);font-size:11px;font-weight:600;}
+  .pill.gray{background:var(--gray-100);color:var(--gray-600);}
+  .pill.gray:hover{background:var(--gray-100);}
+  .pill.blue{background:var(--blue-50);color:var(--blue-700);}
+  .pill.green{background:var(--green-50);color:var(--green-600);}
+  .pill.red{background:var(--red-50);color:var(--red-700);}
+  .pill.amber{background:var(--amber-100);color:var(--amber-700);}
+  .pill-dot{width:8px;height:8px;border-radius:50%;}
+  .hdr-avatar{width:32px;height:32px;background:var(--amber-600);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;}
+
+  /* ---- CONTENT ---- */
+  #content{flex:1;overflow-y:auto;padding:24px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---- CARDS ---- */
+  .card{background:var(--white);border-radius:var(--radius);border:1px solid var(--amber-100);box-shadow:var(--shadow);overflow:hidden;}
+  .card-pad{padding:20px;}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  @media(max-width:1024px){.grid-4{grid-template-columns:repeat(2,1fr);}.grid-3{grid-template-columns:repeat(2,1fr);}}
+
+  .summary-card{border-radius:var(--radius);border:1px solid;padding:16px;}
+  .summary-card .sc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
+  .summary-card .sc-val{font-size:20px;font-weight:700;margin-top:4px;}
+  .summary-card .sc-sub{font-size:11px;margin-top:4px;opacity:.7;}
+  .sc-amber{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:var(--amber-200);color:var(--amber-800);}
+  .sc-blue{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe;color:var(--blue-800);}
+  .sc-purple{background:linear-gradient(135deg,#faf5ff,#f3e8ff);border-color:#e9d5ff;color:var(--purple-800);}
+  .sc-red{background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:var(--red-200);color:var(--red-700);}
+  .sc-indigo{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-color:#c7d2fe;color:var(--indigo-800);}
+  .sc-green{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#bbf7d0;color:#166534;}
+  .sc-teal{background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border-color:#99f6e4;color:var(--teal-800);}
+
+  /* ---- TABLE ---- */
+  .tbl-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  thead tr{background:var(--amber-50);}
+  th{padding:10px 12px;text-align:left;font-size:10.5px;font-weight:700;color:var(--amber-800);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;cursor:pointer;}
+  th:hover{background:var(--amber-100);}
+  td{padding:10px 12px;border-top:1px solid var(--gray-50);vertical-align:middle;}
+  tr:hover td{background:rgba(255,251,235,.4);}
+  tfoot td{background:rgba(255,251,235,.8);font-weight:600;}
+  .tr-red td{background:rgba(254,242,242,.5);}
+
+  /* ---- INPUTS ---- */
+  input[type=text],input[type=number],input[type=date],select{
+    padding:8px 14px;border:1px solid var(--amber-200);border-radius:var(--radius-sm);
+    font-size:13px;outline:none;width:100%;background:var(--white);transition:box-shadow .2s,border-color .2s;
+  }
+  input:focus,select:focus{border-color:var(--amber-600);box-shadow:0 0 0 3px rgba(217,119,6,.15);}
+  label{font-size:10.5px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px;}
+
+  /* ---- BUTTONS ---- */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:all .2s;}
+  .btn-amber{background:var(--amber-600);color:#fff;box-shadow:var(--shadow);}
+  .btn-amber:hover{background:var(--amber-700);}
+  .btn-green{background:var(--green-600);color:#fff;}
+  .btn-green:hover{background:var(--green-700);}
+  .btn-gray{background:var(--gray-100);color:var(--gray-700);}
+  .btn-gray:hover{background:var(--gray-200);}
+  .btn-red{background:var(--red-50);color:var(--red-700);border:1px solid var(--red-200);}
+  .btn-red:hover{background:var(--red-100);}
+  .btn-sm{padding:5px 10px;font-size:11px;border-radius:8px;}
+  .btn-icon-blue{background:var(--blue-100);color:var(--blue-700);}
+  .btn-icon-blue:hover{background:#bfdbfe;}
+  .btn-icon-red{background:var(--red-100);color:var(--red-700);}
+  .btn-icon-red:hover{background:var(--red-200);}
+  .btn-icon-green{background:var(--green-100);color:var(--green-700);}
+  .btn-icon-green:hover{background:var(--green-200);}
+
+  /* ---- MODAL ---- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;}
+  .modal{background:var(--white);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-height:90vh;overflow-y:auto;}
+  .modal-sm{max-width:480px;}
+  .modal-md{max-width:640px;}
+  .modal-lg{max-width:900px;}
+  .modal h3{font-size:17px;font-weight:700;color:var(--gray-800);margin-bottom:16px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .form-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .field{display:flex;flex-direction:column;}
+
+  /* ---- BADGES ---- */
+  .badge{display:inline-block;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700;}
+  .badge-red{background:var(--red-500);color:#fff;}
+  .badge-amber{background:var(--amber-200);color:var(--amber-800);}
+  .badge-green{background:#bbf7d0;color:#166534;}
+  .badge-blue{background:var(--blue-100);color:var(--blue-700);}
+  .badge-gray{background:var(--gray-100);color:var(--gray-600);}
+  .badge-danger{background:var(--red-600);color:#fff;}
+  .text-right{text-align:right;}
+  .text-red{color:var(--red-600);}
+  .text-green{color:var(--green-600);}
+  .text-blue{color:var(--blue-700);}
+  .text-purple{color:var(--purple-700);}
+  .text-orange{color:#c2410c;}
+  .text-amber{color:var(--amber-600);}
+  .fw-bold{font-weight:700;}
+  .fw-semi{font-weight:600;}
+  .truncate{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .space-y>*+*{margin-top:16px;}
+  .flex{display:flex;}
+  .flex-wrap{flex-wrap:wrap;}
+  .items-center{align-items:center;}
+  .justify-between{justify-content:space-between;}
+  .gap-2{gap:8px;}
+  .gap-3{gap:12px;}
+  .gap-4{gap:16px;}
+
+  /* ---- MANAGER FILTER CHIPS ---- */
+  .chip{padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transition:all .2s;border:1px solid var(--amber-200);color:var(--amber-800);background:var(--amber-50);}
+  .chip:hover{background:var(--amber-100);}
+  .chip.active{background:var(--amber-600);color:#fff;border-color:var(--amber-600);box-shadow:var(--shadow);}
+
+  /* ---- SITE CHIPS ---- */
+  .site-chip{padding:6px 12px;border-radius:var(--radius-sm);font-size:11.5px;font-weight:500;transition:all .2s;border:1px solid var(--amber-200);color:var(--amber-800);background:var(--amber-50);}
+  .site-chip:hover{background:var(--amber-100);}
+  .site-chip.active{background:var(--amber-600);color:#fff;border-color:var(--amber-600);box-shadow:var(--shadow);}
+  .sites-grid{display:flex;flex-wrap:wrap;gap:6px;max-height:180px;overflow-y:auto;padding:4px 0;}
+
+  /* ---- PAGINATION ---- */
+  .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--gray-100);background:var(--gray-50);}
+  .pg-info{font-size:12px;color:var(--gray-500);}
+  .pg-btns{display:flex;gap:4px;}
+  .pg-btn{padding:4px 10px;font-size:11.5px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200);color:var(--gray-700);transition:background .2s;}
+  .pg-btn:hover{background:var(--amber-50);}
+  .pg-btn.active{background:var(--amber-600);color:#fff;border-color:var(--amber-600);}
+  .pg-btn:disabled{opacity:.4;cursor:default;}
+
+  /* ---- BG EXPIRY ALERT ---- */
+  .bg-expiry-alert{background:var(--red-50);border:2px solid var(--red-200);border-radius:var(--radius);padding:20px;}
+  .bg-expiry-alert h3{color:var(--red-700);font-size:16px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .exp-dot{width:12px;height:12px;background:var(--red-500);border-radius:50%;animation:pulse 1.5s infinite;}
+
+  /* ---- RANK LIST ---- */
+  .rank-item{display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,251,235,.5);border-radius:var(--radius-sm);transition:background .2s;}
+  .rank-item:hover{background:var(--amber-50);}
+  .rank-num{width:28px;height:28px;background:var(--amber-200);color:var(--amber-800);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+
+  /* ---- PANTRY SETTINGS ---- */
+  .settings-block{background:var(--white);border-radius:var(--radius);border:1px solid var(--amber-100);padding:24px;margin-bottom:16px;}
+  .settings-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px;}
+  .step-item{display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--gray-600);}
+  .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+
+  /* ---- LOADING ---- */
+  .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:256px;gap:12px;}
+  .spinner{width:40px;height:40px;border:4px solid var(--amber-200);border-top-color:var(--amber-600);border-radius:50%;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  /* ---- SEARCH BAR ---- */
+  .search-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--gray-100);}
+  .search-input{padding:8px 14px;border:1px solid var(--amber-200);border-radius:var(--radius-sm);font-size:13px;outline:none;width:260px;}
+  .search-input:focus{border-color:var(--amber-600);box-shadow:0 0 0 3px rgba(217,119,6,.15);}
+  .search-meta{font-size:12px;color:var(--gray-500);}
+  .search-meta span.hl{font-weight:700;color:var(--red-600);}
+
+  /* ---- EMPTY STATE ---- */
+  .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--gray-400);border:2px dashed var(--amber-200);border-radius:var(--radius);}
+  .empty-state .emoji{font-size:36px;margin-bottom:8px;}
+
+  /* ---- INVOICE STAT CARDS ---- */
+  .inv-stat{border-radius:var(--radius-sm);border:1px solid;padding:12px 14px;}
+  .inv-stat .ist-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+  .inv-stat .ist-val{font-size:17px;font-weight:700;margin-top:2px;}
+  .ist-blue{background:linear-gradient(135deg,var(--blue-50),var(--blue-100));border-color:#bfdbfe;color:var(--blue-800);}
+  .ist-green{background:linear-gradient(135deg,var(--green-50),var(--green-100));border-color:#bbf7d0;color:#166534;}
+  .ist-purple{background:linear-gradient(135deg,var(--purple-50),var(--purple-100));border-color:#e9d5ff;color:var(--purple-800);}
+</style>
+</head>
+<body>
+
+<!-- ========================== SIDEBAR ========================== -->
+<aside id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">VT</div>
+      <div class="sb-logo-text">
+        <h2>VISHAL</h2>
+        <p>TECHNOPOWER</p>
+      </div>
+    </div>
+    <button class="sb-toggle" id="sidebarToggle" title="Toggle Sidebar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+  </div>
+
+  <nav id="navLinks">
+    <button class="nav-btn active" data-tab="dashboard">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-btn" data-tab="outstanding">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      <span class="nav-label">Outstanding</span>
+    </button>
+    <button class="nav-btn" data-tab="billdetail">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <span class="nav-label">Bill Details</span>
+    </button>
+    <button class="nav-btn" data-tab="bg">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      <span class="nav-label">BG Report</span>
+    </button>
+    <button class="nav-btn" data-tab="deposits">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      <span class="nav-label">Deposits</span>
+    </button>
+    <button class="nav-btn" data-tab="invoices">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span class="nav-label">Invoices</span>
+    </button>
+    <button class="nav-btn" data-tab="settings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <span class="nav-label">Pantry Sync</span>
+    </button>
+
+    <div id="sbPantryAlert" class="sb-alert green" style="display:none">
+      <div style="font-weight:700;font-size:11px;display:flex;align-items:center;"><span class="sb-alert-dot"></span>☁ Pantry Connected</div>
+      <div id="sbLastSync" style="font-size:10px;margin-top:2px;">Ready to sync</div>
+    </div>
+    <div id="sbBGAlert" class="sb-alert red" style="display:none">
+      <div style="font-weight:700;font-size:11px;display:flex;align-items:center;"><span class="sb-alert-dot"></span>⚠ BG Expiry Alert</div>
+      <div id="sbBGAlertText" style="font-size:10px;margin-top:2px;"></div>
+    </div>
+  </nav>
+
+  <div class="sb-footer">
+    <p>Vishal Technopower © 2026</p>
+  </div>
+</aside>
+
+<!-- ========================== MAIN ========================== -->
+<div id="main">
+  <header id="header">
+    <div class="hdr-title">
+      <h1 id="pageTitle">📊 Dashboard</h1>
+      <p>Vishal Technopower - Management Portal</p>
+    </div>
+    <div class="hdr-actions">
+      <button id="hdrSyncBtn" class="pill gray" onclick="syncNow()" style="display:none">
+        <span class="pill-dot" id="syncDot" style="background:#9ca3af;border-radius:50%;"></span>
+        <span id="syncLabel">☁ Sync</span>
+      </button>
+      <button id="hdrSetupBtn" class="pill amber" onclick="switchTab('settings')" style="display:none">⚙ Setup Pantry</button>
+      <span id="hdrBGBadge" class="pill red" style="display:none">
+        <span class="pill-dot" style="background:#ef4444;border-radius:50%;animation:pulse 1.5s infinite;"></span>
+        <span id="bgBadgeText">0 BG Expiring</span>
+      </span>
+      <div class="hdr-avatar">V</div>
+    </div>
+  </header>
+
+  <div id="content">
+    <!-- LOADING -->
+    <div id="loadingView" class="view active">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p style="font-size:13px;color:var(--gray-500);">Loading data from sheets...</p>
+        <button class="btn btn-amber" onclick="skipLoading()">Skip Loading (Show Dashboard)</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="view">
+      <div class="space-y">
+        <!-- Manager Filter -->
+        <div class="card card-pad">
+          <label>👷 Filter by Manager</label>
+          <div class="flex flex-wrap gap-2" style="margin-top:8px;" id="managerChips"></div>
+        </div>
+        <!-- Manager Totals -->
+        <div class="grid-4" id="managerCards"></div>
+        <!-- Summary Cards -->
+        <div class="grid-4" id="summaryCards1"></div>
+        <div class="grid-4" id="summaryCards2"></div>
+        <!-- Expiring BGs Alert -->
+        <div id="expiringBGAlert" style="display:none" class="bg-expiry-alert">
+          <h3><span class="exp-dot"></span> ⚠ Bank Guarantees Expiring Within 5 Days</h3>
+          <div class="tbl-wrap">
+            <table id="expiringBGTable">
+              <thead><tr><th>Authority</th><th>BG No</th><th>Amount</th><th>Expiry Date</th><th>Days Left</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Top Sites -->
+        <div class="card card-pad">
+          <h3 style="font-size:15px;font-weight:700;color:var(--gray-800);margin-bottom:12px;">🏗️ Top 10 Outstanding Sites</h3>
+          <div id="topSitesList" class="space-y"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTSTANDING -->
+    <div id="outstanding" class="view">
+      <div class="card">
+        <div class="search-row">
+          <input type="text" class="search-input" id="osSearch" placeholder="🔍 Search site or PM..." oninput="renderOutstanding()">
+          <div class="search-meta" id="osMeta"></div>
+        </div>
+        <div class="tbl-wrap">
+          <table id="osTable">
+            <thead><tr id="osHead"></tr></thead>
+            <tbody id="osTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILL DETAILS -->
+    <div id="billdetail" class="view">
+      <div class="space-y">
+        <div class="card card-pad">
+          <label>📍 Select Site</label>
+          <div class="sites-grid" id="siteChips"></div>
+        </div>
+        <div id="billContent" style="display:none">
+          <div class="flex items-center justify-between" style="margin-bottom:12px;">
+            <h3 style="font-size:15px;font-weight:700;color:var(--gray-800);" id="billSiteTitle">Bills</h3>
+            <button class="btn btn-green" onclick="openAddBill()">+ Add New Bill</button>
+          </div>
+          <div class="card">
+            <div class="tbl-wrap"><table id="billTable"><thead><tr id="billHead"></tr></thead><tbody id="billTbody"></tbody><tfoot id="billFoot"></tfoot></table></div>
+            <div class="pagination"><span class="pg-info" id="billPgInfo"></span><div class="pg-btns" id="billPgBtns"></div></div>
+          </div>
+        </div>
+        <div id="billEmpty" class="empty-state"><div class="emoji">📄</div><p>Select a site above to view its bill details</p></div>
+      </div>
+    </div>
+
+    <!-- BG REPORT -->
+    <div id="bg" class="view">
+      <div class="space-y">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex gap-2 items-center">
+            <input type="text" class="search-input" id="bgSearch" placeholder="🔍 Search BG..." oninput="renderBG()">
+            <button id="bgFilterBtn" class="btn btn-red" onclick="toggleBGFilter()">⚠ Expiring</button>
+          </div>
+          <button class="btn btn-green" onclick="openAddBG()">+ Add BG</button>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap"><table id="bgTable"><thead><tr id="bgHead"></tr></thead><tbody id="bgTbody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEPOSITS -->
+    <div id="deposits" class="view">
+      <div class="space-y">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <input type="text" class="search-input" id="depSearch" placeholder="🔍 Search deposits..." oninput="renderDeposits()">
+          <div class="flex items-center gap-2">
+            <span class="search-meta" id="depMeta"></span>
+            <button class="btn btn-green" onclick="openAddDeposit()">+ Add Deposit</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap"><table id="depTable"><thead><tr id="depHead"></tr></thead><tbody id="depTbody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICES -->
+    <div id="invoices" class="view">
+      <div class="space-y">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <input type="text" class="search-input" id="invSearch" placeholder="🔍 Search invoices..." oninput="renderInvoices()">
+          <button class="btn btn-green" onclick="openAddInvoice()">+ Add Invoice</button>
+        </div>
+        <div class="grid-3" id="invStats"></div>
+        <div class="card">
+          <div class="tbl-wrap"><table id="invTable"><thead><tr id="invHead"></tr></thead><tbody id="invTbody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANTRY SETTINGS -->
+    <div id="settings" class="view">
+      <div style="max-width:600px;">
+        <div class="settings-block">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div class="settings-icon" style="background:linear-gradient(135deg,#3b82f6,#6366f1);">☁</div>
+            <div><h3 style="margin-bottom:2px;font-size:17px;font-weight:700;">Pantry Cloud Sync</h3><p style="font-size:11px;color:var(--gray-500);">Cross-PC live sync via getpantry.cloud</p></div>
+          </div>
+          <label>Pantry ID</label>
+          <p style="font-size:11px;color:var(--gray-400);margin-bottom:6px;">Get free ID from <a href="https://getpantry.cloud" target="_blank" style="color:var(--blue-600);">getpantry.cloud</a></p>
+          <div class="flex gap-2" style="margin-bottom:6px;">
+            <input type="text" id="pantryInput" placeholder="paste-your-pantry-id-here" style="font-family:'DM Mono',monospace;font-size:12px;">
+            <button class="btn btn-amber" onclick="testPantry()">🔍 Test</button>
+          </div>
+          <div id="pantryTestResult" style="font-size:12px;font-weight:600;"></div>
+          <div class="flex gap-2" style="margin-top:12px;">
+            <button class="btn btn-amber" onclick="savePantryId()">💾 Save Pantry ID</button>
+            <button class="btn btn-red" id="pantryDisconnectBtn" onclick="disconnectPantry()" style="display:none;">🔌 Disconnect</button>
+          </div>
+        </div>
+        <div id="syncStatusBlock" class="settings-block" style="display:none;">
+          <h3 style="margin-bottom:12px;">📊 Sync Status</h3>
+          <div class="grid-2" style="gap:12px;">
+            <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:14px;">
+              <p style="font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;">Status</p>
+              <p id="syncStatusText" style="font-size:17px;font-weight:700;margin-top:4px;">⏸ Idle</p>
+            </div>
+            <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:14px;">
+              <p style="font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;">Last Sync</p>
+              <p id="lastSyncText" style="font-size:17px;font-weight:700;margin-top:4px;color:var(--gray-800);">Never</p>
+            </div>
+            <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:14px;">
+              <p style="font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;">Auto-Save</p>
+              <p style="font-size:13px;font-weight:700;margin-top:4px;color:var(--green-600);">✅ ON (2s debounce)</p>
+            </div>
+            <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:14px;">
+              <p style="font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;">Live Polling</p>
+              <p style="font-size:13px;font-weight:700;margin-top:4px;color:var(--green-600);">✅ ON (30s interval)</p>
+            </div>
+          </div>
+          <div class="flex gap-2" style="margin-top:16px;">
+            <button class="btn btn-amber" style="flex:1;" onclick="syncNow()">⬆ Push All Data Now</button>
+            <button class="btn btn-green" style="flex:1;" onclick="pullNow()">⬇ Pull Latest Data Now</button>
+          </div>
+        </div>
+        <div class="settings-block">
+          <h3 style="margin-bottom:12px;">ℹ️ How It Works</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div class="step-item"><span class="step-num" style="background:var(--blue-100);color:var(--blue-700);">1</span><p>Get free Pantry ID from <a href="https://getpantry.cloud" target="_blank" style="color:var(--blue-600);">getpantry.cloud</a> — no signup!</p></div>
+            <div class="step-item"><span class="step-num" style="background:var(--blue-100);color:var(--blue-700);">2</span><p>Enter same Pantry ID on all PCs.</p></div>
+            <div class="step-item"><span class="step-num" style="background:var(--green-100);color:var(--green-600);">3</span><p><strong>Auto-Save:</strong> Every edit auto-pushes to cloud in 2 seconds.</p></div>
+            <div class="step-item"><span class="step-num" style="background:var(--green-100);color:var(--green-600);">4</span><p><strong>Live Sync:</strong> Pulls latest data every 30 seconds from cloud.</p></div>
+            <div class="step-item"><span class="step-num" style="background:var(--amber-100);color:var(--amber-700);">5</span><p><strong>All Data:</strong> Outstanding, Bills, BG, Deposits, Invoices synced.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================== MODALS ========================== -->
+<!-- Bill Add/Edit Modal -->
+<div class="modal-overlay" id="billModal" style="display:none;" onclick="closeBillModal()">
+  <div class="modal modal-lg" onclick="event.stopPropagation()">
+    <h3 id="billModalTitle">➕ Add New Bill</h3>
+    <div class="form-grid-4" id="billFormFields"></div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeBillModal()">Cancel</button>
+      <button class="btn btn-amber" onclick="saveBill()">💾 Save Bill</button>
+    </div>
+  </div>
+</div>
+<!-- Receive Payment Modal -->
+<div class="modal-overlay" id="receiveModal" style="display:none;" onclick="closeReceiveModal()">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <h3>💰 Record Payment Received</h3>
+    <div class="field" style="margin-bottom:12px;"><label>Amount Received</label><input type="text" id="receiveAmount" placeholder="Enter amount..."></div>
+    <div class="field"><label>Payment Date</label><input type="text" id="receiveDate" placeholder="DD/MM/YYYY"></div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeReceiveModal()">Cancel</button>
+      <button class="btn btn-green" onclick="confirmReceivePayment()">✅ Record Payment</button>
+    </div>
+  </div>
+</div>
+<!-- BG Edit Modal -->
+<div class="modal-overlay" id="bgModal" style="display:none;" onclick="closeBGModal()">
+  <div class="modal modal-md" onclick="event.stopPropagation()">
+    <h3 id="bgModalTitle">✏️ Edit BG Record</h3>
+    <div class="form-grid" id="bgFormFields"></div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeBGModal()">Cancel</button>
+      <button class="btn btn-amber" onclick="saveBG()">💾 Save</button>
+    </div>
+  </div>
+</div>
+<!-- Deposit Edit Modal -->
+<div class="modal-overlay" id="depModal" style="display:none;" onclick="closeDepModal()">
+  <div class="modal modal-md" onclick="event.stopPropagation()">
+    <h3 id="depModalTitle">✏️ Edit Deposit</h3>
+    <div class="form-grid" id="depFormFields"></div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeDepModal()">Cancel</button>
+      <button class="btn btn-amber" onclick="saveDeposit()">💾 Save</button>
+    </div>
+  </div>
+</div>
+<!-- Invoice Edit Modal -->
+<div class="modal-overlay" id="invModal" style="display:none;" onclick="closeInvModal()">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <h3 id="invModalTitle">✏️ Edit Invoice</h3>
+    <div class="form-grid" id="invFormFields"></div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeInvModal()">Cancel</button>
+      <button class="btn btn-amber" onclick="saveInvoice()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========================== CONSTANTS ==========================
+const SHEET1_ID = '1iHrPxhvsFnedO2Js7u3wmFbPAxLeC4F1WP71MBv5gcw';
+const SHEET2_ID = '17QQsc3tHWY-VFaMXx1EqNU4iCrFtvqj5s0u-pkMG_QU';
+const PANTRY_BASE = 'https://getpantry.cloud/apiv1/pantry';
+const MANAGERS = ['All','Vicky','Ravi','Chandrashekhar','Keshav'];
+const SHEET1_GIDS = [
+  {gid:'0',name:'IOCL MATHURA BDFP'},{gid:'174412694',name:'IOCL PANIPAT DO'},{gid:'118852844',name:'IOCL Salem DO'},
+  {gid:'548407335',name:'IOCL Coimbatore DO'},{gid:'751444077',name:'IOCL Trichy DO'},{gid:'1347791283',name:'IOCL Madurai DO'},
+  {gid:'321034887',name:'IOCL CHENNAI'},{gid:'1979702996',name:'IOCL HISSAR DO'},{gid:'1893067828',name:'IOCL PANIPAT REFINERY'},
+  {gid:'1234783628',name:'IOCL BARAUNI'},{gid:'977030954',name:'IOCL KANPUR'},{gid:'1642019228',name:'IOCL Howrah'},
+  {gid:'1920245490',name:'IOCL LONI'},{gid:'2004258151',name:'IOCL Jatni'},{gid:'1666678437',name:'IOCL Paradeep'},
+  {gid:'458687889',name:'IOCL AHMEDNAGAR'},{gid:'178072507',name:'IOCL Allahabad'},{gid:'1087865048',name:'IOCL Khunti'},
+  {gid:'1871920534',name:'IOCL Jharsuguda'},{gid:'1053026690',name:'IOCL NASHIK'},{gid:'1485879867',name:'HPCL Loni'},
+  {gid:'1545839474',name:'NFC Kota Township'},{gid:'477557482',name:'NFC KOTA'},{gid:'279843949',name:'NFC HYDERABAD'},
+  {gid:'671962254',name:'IOCL MUMBAI DO'},{gid:'387496523',name:'GENPACT Gurgaon'},{gid:'323328787',name:'IOCL SARPARA'},
+  {gid:'1725908395',name:'IOCL MORADABAD DO'},{gid:'493192291',name:'Transrail Lighting'},{gid:'1199190624',name:'IOCL Bangalore'},
+  {gid:'1110433204',name:'IOCL VIZAG'},{gid:'606059273',name:'IOCL RAIPUR'},{gid:'1612881510',name:'IOCL BHATINDA'},
+  {gid:'1855046779',name:'IOCL SECUNDERABAD'},{gid:'980845244',name:'IOCL WARANGAL'},{gid:'989690966',name:'IOCL Tirupati'},
+  {gid:'2070489175',name:'IOCL Nizamabad'},{gid:'776970165',name:'IOCL VIJAYWADA'},{gid:'1201529354',name:'AAI Amritsar'},
+  {gid:'1729965160',name:'IOCL PARADEEP HM'},{gid:'131840235',name:'PPA PORT'},{gid:'923489850',name:'NTPC Dadri'},
+  {gid:'996674553',name:'GAIL VIJYAPUR'}
+];
+
+// ========================== STATE ==========================
+let state = {
+  outstanding: [], bills: {}, bg: [], deposits: [], invoices: [],
+  selectedManager: 'All', selectedSite: '', activeTab: 'dashboard',
+  osSort: {key:'totalOutstanding',dir:'desc'}, bgFilter: false,
+  billPage: 0, billPageSize: 15,
+  editingBill: null, editingBG: null, editingDep: null, editingInv: null,
+  receiveBillSno: null,
+  pantryId: localStorage.getItem('vt_pantry_id') || '',
+  syncStatus: 'idle', lastSync: '',
+  saveDebounce: null, syncTimer: null,
+  sidebarCollapsed: false
+};
+
+// DEMO DATA
+const demoOutstanding = [
+  {sno:1,siteName:'IOCL Mathura BDFP',sheetLink:'',pm:'Vicky',pendingBill:0,sdDeduction:0,ldDeduction:1143938.95,gstHold:0,instantRelease:0,otherDeduction:0,withheldComm:0,totalOutstanding:1143938.95},
+  {sno:2,siteName:'IOCL Panipat DO',sheetLink:'',pm:'Ravi',pendingBill:0,sdDeduction:0,ldDeduction:358778.71,gstHold:0,instantRelease:0,otherDeduction:0,withheldComm:0,totalOutstanding:358778.71},
+  {sno:3,siteName:'IOCL Salem DO',sheetLink:'',pm:'Ravi',pendingBill:817313.81,sdDeduction:4159.40,ldDeduction:0,gstHold:0,instantRelease:0,otherDeduction:0,withheldComm:0,totalOutstanding:821473.21},
+  {sno:7,siteName:'IOCL Chennai',sheetLink:'',pm:'Ravi',pendingBill:0,sdDeduction:905314.25,ldDeduction:989416.45,gstHold:0,instantRelease:0,otherDeduction:0,withheldComm:614480,totalOutstanding:2509210.70},
+  {sno:8,siteName:'IOCL Hissar DO',sheetLink:'',pm:'Ravi',pendingBill:2054704.29,sdDeduction:0,ldDeduction:1145966.13,gstHold:0,instantRelease:0,otherDeduction:0,withheldComm:0,totalOutstanding:3200670.42},
+  {sno:9,siteName:'IOCL Panipat Refinery',sheetLink:'',pm:'Chandrashekhar',pendingBill:3907118.72,sdDeduction:37208.44,ldDeduction:1394719.05,gstHold:0,instantRelease:0,otherDeduction:369114.64,withheldComm:0,totalOutstanding:5708160.84},
+  {sno:19,siteName:'IOCL Jharsuguda',sheetLink:'',pm:'Ravi',pendingBill:1564080.45,sdDeduction:0,ldDeduction:928887.91,gstHold:0,instantRelease:0,otherDeduction:0,withheldComm:0,totalOutstanding:2492968.36},
+  {sno:29,siteName:'Transrail Lighting',sheetLink:'',pm:'Vicky',pendingBill:384450,sdDeduction:0,ldDeduction:0,gstHold:0,instantRelease:0,otherDeduction:0,withheldComm:1299025,totalOutstanding:1683475},
+  {sno:41,siteName:'PPA Port',sheetLink:'',pm:'Keshav',pendingBill:0,sdDeduction:1521853,ldDeduction:2174077,gstHold:0,instantRelease:0,otherDeduction:0,withheldComm:4468402,totalOutstanding:8164332},
+  {sno:42,siteName:'NTPC Dadri',sheetLink:'',pm:'Vicky',pendingBill:270223.78,sdDeduction:364811,ldDeduction:0,gstHold:0,instantRelease:0,otherDeduction:0,withheldComm:145924,totalOutstanding:780958.78}
+];
+const demoBG = [
+  {sno:1,authority:'IOCL Panipat',tenderNo:'PPMC/PT/HMT/20-21/01',workName:'High Mast Towers at PPMC',bgNo:'00401IG210000047',bgPercentage:'',completionDate:'30.11.2021',dlpPeriod:'18',releaseDate:'',issueDate:'23.04.2021',expiryDate:'03.03.2027',claimPeriod:'03.03.2028',amount:'₹1,66,441',remark:'Pending'},
+  {sno:9,authority:'IOCL Ahmednagar',tenderNo:'WRCC/2023-24/LT/14',workName:'Electrical works Phase-II',bgNo:'0040123IPG000012',bgPercentage:'',completionDate:'',dlpPeriod:'',releaseDate:'19.07.2023',issueDate:'31.03.2025',expiryDate:'30.09.2025',claimPeriod:'30.09.2026',amount:'₹3,52,896',remark:'Pending'},
+  {sno:10,authority:'NFC Hyderabad',tenderNo:'NFC/EP/E-41862',workName:'Illumination ATMF Plant',bgNo:'0040123IPG000013',bgPercentage:'',completionDate:'',dlpPeriod:'12',releaseDate:'19.07.2023',issueDate:'30.06.2024',expiryDate:'28.02.2025',claimPeriod:'28.02.2025',amount:'₹13,90,739',remark:'Pending'},
+  {sno:16,authority:'IOCL Mathura BDFP',tenderNo:'RCC/NR/UPSOII/ENG/LT-206/23-24',workName:'High mast lighting towers',bgNo:'0040124IPG000067',bgPercentage:'10%',completionDate:'',dlpPeriod:'12',releaseDate:'14.02.2024',issueDate:'31.12.2025',expiryDate:'31.12.2026',claimPeriod:'31.12.2026',amount:'₹10,69,980',remark:'Pending'},
+  {sno:21,authority:'IOCL Panipat Refinery',tenderNo:'RPRC246021',workName:'Area illumination improvement',bgNo:'0040124IPG000080',bgPercentage:'2.50%',completionDate:'',dlpPeriod:'',releaseDate:'17.05.2024',issueDate:'30.04.2027',expiryDate:'30.04.2028',claimPeriod:'30.04.2028',amount:'₹6,96,620',remark:'Pending'}
+];
+const demoDeposits = [
+  {sno:22,authority:'Ghaziabad Dev Authority',tenderNo:'543/4/PA-T/2020-21',nature:'EMD',workName:'LED lights maintenance',amount:'5,500',instrumentNo:'FDR No. 765476',bank:'Indian Bank',dated:'24.02.2021',period:'12 months',remark:'Pending',dueOn:'24.02.2022'},
+  {sno:69,authority:'IOCL Howrah Terminal',tenderNo:'RCC/ERO/37/2024-25/LT-62',nature:'EMD',workName:'Electrical cabling works',amount:'37,564',instrumentNo:'UTR No. 8293135',bank:'ICICI Bank',dated:'11.10.2024',period:'',remark:'Pending',dueOn:''},
+  {sno:108,authority:'UPSCIDC-06',tenderNo:'14/Elect./Ghaziabad/2024-25',nature:'EMD',workName:'LED Semi Highmast Lights',amount:'23,000',instrumentNo:'UTR No. IDIBN52025031251255048',bank:'Indian Bank',dated:'13.03.2025',period:'3 Months',remark:'Pending',dueOn:'13.06.2025'}
+];
+const demoInvoices = [
+  {invDate:'08/04/2026',invNo:'VE/26-27/1',partyName:'IOCL Secunderabad',taxableValue:196323,igst:35338,cgst:0,sgst:0,totalValue:231661,nrCoding:'R',month:'April'},
+  {invDate:'30/04/2026',invNo:'VE/26-27/2',partyName:'IOCL Barauni',taxableValue:231538,igst:41677,cgst:0,sgst:0,totalValue:273215,nrCoding:'R',month:'April'},
+  {invDate:'08/05/2026',invNo:'VE/26-27/3',partyName:'IOCL Trichy',taxableValue:658403,igst:118513,cgst:0,sgst:0,totalValue:776916,nrCoding:'R',month:'May'},
+  {invDate:'22/05/2026',invNo:'VE/26-27/4',partyName:'UP State Construction',taxableValue:5000000,igst:0,cgst:450000,sgst:450000,totalValue:5900000,nrCoding:'R',month:'May'}
+];
+
+// ========================== UTILS ==========================
+function parseNum(v) {
+  if(v===undefined||v===null||v==='')return 0;
+  if(typeof v==='number')return v;
+  return parseFloat(String(v).replace(/["₹,\s]/g,'').trim())||0;
+}
+function fmt(v) {
+  if(v===0)return '₹0.00';
+  return '₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function parseCSV(text) {
+  const rows=[];let cur='',inQ=false,row=[];
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){if(c==='"'){if(i+1<text.length&&text[i+1]==='"'){cur+='"';i++;}else{inQ=false;}}else{cur+=c;}}
+    else{if(c==='"'){inQ=true;}else if(c===','){row.push(cur.trim());cur='';}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&i+1<text.length&&text[i+1]==='\n')i++;
+    row.push(cur.trim());if(row.length>1||row[0]!=='')rows.push(row);row=[];cur='';}else{cur+=c;}}
+  }
+  row.push(cur.trim());if(row.length>1||row[0]!=='')rows.push(row);
+  return rows;
+}
+function daysLeft(dateStr) {
+  if(!dateStr)return -999;
+  try{
+    let s=dateStr.replace(/Extended|Extend|to|BG|:/gi,'').trim();
+    const p=s.split(/[\/\-\.]/);if(p.length<2)return -999;
+    let d=1,m=1,y=2000;
+    if(p.length>=3){d=parseInt(p[0]);m=parseInt(p[1]);y=parseInt(p[2]);if(y<100)y+=2000;}
+    const exp=new Date(y,m-1,d);
+    return Math.ceil((exp-new Date())/(864e5));
+  }catch{return -999;}
+}
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ========================== SIDEBAR ==========================
+document.getElementById('sidebarToggle').addEventListener('click',()=>{
+  state.sidebarCollapsed=!state.sidebarCollapsed;
+  const sb=document.getElementById('sidebar');
+  sb.classList.toggle('collapsed',state.sidebarCollapsed);
+  const ic=document.querySelector('#sidebarToggle svg path');
+  ic.setAttribute('d', state.sidebarCollapsed ? 'M9 18l6-6-6-6' : 'M15 18l-6-6 6-6');
+});
+
+// ========================== TAB SWITCHING ==========================
+const PAGE_TITLES = {
+  dashboard:'📊 Dashboard',outstanding:'📋 Outstanding Payments',
+  billdetail:'📄 Bill Details',bg:'🔒 Bank Guarantee Report',
+  deposits:'💰 Deposits Report',invoices:'🧾 Invoice Register',settings:'⚙️ Pantry Sync Settings'
+};
+function switchTab(tab) {
+  state.activeTab = tab;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el = document.getElementById(tab);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab===tab);
+  });
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[tab]||tab;
+  if(tab==='dashboard') renderDashboard();
+  if(tab==='outstanding') renderOutstanding();
+  if(tab==='bg') renderBG();
+  if(tab==='deposits') renderDeposits();
+  if(tab==='invoices') renderInvoices();
+  if(tab==='billdetail') renderSiteChips();
+  if(tab==='settings') renderSettings();
+}
+document.querySelectorAll('.nav-btn[data-tab]').forEach(btn=>{
+  btn.addEventListener('click',()=>{ state.selectedSite=''; switchTab(btn.dataset.tab); });
+});
+
+// ========================== DASHBOARD ==========================
+function renderDashboard() {
+  const data = state.outstanding;
+  const filtered = state.selectedManager==='All' ? data : data.filter(r=>r.pm===state.selectedManager);
+
+  // Manager chips
+  let chips='';
+  MANAGERS.forEach(m=>{
+    chips+=`<button class="chip${state.selectedManager===m?' active':''}" onclick="setManager('${m}')">${m==='All'?'🌐 All Managers':'👤 '+m}</button>`;
+  });
+  document.getElementById('managerChips').innerHTML=chips;
+
+  // Manager summary cards
+  const mgrs=MANAGERS.filter(m=>m!=='All');
+  let mc='';
+  mgrs.forEach(m=>{
+    const tot=data.filter(r=>r.pm===m).reduce((s,r)=>s+r.totalOutstanding,0);
+    const cnt=data.filter(r=>r.pm===m).length;
+    mc+=`<div class="summary-card sc-indigo"><div class="sc-label">👤 ${escH(m)}</div><div class="sc-val">${fmt(tot)}</div><div class="sc-sub">${cnt} Sites</div></div>`;
+  });
+  document.getElementById('managerCards').innerHTML=mc;
+
+  // Summary cards 1
+  const totOS=filtered.reduce((s,r)=>s+r.totalOutstanding,0);
+  const totPB=filtered.reduce((s,r)=>s+r.pendingBill,0);
+  const totSD=filtered.reduce((s,r)=>s+r.sdDeduction,0);
+  const totLD=filtered.reduce((s,r)=>s+r.ldDeduction,0);
+  document.getElementById('summaryCards1').innerHTML=`
+    <div class="summary-card sc-amber"><div class="sc-label">Total Outstanding</div><div class="sc-val">${fmt(totOS)}</div><div class="sc-sub">${filtered.length} Sites</div></div>
+    <div class="summary-card sc-blue"><div class="sc-label">Pending Bills</div><div class="sc-val">${fmt(totPB)}</div></div>
+    <div class="summary-card sc-purple"><div class="sc-label">SD Deduction</div><div class="sc-val">${fmt(totSD)}</div></div>
+    <div class="summary-card sc-red"><div class="sc-label">LD Deduction</div><div class="sc-val">${fmt(totLD)}</div></div>`;
+
+  const totBG=state.bg.reduce((s,r)=>s+parseNum(r.amount.replace(/[₹,]/g,'')),0);
+  const totDep=state.deposits.reduce((s,r)=>s+parseNum(r.amount),0);
+  const totInv=state.invoices.reduce((s,r)=>s+r.totalValue,0);
+  const expBGs=getExpiringBGs();
+  document.getElementById('summaryCards2').innerHTML=`
+    <div class="summary-card sc-indigo"><div class="sc-label">BG Amount</div><div class="sc-val">${fmt(totBG)}</div><div class="sc-sub">${state.bg.length} BGs</div></div>
+    <div class="summary-card sc-green"><div class="sc-label">Deposits</div><div class="sc-val">${fmt(totDep)}</div><div class="sc-sub">${state.deposits.length} Entries</div></div>
+    <div class="summary-card sc-teal"><div class="sc-label">Invoice Value</div><div class="sc-val">${fmt(totInv)}</div></div>
+    <div class="summary-card sc-red${expBGs.length>0?' sc-pulse':''}"><div class="sc-label">⚠ Expiring BGs</div><div class="sc-val">${expBGs.length}</div><div class="sc-sub">Within 5 Days</div></div>`;
+
+  // Expiring BGs
+  if(expBGs.length>0) {
+    document.getElementById('expiringBGAlert').style.display='';
+    let rows='';
+    expBGs.forEach(bg=>{
+      const dl=daysLeft(bg.expiryDate);
+      const cls=dl<=0?'badge-danger':dl<=2?'badge-red':'badge-amber';
+      rows+=`<tr><td class="fw-semi" style="color:var(--red-700)">${escH(bg.authority)}</td><td style="font-size:11px">${escH(bg.bgNo)}</td><td class="fw-semi">${escH(bg.amount)}</td><td>${escH(bg.expiryDate)}</td><td><span class="badge ${cls}">${dl<=0?'EXPIRED':dl+'d'}</span></td></tr>`;
+    });
+    document.querySelector('#expiringBGTable tbody').innerHTML=rows;
+  } else {
+    document.getElementById('expiringBGAlert').style.display='none';
+  }
+
+  // Top 10 sites
+  const sorted=[...filtered].sort((a,b)=>b.totalOutstanding-a.totalOutstanding);
+  let html='';
+  sorted.forEach((s,i)=>{
+    html+=`<div class="rank-item"><div class="flex items-center gap-3"><span class="rank-num">${i+1}</span><div><div style="font-size:13px;font-weight:600;color:var(--gray-800)">${escH(s.siteName)}</div><div style="font-size:11px;color:var(--gray-500)">PM: ${escH(s.pm||'N/A')}</div></div></div><span style="font-size:13px;font-weight:700;color:var(--red-600)">${fmt(s.totalOutstanding)}</span></div>`;
+  });
+  document.getElementById('topSitesList').innerHTML=html||'<p style="color:var(--gray-400);font-size:13px;text-align:center;padding:16px;">No data</p>';
+
+  updateAlerts();
+}
+
+function setManager(m){
+  state.selectedManager=m;
+  renderDashboard();
+}
+
+function getExpiringBGs(){
+  return state.bg.filter(bg=>{const d=daysLeft(bg.expiryDate);return d>=0&&d<=5;});
+}
+
+function updateAlerts(){
+  const expBGs=getExpiringBGs();
+  // Sidebar
+  const sbBGA=document.getElementById('sbBGAlert');
+  if(expBGs.length>0){sbBGA.style.display='';document.getElementById('sbBGAlertText').textContent=expBGs.length+' BG(s) expiring within 5 days!';}
+  else sbBGA.style.display='none';
+  // Header badge
+  const hdrBG=document.getElementById('hdrBGBadge');
+  if(expBGs.length>0){hdrBG.style.display='';document.getElementById('bgBadgeText').textContent=expBGs.length+' BG Expiring';}
+  else hdrBG.style.display='none';
+}
+
+// ========================== OUTSTANDING ==========================
+function renderOutstanding(){
+  const search=(document.getElementById('osSearch').value||'').toLowerCase();
+  let data=state.selectedManager==='All'?[...state.outstanding]:state.outstanding.filter(r=>r.pm===state.selectedManager);
+  if(search) data=data.filter(r=>r.siteName.toLowerCase().includes(search)||r.pm.toLowerCase().includes(search));
+  const {key,dir}=state.osSort;
+  data.sort((a,b)=>{const av=a[key]||0,bv=b[key]||0; return dir==='desc'?bv-av:av-bv;});
+  const cols=[['S.No','sno'],['Site Name','siteName'],['PM','pm'],['Pending Bill','pendingBill'],
+    ['SD Ded.','sdDeduction'],['LD Ded.','ldDeduction'],['GST Hold','gstHold'],
+    ['Instant Rel.','instantRelease'],['Other Ded.','otherDeduction'],
+    ['Withheld Comm.','withheldComm'],['Total Outstanding','totalOutstanding']];
+  let hdr='';
+  cols.forEach(([l,k])=>{const arrow=state.osSort.key===k?(state.osSort.dir==='desc'?' ↓':' ↑'):'';
+    hdr+=`<th onclick="osSort('${k}')">${escH(l)}${arrow}</th>`;});
+  document.getElementById('osHead').innerHTML=hdr;
+  let rows='';
+  data.forEach(r=>{
+    rows+=`<tr>
+      <td class="fw-bold" style="color:var(--gray-400)">${r.sno}</td>
+      <td class="truncate fw-semi" style="max-width:200px" title="${escH(r.siteName)}">${escH(r.siteName)}</td>
+      <td>${escH(r.pm)}</td>
+      <td class="text-right text-blue fw-semi">${fmt(r.pendingBill)}</td>
+      <td class="text-right text-purple">${fmt(r.sdDeduction)}</td>
+      <td class="text-right text-red">${fmt(r.ldDeduction)}</td>
+      <td class="text-right" style="color:var(--gray-500)">${fmt(r.gstHold)}</td>
+      <td class="text-right text-green">${fmt(r.instantRelease)}</td>
+      <td class="text-right" style="color:var(--gray-500)">${fmt(r.otherDeduction)}</td>
+      <td class="text-right text-orange">${fmt(r.withheldComm)}</td>
+      <td class="text-right fw-bold text-red">${fmt(r.totalOutstanding)}</td>
+    </tr>`;
+  });
+  document.getElementById('osTbody').innerHTML=rows||'<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--gray-400)">No data</td></tr>';
+  const total=data.reduce((s,r)=>s+r.totalOutstanding,0);
+  document.getElementById('osMeta').innerHTML=`${data.length} sites &nbsp;•&nbsp; <span class="hl">Total: ${fmt(total)}</span>`;
+}
+function osSort(k){
+  if(state.osSort.key===k)state.osSort.dir=state.osSort.dir==='asc'?'desc':'asc';
+  else{state.osSort.key=k;state.osSort.dir='desc';}
+  renderOutstanding();
+}
+
+// ========================== BILL DETAILS ==========================
+function renderSiteChips(){
+  let html='';
+  SHEET1_GIDS.forEach(s=>{
+    html+=`<button class="site-chip${state.selectedSite===s.gid?' active':''}" onclick="selectSite('${s.gid}','${escH(s.name)}')">${escH(s.name)}</button>`;
+  });
+  document.getElementById('siteChips').innerHTML=html;
+  if(state.selectedSite) renderBillTable();
+  else{document.getElementById('billContent').style.display='none';document.getElementById('billEmpty').style.display='';}
+}
+function selectSite(gid,name){
+  state.selectedSite=gid;state.billPage=0;
+  renderSiteChips();
+  document.getElementById('billContent').style.display='';
+  document.getElementById('billEmpty').style.display='none';
+  const sname=SHEET1_GIDS.find(s=>s.gid===gid)?.name||name;
+  document.getElementById('billSiteTitle').textContent=`${sname} — Bill Details`;
+  renderBillTable();
+}
+function renderBillTable(){
+  const bills=(state.bills[state.selectedSite]||[]);
+  const {billPage:pg,billPageSize:ps}=state;
+  const total=bills.length;
+  const totalPages=Math.ceil(total/ps)||1;
+  const paged=bills.slice(pg*ps,(pg+1)*ps);
+  const cols=['S.No','Invoice No','Inv Date','Taxable','GST','Total Inv','Pymt Date','Pymt Recvd','GST TDS','IT TDS','Labour Cess','10% Held','Auto DD','LD','Short Pymt','Actions'];
+  document.getElementById('billHead').innerHTML=cols.map(c=>`<th>${c}</th>`).join('');
+  let rows='';
+  paged.forEach(b=>{
+    rows+=`<tr>
+      <td>${b.sno}</td><td class="fw-semi">${escH(b.invoiceNo)}</td><td>${escH(b.invDate)}</td>
+      <td class="text-right">${fmt(b.taxableValue)}</td><td class="text-right">${fmt(b.gst)}</td>
+      <td class="text-right fw-semi">${fmt(b.totalInvoice)}</td><td>${escH(b.paymentDate)}</td>
+      <td class="text-right text-green">${fmt(b.paymentReceived)}</td>
+      <td class="text-right">${fmt(b.gstTds)}</td><td class="text-right">${fmt(b.incomeTaxTds)}</td>
+      <td class="text-right">${fmt(b.labourCess)}</td><td class="text-right">${fmt(b.withheld10)}</td>
+      <td class="text-right">${fmt(b.autoDdRecovery)}</td>
+      <td class="text-right text-red">${fmt(b.ld)}</td>
+      <td class="text-right">${fmt(b.shortPayment)}</td>
+      <td><div class="flex gap-2">
+        <button class="btn btn-sm btn-icon-blue" onclick='editBill(${b.sno})' title="Edit">✏️</button>
+        <button class="btn btn-sm btn-icon-green" onclick='openReceive(${b.sno})' title="Receive Payment">💰</button>
+        <button class="btn btn-sm btn-icon-red" onclick='deleteBill(${b.sno})' title="Delete">🗑️</button>
+      </div></td>
+    </tr>`;
+  });
+  if(!paged.length) rows=`<tr><td colspan="16" style="text-align:center;padding:32px;color:var(--gray-400)">No bill details found for this site</td></tr>`;
+  document.getElementById('billTbody').innerHTML=rows;
+  // Footer totals
+  if(bills.length>0){
+    const sum=f=>bills.reduce((s,b)=>s+b[f],0);
+    document.getElementById('billFoot').innerHTML=`<tr>
+      <td colspan="3" class="text-right">Totals:</td>
+      <td class="text-right">${fmt(sum('taxableValue'))}</td>
+      <td class="text-right">${fmt(sum('gst'))}</td>
+      <td class="text-right">${fmt(sum('totalInvoice'))}</td>
+      <td></td>
+      <td class="text-right text-green">${fmt(sum('paymentReceived'))}</td>
+      <td class="text-right">${fmt(sum('gstTds'))}</td>
+      <td class="text-right">${fmt(sum('incomeTaxTds'))}</td>
+      <td class="text-right">${fmt(sum('labourCess'))}</td>
+      <td class="text-right">${fmt(sum('withheld10'))}</td>
+      <td class="text-right">${fmt(sum('autoDdRecovery'))}</td>
+      <td class="text-right text-red">${fmt(sum('ld'))}</td>
+      <td class="text-right">${fmt(sum('shortPayment'))}</td>
+      <td></td>
+    </tr>`;
+  } else document.getElementById('billFoot').innerHTML='';
+  // Pagination
+  document.getElementById('billPgInfo').textContent=`Page ${pg+1} of ${totalPages}`;
+  let pBtns=`<button class="pg-btn" onclick="billGoPage(${pg-1})" ${pg===0?'disabled':''}>← Prev</button>`;
+  const start=Math.max(0,Math.min(pg-2,totalPages-5));
+  for(let i=start;i<Math.min(start+5,totalPages);i++){
+    pBtns+=`<button class="pg-btn${i===pg?' active':''}" onclick="billGoPage(${i})">${i+1}</button>`;
+  }
+  pBtns+=`<button class="pg-btn" onclick="billGoPage(${pg+1})" ${pg>=totalPages-1?'disabled':''}>Next →</button>`;
+  document.getElementById('billPgBtns').innerHTML=pBtns;
+}
+function billGoPage(p){state.billPage=p;renderBillTable();}
+
+function openAddBill(){
+  const site=SHEET1_GIDS.find(s=>s.gid===state.selectedSite);
+  state.editingBill={sno:0,partyName:site?.name||'',invoiceNo:'',invDate:'',taxableValue:0,gst:0,totalInvoice:0,paymentDate:'',paymentReceived:0,gstTds:0,incomeTaxTds:0,labourCess:0,withheld10:0,autoDdRecovery:0,ld:0,shortPayment:0,paymentLink:''};
+  showBillModal(false);
+}
+function editBill(sno){
+  const b=(state.bills[state.selectedSite]||[]).find(b=>b.sno===sno);
+  if(!b)return;
+  state.editingBill={...b};
+  showBillModal(true);
+}
+function showBillModal(isEdit){
+  document.getElementById('billModalTitle').textContent=isEdit?'✏️ Edit Bill':'➕ Add New Bill';
+  const fields=[['invoiceNo','Invoice No','text'],['invDate','Inv Date','text'],['taxableValue','Taxable Value','number'],['gst','GST','number'],['totalInvoice','Total Invoice','number'],['paymentDate','Payment Date','text'],['paymentReceived','Payment Received','number'],['gstTds','GST TDS','number'],['incomeTaxTds','Income Tax TDS','number'],['labourCess','Labour Cess','number'],['withheld10','10% Withheld','number'],['autoDdRecovery','Auto DD Recovery','number'],['ld','LD','number'],['shortPayment','Short Payment','number'],['paymentLink','Payment Link','text']];
+  let html='';
+  fields.forEach(([k,l,t])=>{
+    html+=`<div class="field" style="grid-column:span 1"><label>${l}</label><input type="${t}" id="bf_${k}" value="${escH(String(state.editingBill[k]||''))}" oninput="updateEditBill('${k}',this.value,'${t}')"></div>`;
+  });
+  document.getElementById('billFormFields').innerHTML=html;
+  document.getElementById('billModal').style.display='';
+}
+function updateEditBill(k,v,t){state.editingBill[k]=t==='number'?parseNum(v):v;}
+function saveBill(){
+  if(!state.editingBill||!state.selectedSite)return;
+  const cur=[...(state.bills[state.selectedSite]||[])];
+  const idx=cur.findIndex(b=>b.sno===state.editingBill.sno);
+  if(idx>=0){cur[idx]=state.editingBill;}else{const newSno=cur.length?Math.max(...cur.map(b=>b.sno))+1:1;cur.push({...state.editingBill,sno:newSno});}
+  state.bills[state.selectedSite]=cur;
+  closeBillModal();renderBillTable();scheduleSave();
+}
+function deleteBill(sno){state.bills[state.selectedSite]=(state.bills[state.selectedSite]||[]).filter(b=>b.sno!==sno);renderBillTable();scheduleSave();}
+function closeBillModal(){document.getElementById('billModal').style.display='none';state.editingBill=null;}
+
+function openReceive(sno){
+  state.receiveBillSno=sno;
+  document.getElementById('receiveAmount').value='';
+  document.getElementById('receiveDate').value='';
+  document.getElementById('receiveModal').style.display='';
+}
+function closeReceiveModal(){document.getElementById('receiveModal').style.display='none';state.receiveBillSno=null;}
+function confirmReceivePayment(){
+  if(!state.receiveBillSno)return;
+  const amt=parseNum(document.getElementById('receiveAmount').value);
+  const dt=document.getElementById('receiveDate').value||new Date().toLocaleDateString('en-GB');
+  const cur=[...(state.bills[state.selectedSite]||[])];
+  const idx=cur.findIndex(b=>b.sno===state.receiveBillSno);
+  if(idx>=0){cur[idx]={...cur[idx],paymentReceived:amt,paymentDate:dt};}
+  state.bills[state.selectedSite]=cur;
+  closeReceiveModal();renderBillTable();scheduleSave();
+}
+
+// ========================== BG REPORT ==========================
+function renderBG(){
+  const search=(document.getElementById('bgSearch').value||'').toLowerCase();
+  let data=state.bgFilter?getExpiringBGs():[...state.bg];
+  if(search) data=data.filter(r=>r.authority.toLowerCase().includes(search)||r.bgNo.toLowerCase().includes(search)||r.workName.toLowerCase().includes(search));
+  const cols=['S.No','Authority','Tender No','Work Name','BG No','BG %','Completion','DLP','Issue Date','Expiry Date','Claim Period','Amount','Remark','Actions'];
+  document.getElementById('bgHead').innerHTML=cols.map(c=>`<th>${c}</th>`).join('');
+  let rows='';
+  data.forEach(bg=>{
+    const dl=daysLeft(bg.expiryDate);
+    const isExp=dl>=0&&dl<=5;
+    const badgeCls=dl<0?'badge-gray':dl<=5?'badge-red':dl<=30?'badge-amber':'badge-green';
+    rows+=`<tr class="${isExp?'tr-red':''}">
+      <td>${bg.sno}</td>
+      <td class="fw-semi truncate" title="${escH(bg.authority)}">${escH(bg.authority)}</td>
+      <td style="font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis" title="${escH(bg.tenderNo)}">${escH(bg.tenderNo)}</td>
+      <td style="font-size:10px;max-width:150px;overflow:hidden;text-overflow:ellipsis" title="${escH(bg.workName)}">${escH(bg.workName)}</td>
+      <td style="font-size:10px">${escH(bg.bgNo)}</td>
+      <td>${escH(bg.bgPercentage)}</td>
+      <td>${escH(bg.completionDate)}</td>
+      <td>${escH(bg.dlpPeriod)}</td>
+      <td>${escH(bg.issueDate)}</td>
+      <td><span${isExp?' style="color:var(--red-600);font-weight:700"':''}>${escH(bg.expiryDate)}</span>${dl>-900?` <span class="badge ${badgeCls}">${dl<=0?'EXP':dl+'d'}</span>`:''}</td>
+      <td>${escH(bg.claimPeriod)}</td>
+      <td class="fw-semi">${escH(bg.amount)}</td>
+      <td style="font-size:10px">${escH(bg.remark)}</td>
+      <td><div class="flex gap-1">
+        <button class="btn btn-sm btn-icon-blue" onclick='editBGRow(${bg.sno})'>✏️</button>
+        <button class="btn btn-sm btn-icon-red" onclick='deleteBGRow(${bg.sno})'>🗑️</button>
+      </div></td>
+    </tr>`;
+  });
+  document.getElementById('bgTbody').innerHTML=rows||'<tr><td colspan="14" style="text-align:center;padding:24px;color:var(--gray-400)">No data</td></tr>';
+  const exp=getExpiringBGs();
+  document.getElementById('bgFilterBtn').textContent=state.bgFilter?'Show All':`⚠ Expiring (${exp.length})`;
+  document.getElementById('bgFilterBtn').className=`btn ${state.bgFilter?'btn-amber':'btn-red'}`;
+}
+function toggleBGFilter(){state.bgFilter=!state.bgFilter;renderBG();}
+function editBGRow(sno){const b=state.bg.find(b=>b.sno===sno);if(!b)return;state.editingBG={...b};showBGModal();}
+function openAddBG(){state.editingBG={sno:Math.max(...state.bg.map(b=>b.sno),0)+1,authority:'',tenderNo:'',workName:'',bgNo:'',bgPercentage:'',completionDate:'',dlpPeriod:'',releaseDate:'',issueDate:'',expiryDate:'',claimPeriod:'',amount:'',remark:''};showBGModal();}
+function showBGModal(){
+  let html='';
+  Object.keys(state.editingBG).filter(k=>k!=='sno').forEach(k=>{
+    html+=`<div class="field"><label>${k}</label><input type="text" id="bgf_${k}" value="${escH(state.editingBG[k]||'')}" oninput="state.editingBG['${k}']=this.value"></div>`;
+  });
+  document.getElementById('bgFormFields').innerHTML=html;
+  document.getElementById('bgModal').style.display='';
+}
+function saveBG(){
+  if(!state.editingBG)return;
+  const idx=state.bg.findIndex(b=>b.sno===state.editingBG.sno);
+  if(idx>=0)state.bg[idx]=state.editingBG;else state.bg.push(state.editingBG);
+  closeBGModal();renderBG();updateAlerts();scheduleSave();
+}
+function deleteBGRow(sno){state.bg=state.bg.filter(b=>b.sno!==sno);renderBG();updateAlerts();scheduleSave();}
+function closeBGModal(){document.getElementById('bgModal').style.display='none';state.editingBG=null;}
+
+// ========================== DEPOSITS ==========================
+function renderDeposits(){
+  const search=(document.getElementById('depSearch').value||'').toLowerCase();
+  let data=search?state.deposits.filter(r=>r.authority.toLowerCase().includes(search)||r.nature.toLowerCase().includes(search)):[...state.deposits];
+  const cols=['S.No','Authority','Tender No','Nature','Work Name','Amount','Instrument No','Bank','Dated','Period','Remark','Due On','Actions'];
+  document.getElementById('depHead').innerHTML=cols.map(c=>`<th>${c}</th>`).join('');
+  let rows='';
+  data.forEach(d=>{
+    rows+=`<tr>
+      <td>${d.sno}</td>
+      <td class="fw-semi truncate" title="${escH(d.authority)}">${escH(d.authority)}</td>
+      <td style="font-size:10px">${escH(d.tenderNo)}</td>
+      <td><span class="badge badge-blue">${escH(d.nature)}</span></td>
+      <td style="font-size:10px;max-width:150px;overflow:hidden;text-overflow:ellipsis">${escH(d.workName)}</td>
+      <td class="fw-semi text-green">${escH(d.amount)}</td>
+      <td style="font-size:10px">${escH(d.instrumentNo)}</td>
+      <td style="font-size:10px">${escH(d.bank)}</td>
+      <td>${escH(d.dated)}</td>
+      <td>${escH(d.period)}</td>
+      <td style="font-size:10px">${escH(d.remark)}</td>
+      <td>${escH(d.dueOn)}</td>
+      <td><div class="flex gap-1">
+        <button class="btn btn-sm btn-icon-blue" onclick='editDepRow(${d.sno})'>✏️</button>
+        <button class="btn btn-sm btn-icon-red" onclick='deleteDepRow(${d.sno})'>🗑️</button>
+      </div></td>
+    </tr>`;
+  });
+  document.getElementById('depTbody').innerHTML=rows||'<tr><td colspan="13" style="text-align:center;padding:24px;color:var(--gray-400)">No data</td></tr>';
+  const total=data.reduce((s,d)=>s+parseNum(d.amount),0);
+  document.getElementById('depMeta').innerHTML=`${data.length} entries &nbsp;•&nbsp; Total: ${fmt(total)}`;
+}
+function editDepRow(sno){const d=state.deposits.find(d=>d.sno===sno);if(!d)return;state.editingDep={...d};showDepModal();}
+function openAddDeposit(){state.editingDep={sno:Math.max(...state.deposits.map(d=>d.sno),0)+1,authority:'',tenderNo:'',nature:'EMD',workName:'',amount:'',instrumentNo:'',bank:'',dated:'',period:'',remark:'',dueOn:''};showDepModal();}
+function showDepModal(){
+  let html='';
+  Object.keys(state.editingDep).filter(k=>k!=='sno').forEach(k=>{
+    html+=`<div class="field"><label>${k}</label><input type="text" id="df_${k}" value="${escH(state.editingDep[k]||'')}" oninput="state.editingDep['${k}']=this.value"></div>`;
+  });
+  document.getElementById('depFormFields').innerHTML=html;
+  document.getElementById('depModal').style.display='';
+}
+function saveDeposit(){
+  if(!state.editingDep)return;
+  const idx=state.deposits.findIndex(d=>d.sno===state.editingDep.sno);
+  if(idx>=0)state.deposits[idx]=state.editingDep;else state.deposits.push(state.editingDep);
+  closeDepModal();renderDeposits();scheduleSave();
+}
+function deleteDepRow(sno){state.deposits=state.deposits.filter(d=>d.sno!==sno);renderDeposits();scheduleSave();}
+function closeDepModal(){document.getElementById('depModal').style.display='none';state.editingDep=null;}
+
+// ========================== INVOICES ==========================
+function renderInvoices(){
+  const search=(document.getElementById('invSearch').value||'').toLowerCase();
+  let data=search?state.invoices.filter(r=>r.partyName.toLowerCase().includes(search)||r.invNo.toLowerCase().includes(search)):[...state.invoices];
+  const totV=data.reduce((s,r)=>s+r.totalValue,0);
+  const totT=data.reduce((s,r)=>s+r.taxableValue,0);
+  const totI=data.reduce((s,r)=>s+r.igst,0);
+  document.getElementById('invStats').innerHTML=`
+    <div class="inv-stat ist-blue"><div class="ist-label">Total Invoice Value</div><div class="ist-val">${fmt(totV)}</div></div>
+    <div class="inv-stat ist-green"><div class="ist-label">Total Taxable</div><div class="ist-val">${fmt(totT)}</div></div>
+    <div class="inv-stat ist-purple"><div class="ist-label">Total IGST</div><div class="ist-val">${fmt(totI)}</div></div>`;
+  const cols=['Inv Date','Inv No','Party Name','Taxable Value','IGST','CGST','SGST','Total Value','N/R','Month','Actions'];
+  document.getElementById('invHead').innerHTML=cols.map(c=>`<th>${c}</th>`).join('');
+  let rows='';
+  data.forEach((inv,i)=>{
+    rows+=`<tr>
+      <td>${escH(inv.invDate)}</td>
+      <td class="fw-semi">${escH(inv.invNo)}</td>
+      <td class="truncate" title="${escH(inv.partyName)}">${escH(inv.partyName)}</td>
+      <td class="text-right">${fmt(inv.taxableValue)}</td>
+      <td class="text-right">${fmt(inv.igst)}</td>
+      <td class="text-right">${fmt(inv.cgst)}</td>
+      <td class="text-right">${fmt(inv.sgst)}</td>
+      <td class="text-right fw-semi">${fmt(inv.totalValue)}</td>
+      <td><span class="badge badge-gray">${escH(inv.nrCoding)}</span></td>
+      <td>${escH(inv.month)}</td>
+      <td><div class="flex gap-1">
+        <button class="btn btn-sm btn-icon-blue" onclick='editInvRow(${i})'>✏️</button>
+        <button class="btn btn-sm btn-icon-red" onclick='deleteInvRow(${i})'>🗑️</button>
+      </div></td>
+    </tr>`;
+  });
+  document.getElementById('invTbody').innerHTML=rows||'<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--gray-400)">No data</td></tr>';
+}
+function editInvRow(i){state.editingInv={...state.invoices[i],_idx:i};showInvModal();}
+function openAddInvoice(){state.editingInv={invDate:'',invNo:'',partyName:'',taxableValue:0,igst:0,cgst:0,sgst:0,totalValue:0,nrCoding:'R',month:'',_idx:-1};showInvModal();}
+function showInvModal(){
+  const numFields=['taxableValue','igst','cgst','sgst','totalValue'];
+  const fields=[['invDate','Inv Date'],['invNo','Inv No'],['partyName','Party Name'],['taxableValue','Taxable Value'],['igst','IGST'],['cgst','CGST'],['sgst','SGST'],['totalValue','Total Value'],['nrCoding','N/R Coding'],['month','Month']];
+  let html='';
+  fields.forEach(([k,l])=>{
+    const t=numFields.includes(k)?'number':'text';
+    html+=`<div class="field"><label>${l}</label><input type="${t}" value="${escH(String(state.editingInv[k]||''))}" oninput="state.editingInv['${k}']=${t==='number'?'parseNum(this.value)':'this.value'}"></div>`;
+  });
+  document.getElementById('invFormFields').innerHTML=html;
+  document.getElementById('invModal').style.display='';
+}
+function saveInvoice(){
+  if(!state.editingInv)return;
+  const {_idx,...inv}=state.editingInv;
+  if(_idx>=0)state.invoices[_idx]=inv;else state.invoices.push(inv);
+  closeInvModal();renderInvoices();scheduleSave();
+}
+function deleteInvRow(i){state.invoices.splice(i,1);renderInvoices();scheduleSave();}
+function closeInvModal(){document.getElementById('invModal').style.display='none';state.editingInv=null;}
+
+// ========================== SETTINGS ==========================
+function renderSettings(){
+  document.getElementById('pantryInput').value=state.pantryId||'';
+  document.getElementById('pantryDisconnectBtn').style.display=state.pantryId?'':'none';
+  document.getElementById('syncStatusBlock').style.display=state.pantryId?'':'none';
+  updateSyncUI();
+}
+
+// ========================== PANTRY SYNC ==========================
+function getPantryId(){return state.pantryId;}
+async function pantryPut(basket,data){
+  if(!state.pantryId)return false;
+  try{const res=await fetch(`${PANTRY_BASE}/${state.pantryId}/basket/${basket}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return res.ok;}catch{return false;}
+}
+async function pantryGet(basket){
+  if(!state.pantryId)return null;
+  try{const res=await fetch(`${PANTRY_BASE}/${state.pantryId}/basket/${basket}`,{method:'GET',headers:{'Content-Type':'application/json'}});if(!res.ok)return null;return await res.json();}catch{return null;}
+}
+async function syncNow(){
+  if(!state.pantryId)return;
+  setSyncStatus('syncing');
+  try{
+    const results=await Promise.all([
+      pantryPut('vt-outstanding',{records:state.outstanding,ts:Date.now()}),
+      pantryPut('vt-bills',{records:state.bills,ts:Date.now()}),
+      pantryPut('vt-bg',{records:state.bg,ts:Date.now()}),
+      pantryPut('vt-deposits',{records:state.deposits,ts:Date.now()}),
+      pantryPut('vt-invoices',{records:state.invoices,ts:Date.now()})
+    ]);
+    const ok=results.every(Boolean);
+    setSyncStatus(ok?'success':'error');
+    if(ok){state.lastSync=new Date().toLocaleTimeString();}
+  }catch{setSyncStatus('error');}
+  setTimeout(()=>setSyncStatus('idle'),3000);
+}
+async function pullNow(){
+  if(!state.pantryId)return;
+  setSyncStatus('syncing');
+  try{
+    const [os,bills,bg,deps,invs]=await Promise.all([
+      pantryGet('vt-outstanding'),pantryGet('vt-bills'),pantryGet('vt-bg'),
+      pantryGet('vt-deposits'),pantryGet('vt-invoices')
+    ]);
+    if(os?.records)state.outstanding=os.records;
+    if(bills?.records)state.bills=bills.records;
+    if(bg?.records)state.bg=bg.records;
+    if(deps?.records)state.deposits=deps.records;
+    if(invs?.records)state.invoices=invs.records;
+    setSyncStatus('success');
+    state.lastSync=new Date().toLocaleTimeString();
+    if(state.activeTab==='dashboard')renderDashboard();
+  }catch{setSyncStatus('error');}
+  setTimeout(()=>setSyncStatus('idle'),3000);
+}
+function setSyncStatus(s){
+  state.syncStatus=s;
+  const dot=document.getElementById('syncDot');
+  const lbl=document.getElementById('syncLabel');
+  const btn=document.getElementById('hdrSyncBtn');
+  if(!dot||!lbl)return;
+  const map={syncing:['#2563eb','⟳ Syncing...'],success:['#16a34a','✓ Synced'],error:['#dc2626','✗ Error'],idle:['#9ca3af','☁ Sync']};
+  const [color,text]=map[s]||map.idle;
+  dot.style.background=color;lbl.textContent=text;
+  btn.className=`pill ${s==='syncing'?'blue':s==='success'?'green':s==='error'?'red':'gray'}`;
+  const st=document.getElementById('syncStatusText');
+  if(st)st.textContent=s==='syncing'?'⟳ Syncing...':s==='success'?'✅ Synced':s==='error'?'❌ Error':'⏸ Idle';
+  const ls=document.getElementById('lastSyncText');
+  if(ls&&state.lastSync)ls.textContent=state.lastSync;
+  const sbls=document.getElementById('sbLastSync');
+  if(sbls&&state.lastSync)sbls.textContent='Last: '+state.lastSync;
+}
+function scheduleSave(){
+  if(!state.pantryId)return;
+  if(state.saveDebounce)clearTimeout(state.saveDebounce);
+  state.saveDebounce=setTimeout(syncNow,2000);
+}
+function updateSyncUI(){
+  const has=!!state.pantryId;
+  document.getElementById('hdrSyncBtn').style.display=has?'':'none';
+  document.getElementById('hdrSetupBtn').style.display=has?'none':'';
+  const sba=document.getElementById('sbPantryAlert');
+  sba.style.display=has?'':'none';
+  setSyncStatus('idle');
+}
+function savePantryId(){
+  const id=document.getElementById('pantryInput').value.trim();
+  state.pantryId=id;
+  localStorage.setItem('vt_pantry_id',id);
+  document.getElementById('pantryDisconnectBtn').style.display=id?'':'none';
+  document.getElementById('syncStatusBlock').style.display=id?'':'none';
+  updateSyncUI();
+  if(id){
+    clearInterval(state.syncTimer);
+    state.syncTimer=setInterval(pullNow,30000);
+  }
+}
+function disconnectPantry(){
+  state.pantryId='';localStorage.removeItem('vt_pantry_id');
+  document.getElementById('pantryInput').value='';
+  document.getElementById('pantryDisconnectBtn').style.display='none';
+  document.getElementById('syncStatusBlock').style.display='none';
+  clearInterval(state.syncTimer);updateSyncUI();
+}
+async function testPantry(){
+  const id=document.getElementById('pantryInput').value.trim();
+  if(!id)return;
+  const el=document.getElementById('pantryTestResult');
+  el.textContent='Testing...';el.style.color='#6b7280';
+  try{const res=await fetch(`${PANTRY_BASE}/${id}`,{method:'GET'});
+    el.textContent=res.ok?'✅ Connection successful!':'❌ Connection failed. Check ID.';
+    el.style.color=res.ok?'#16a34a':'#dc2626';}
+  catch{el.textContent='❌ Connection failed.';el.style.color='#dc2626';}
+}
+function skipLoading(){
+  document.getElementById('loadingView').classList.remove('active');
+  switchTab('dashboard');
+}
+
+// ========================== FETCH DATA ==========================
+function fetchWithTimeout(url,ms=8000){
+  const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout')),ms));
+  return Promise.race([fetch(url),timeout]);
+}
+
+async function fetchAllData(){
+  document.getElementById('loadingView').classList.add('active');
+  state.outstanding=[...demoOutstanding];
+  state.bg=[...demoBG];
+  state.deposits=[...demoDeposits];
+  state.invoices=[...demoInvoices];
+  const timeout=setTimeout(()=>{
+    document.getElementById('loadingView').classList.remove('active');
+    switchTab('dashboard');
+  },15000);
+  try{
+    // Outstanding
+    try{
+      const r=await fetchWithTimeout('https://docs.google.com/spreadsheets/d/e/2PACX-1vTIdqeYJVJRbkK0rk1OPzE2nWRdyfseDrLs0UXoSZf9i3Jq_CJBdNR1eMRJGLl49eRa2FXJWbbHsoiH/pub?output=csv',10000);
+      const txt=await r.text();const rows=parseCSV(txt);
+      const parsed=[];
+      for(let i=4;i<rows.length;i++){const row=rows[i];if(!row[0]||row[0].toLowerCase().includes('total'))continue;
+        parsed.push({sno:parseInt(row[0])||0,siteName:(row[1]||'').trim(),sheetLink:(row[2]||'').trim(),pm:(row[3]||'').trim(),pendingBill:parseNum(row[4]),sdDeduction:parseNum(row[5]),ldDeduction:parseNum(row[6]),gstHold:parseNum(row[7]),instantRelease:parseNum(row[8]),otherDeduction:parseNum(row[9]),withheldComm:parseNum(row[10]),totalOutstanding:parseNum(row[11]),remark:row[12]||''});}
+      if(parsed.length)state.outstanding=parsed;
+    }catch(e){console.warn('Outstanding fetch:',e);}
+    // BG
+    try{
+      const r=await fetchWithTimeout(`https://docs.google.com/spreadsheets/d/${SHEET2_ID}/export?format=csv&gid=1072360634`,8000);
+      const txt=await r.text();const rows=parseCSV(txt);
+      const parsed=[];
+      for(let i=2;i<rows.length;i++){const row=rows[i];if(!row[0]||!row[0].trim())continue;
+        parsed.push({sno:parseInt(row[0])||0,authority:row[1]||'',tenderNo:row[2]||'',workName:row[3]||'',bgNo:row[4]||'',bgPercentage:row[5]||'',completionDate:row[6]||'',dlpPeriod:row[7]||'',releaseDate:row[8]||'',issueDate:row[9]||'',expiryDate:row[10]||'',claimPeriod:row[11]||'',amount:row[12]||'',remark:row[13]||''});}
+      if(parsed.length)state.bg=parsed;
+    }catch(e){console.warn('BG fetch:',e);}
+    // Deposits
+    try{
+      const r=await fetchWithTimeout(`https://docs.google.com/spreadsheets/d/${SHEET2_ID}/export?format=csv&gid=1718566370`,8000);
+      const txt=await r.text();const rows=parseCSV(txt);
+      const parsed=[];
+      for(let i=3;i<rows.length;i++){const row=rows[i];if(!row[0]||!row[0].trim())continue;
+        parsed.push({sno:parseInt(row[0])||0,authority:row[1]||'',tenderNo:row[2]||'',nature:row[3]||'',workName:row[4]||'',amount:row[5]||'',instrumentNo:row[6]||'',bank:row[7]||'',dated:row[8]||'',period:row[9]||'',remark:row[10]||'',dueOn:row[11]||''});}
+      if(parsed.length)state.deposits=parsed;
+    }catch(e){console.warn('Deposits fetch:',e);}
+    // Invoices
+    try{
+      const r=await fetchWithTimeout(`https://docs.google.com/spreadsheets/d/${SHEET1_ID}/export?format=csv&gid=22890483`,8000);
+      const txt=await r.text();const rows=parseCSV(txt);
+      const parsed=[];
+      for(let i=1;i<rows.length;i++){const row=rows[i];if(!row[0]||row[0].toLowerCase().includes('total'))continue;
+        parsed.push({invDate:row[0]||'',invNo:row[1]||'',partyName:row[2]||'',taxableValue:parseNum(row[3]),igst:parseNum(row[4]),cgst:parseNum(row[5]),sgst:parseNum(row[6]),totalValue:parseNum(row[7]),nrCoding:row[8]||'',month:row[9]||''});}
+      if(parsed.length)state.invoices=parsed;
+    }catch(e){console.warn('Invoices fetch:',e);}
+    // Bill details in batches
+    const billMap={};
+    for(let i=0;i<SHEET1_GIDS.length;i+=5){
+      const batch=SHEET1_GIDS.slice(i,i+5);
+      await Promise.allSettled(batch.map(async sheet=>{
+        try{
+          const r=await fetchWithTimeout(`https://docs.google.com/spreadsheets/d/${SHEET1_ID}/export?format=csv&gid=${sheet.gid}`,5000);
+          const txt=await r.text();const rows=parseCSV(txt);
+          const bills=[];let foundHdr=false;
+          for(let j=0;j<rows.length;j++){const row=rows[j];
+            if(!foundHdr){if(row.some(c=>c.toLowerCase().includes('s.no')||c.toLowerCase().includes('invoice no'))){foundHdr=true;}continue;}
+            if(!row[0]||row[0].trim()===''||row[0].toLowerCase().includes('total'))continue;
+            bills.push({sno:parseInt(row[0])||0,partyName:row[1]||'',invoiceNo:row[2]||'',invDate:row[3]||'',taxableValue:parseNum(row[4]),gst:parseNum(row[5]),totalInvoice:parseNum(row[6]),paymentDate:row[8]||'',paymentReceived:parseNum(row[9]),gstTds:parseNum(row[10]),incomeTaxTds:parseNum(row[11]),labourCess:parseNum(row[12]),withheld10:parseNum(row[13]),autoDdRecovery:parseNum(row[14]),ld:parseNum(row[15]),shortPayment:parseNum(row[16]),paymentLink:row[17]||''});}
+          if(bills.length)billMap[sheet.gid]=bills;
+        }catch{}
+      }));
+    }
+    state.bills=billMap;
+  }catch(e){console.error('Fetch error:',e);}
+  finally{
+    clearTimeout(timeout);
+    document.getElementById('loadingView').classList.remove('active');
+    switchTab('dashboard');
+    // If pantry connected, pull latest
+    if(state.pantryId) pullNow();
+    // Start auto-poll
+    if(state.pantryId){
+      state.syncTimer=setInterval(pullNow,30000);
+    }
+  }
+}
+
+// ========================== INIT ==========================
+window.addEventListener('load',()=>{
+  updateSyncUI();
+  fetchAllData();
+});
+</script>
+</body>
+</html>
